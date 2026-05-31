@@ -22,6 +22,7 @@ npx skills@latest add prathamdby/skills
    - `/peer-review`, review a plan for gaps before building
    - `/fix-linear-ticket`, fetch ticket, branch, plan, fix, review
    - `/make-pr`, open PRs with thematic summaries
+   - `/box`, clone and search any git repo locally
 
 ## Why These Skills Exist
 
@@ -57,6 +58,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/peer-review`](./skills/peer-review/SKILL.md) analyzes any implementation plan against requirements, flags the single critical risk, lists other gaps, proposes a fix for the critical risk only, and gives a verdict: ship it, fix critical first, or needs rework.
 
+### #6: Agents Can't Search External Repos
+
+**The Problem.** You drop a GitHub link and the agent either ignores it, guesses the contents, or dumps the raw README without understanding the code. No persistence, no local search, no context next time you mention the repo.
+
+**The Fix.** [`/box`](./skills/box/SKILL.md) clones the repo locally (shallow, `--depth 1`), tracks it in a manifest, and searches the actual source when you ask. Pass `--persist` to write a reference into your project's `AGENTS.md` so future agents know the repo exists and can search it anytime you mention it by name.
+
 ## Reference
 
 | Skill                                                      | Description                                                                                                        |
@@ -66,6 +73,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 | [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.     |
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with thematic summaries. Supports `--target <branch>` and `--ticket <id>`.                                |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                     |
+| [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, and `--list`.                                |
 
 ## License
 
