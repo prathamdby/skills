@@ -81,3 +81,15 @@ Every sentence needs a subject doing something.
 | consecutive sentences equal length | break one            |
 | every paragraph ends punchily      | vary endings         |
 | staccato short sentences           | let one breathe      |
+
+## Em Dashes
+
+AI text overuses em dashes to join clauses without committing to sentence boundaries.
+
+| Pattern                                      | Fix                                                         |
+| -------------------------------------------- | ----------------------------------------------------------- |
+| clause — standalone follow-up                | period: `clause. Follow-up.`                                |
+| clause — same-sentence aside or continuation | comma: `clause, aside or continuation.`                     |
+| multiple em dashes in one paragraph          | work through each; mix periods and commas as grammar allows |
+
+**Instead:** No em dashes in the final draft. If the second half can stand alone, start a new sentence. If it cannot, keep one sentence with a comma.

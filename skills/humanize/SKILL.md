@@ -36,6 +36,8 @@ The goal of this skill is not to "beat detection." It is to write prose that lac
 
 8. **Put the reader in the room.** No narrator-from-a-distance ("People tend to," "Nobody designed this"). Use "you" or name a specific person. Concreteness over abstraction.
 
+9. **Replace em dashes.** AI text stacks em dashes to glue clauses with false emphasis. Work through every "—" and pick one replacement: a period if what follows can stand as its own sentence, a comma if it must stay in the same sentence. Do not leave em dashes in the final draft.
+
 ## Quick Checks
 
 Before delivering rewritten prose:
@@ -47,6 +49,7 @@ Before delivering rewritten prose:
 - Any adverb or hedge? Remove it.
 - Any vague declarative? Name the specific thing.
 - Any inanimate subject doing a human verb? Fix it.
+- Any em dash left? Replace with "." or ",".
 - Does it sound like a pull-quote? Rewrite it.
 - Would a language model assign this text high probability? If yes, surprise it.
 
@@ -68,7 +71,7 @@ Below 35/50: rewrite again. Report the score and the two weakest dimensions.
 
 1. **Receive text** — from user message, attached file, or clipboard.
 2. **Read the full text** — understand the subject and intent before editing.
-3. **Apply the 8 core rules** in order, rewriting the text.
+3. **Apply the 9 core rules** in order, rewriting the text.
 4. **Run quick checks** on the output.
 5. **Score the result** on the 5 dimensions.
 6. **If below 35/50** — rewrite and re-score.

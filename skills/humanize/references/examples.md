@@ -81,3 +81,17 @@
 > "The team improved engagement with the new feature. They think others can copy it."
 
 **Changes:** Named the actor ("the team"), killed passive voice, replaced "the data tells us" with a human observation.
+
+---
+
+## Example 7: Em Dash Stack
+
+**Before:**
+
+> "We shipped the fix — users stopped churning — and the board finally relaxed."
+
+**After:**
+
+> "We shipped the fix. Users stopped churning, and the board finally relaxed."
+
+**Changes:** First em dash became a period (new sentence). Second became a comma (same sentence, coordinated clause).
