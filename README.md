@@ -81,7 +81,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with thematic summaries. Supports `--target <branch>` and `--ticket <id>`.                                |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                     |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, and `--list`.                                |
-| [`humanize`](./skills/humanize/SKILL.md)                   | Rewrite text to remove AI tells and restore a human voice.                                                           |
+| [`humanize`](./skills/humanize/SKILL.md)                   | Rewrite text to remove AI tells and restore a human voice.                                                         |
 
 ## License
 

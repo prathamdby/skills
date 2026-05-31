@@ -39,6 +39,7 @@ The goal of this skill is not to "beat detection." It is to write prose that lac
 ## Quick Checks
 
 Before delivering rewritten prose:
+
 - Any passive voice? Name the actor.
 - Any discourse marker? Cut it.
 - Any binary contrast or negative listing? State the point directly.
@@ -53,13 +54,13 @@ Before delivering rewritten prose:
 
 Rate the rewritten text 1-10 on each dimension. Total /50.
 
-| Dimension | Question |
-|---|---|
-| Surprise | Does it contain an unexpected detail or turn a reader would not predict? |
-| Specificity | Does it name concrete things, or rely on vague summaries? |
-| Rhythm | Varied sentence length and flow, or metronomic? |
-| Agency | Active voice with named actors, or passive/abstractions? |
-| Voice | Is there a clear human point of view, or is it generic? |
+| Dimension   | Question                                                                 |
+| ----------- | ------------------------------------------------------------------------ |
+| Surprise    | Does it contain an unexpected detail or turn a reader would not predict? |
+| Specificity | Does it name concrete things, or rely on vague summaries?                |
+| Rhythm      | Varied sentence length and flow, or metronomic?                          |
+| Agency      | Active voice with named actors, or passive/abstractions?                 |
+| Voice       | Is there a clear human point of view, or is it generic?                  |
 
 Below 35/50: rewrite again. Report the score and the two weakest dimensions.
 

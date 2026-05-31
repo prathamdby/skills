@@ -21,11 +21,11 @@ Activate when:
 
 After activation, inspect the user's message for the following flags:
 
-| Flag | Effect |
-| --- | --- |
+| Flag        | Effect                                                                                                                |
+| ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | `--persist` | After cloning/searching, append or update a deterministic reference block in the **working directory's** `AGENTS.md`. |
-| `--update` | Force `git pull` on the repo even if it already exists locally. |
-| `--list` | Skip all other work. List previously cloned repos and exit. |
+| `--update`  | Force `git pull` on the repo even if it already exists locally.                                                       |
+| `--list`    | Skip all other work. List previously cloned repos and exit.                                                           |
 
 **Defaults:** If no flags are provided, clone if missing, update if needed, search, and answer. Do not write to `AGENTS.md` unless `--persist` is passed.
 
@@ -52,8 +52,9 @@ If the user invokes `/box` with no URL, no repo name, or passes `--list`:
 _local repo search & context_
 
 Previously cloned:
-- abc  (github.com/john-doe/abc)
-- xyz  (gitlab.com/acme/xyz)
+
+- abc (github.com/john-doe/abc)
+- xyz (gitlab.com/acme/xyz)
 
 Give me a repo URL or name to search, or pass --persist to save a reference.
 ```
