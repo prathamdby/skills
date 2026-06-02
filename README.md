@@ -23,7 +23,6 @@ npx skills@latest add prathamdby/skills
    - `/fix-linear-ticket`, fetch ticket, branch, plan, fix, review
    - `/make-pr`, open PRs with thematic summaries
    - `/box`, clone and search any git repo locally
-   - `/humanize`, remove AI tells from prose
 
 ## Why These Skills Exist
 
@@ -65,12 +64,6 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/box`](./skills/box/SKILL.md) clones the repo locally (shallow, `--depth 1`), tracks it in a manifest, and searches the actual source when you ask. Pass `--persist` to write a reference into your project's `AGENTS.md` so future agents know the repo exists and can search it anytime you mention it by name.
 
-### #7: Prose Sounds Robot-Generated
-
-**The Problem.** AI text has statistical fingerprints: metronomic rhythm, passive voice, discourse markers, binary contrasts, vague declaratives. It reads as flat and lifeless to humans, and these same patterns are what detection tools target.
-
-**The Fix.** [`/humanize`](./skills/humanize/SKILL.md) rewrites text to break probability patterns, name actors, vary rhythm, and replace vague summaries with specific details. Includes a 5-dimension scoring system and references from the detection research literature.
-
 ## Reference
 
 | Skill                                                      | Description                                                                                                        |
@@ -81,7 +74,6 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with thematic summaries. Supports `--target <branch>` and `--ticket <id>`.                                |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                     |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, and `--list`.                                |
-| [`humanize`](./skills/humanize/SKILL.md)                   | Rewrite text to remove AI tells and restore a human voice.                                                         |
 
 ## License
 
