@@ -55,52 +55,10 @@ If there are no changes to diff (empty output), stop and report:
 
 ## Step 3: Generate the commit message
 
-### `--conventional` path (default)
-
-Generate a conventional commit message following these rules strictly:
-
-- **Format:** `type: description`
-- **Allowed types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`
-- **No scope notation** (e.g., no `feat(scope):` — just `feat:`)
-- **First line:**
-  - Maximum 50 characters
-  - All lowercase except proper nouns and technical terms
-    (e.g., OAuth, React, PostgreSQL, API, CLI, HTML, CSS, JSON, URL, HTTP)
-  - No period at the end
-- **Mandatory blank line** after the first line
-- **Body (if needed):**
-  - Use only when the change requires explanation beyond the first line
-  - Bullet points starting with `-`
-  - No blank lines between bullets
-  - Capitalize the first word of each bullet
-  - No periods at the end of bullets
-  - Explain _what_ changed and _why_, not _how_
-
-Example:
-
-```
-feat: add user authentication flow
-
-- Implement OAuth 2.0 login with Google and GitHub
-- Add JWT token handling for session management
-- Update login UI to match new design system
-```
-
-### `--simple` path
-
-Generate a concise plain-English commit message:
-
-- Single line, no type prefix
-- Maximum 72 characters
-- Capitalize the **first word** of the first line; keep everything else lowercase except proper nouns and technical terms
-- No period at the end
-- Describe what changed in plain language
-
-Examples:
-
-- "Add dark mode toggle to settings page"
-- "Fix null pointer exception in user service"
-- "Update README with install instructions"
+- `--conventional` path: Generate a conventional commit message. See REFERENCE.md
+  for full formatting rules.
+- `--simple` path: Generate a concise plain-English message. See REFERENCE.md
+  for full formatting rules.
 
 ## Step 4: Commit
 
@@ -121,23 +79,4 @@ After committing, report to the user:
 3. The style used (`--conventional` or `--simple`)
 4. Confirmation that the commit succeeded
 
-Example report:
-
-```
-Commit complete.
-
-Scope: staged
-Style: conventional
-
-Message:
-```
-
-feat: add password reset endpoint
-
-- Implement token-based reset flow
-- Add email template for reset notifications
-- Update user model with reset token fields
-
-```
-
-```
+See REFERENCE.md for a full example report.
