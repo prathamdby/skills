@@ -24,6 +24,7 @@ npx skills@latest add prathamdby/skills
    - `/make-pr`, open PRs with thematic summaries
    - `/box`, clone and search any git repo locally
    - `/assign`, delegate tasks to external agents like OpenCode
+   - `/handoff`, save session context or resume from a handoff document
 
 ## Why These Skills Exist
 
@@ -71,6 +72,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/assign`](./skills/assign/SKILL.md) writes the prompt to a temp file and pipes it via stdin — avoiding all quoting failures. It auto-approves permissions with the right flags for each agent, monitors output for silent hangs, and cleans up after itself. Supports `--agent <name>` (default: `opencode`) and `--model <provider/model>`.
 
+### #8: Context Is Lost Between Sessions
+
+**The Problem.** You end a session mid-task. The next agent starts fresh, re-reads the codebase, re-derives decisions you already made, and repeats work you already finished.
+
+**The Fix.** [`/handoff`](./skills/handoff/SKILL.md) compacts the current conversation into a handoff document with open tasks, decisions, blockers, and suggested skills. Saved to `./handoffs/` inside the skill directory by default. Resume later with `/handoff --resume <path>`. Supports `--path <path>` to override the save location and a positional argument to describe what the next session should focus on.
+
 ## Reference
 
 | Skill                                                      | Description                                                                                                        |
@@ -82,6 +89,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                     |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, and `--list`.                                |
 | [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` and `--model <provider/model>`.     |
+| [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument. |
 
 ## License
 
