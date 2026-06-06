@@ -1,7 +1,8 @@
 ---
 name: commit
 description: >
-  Generate commit messages and commit changes to git. Use when the user types
+  Generate commit messages from the git diff only and commit changes to git.
+  Ignores session context such as reviews or discussion. Use when the user types
   /commit, asks to commit changes, save work to git, create a commit, or write
   a commit message. Supports flags --staged/--unstaged for diff scope and
   --conventional/--simple for message style.
@@ -32,6 +33,21 @@ was passed.
 `/commit --unstaged --simple` diffs unstaged changes and writes a simple
 message.
 
+## Diff-only constraint
+
+The git diff is the **only** input for the commit message. Ignore everything
+else in the session.
+
+- Do not use conversation history, review threads, ticket text, or the user's
+  stated rationale
+- Do not write messages like "address review feedback", "as requested",
+  "fix issues from discussion", or "implement the plan"
+- Do not reference work that is not visible in the diff
+- Infer type and description solely from added, removed, and modified lines
+
+If the user message explains why they changed something, treat that as
+irrelevant unless the same fact appears in the diff.
+
 ## Step 0: Read REFERENCE.md (mandatory)
 
 **Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
@@ -51,17 +67,22 @@ Run the selected command, capture the full output, and analyze the changes.
 
 ## Step 2: Analyze changes
 
-Read the diff output and identify:
+Read **only** the diff output. Do not use conversation context to interpret it.
+
+Identify from the diff alone:
 
 - What files were changed
 - The nature of the changes (added, modified, deleted, renamed)
-- The purpose of the changes (new feature, bug fix, refactoring, documentation,
+- What the diff actually does (new feature, bug fix, refactoring, documentation,
   test, chore, style, performance improvement)
 
 If there are no changes to diff (empty output), stop and report:
 "No changes found to commit."
 
 ## Step 3: Generate the commit message
+
+Base the message solely on Step 2. Describe what the diff does, not why the
+session wanted it.
 
 - `--conventional` path: Generate a conventional commit message. See REFERENCE.md
   for full formatting rules.

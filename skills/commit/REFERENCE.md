@@ -1,5 +1,25 @@
 # Commit Skill Reference
 
+## Diff-only message rule
+
+The commit message describes **what changed in the diff**, not the surrounding
+session.
+
+**Do not write:**
+
+- "Address review feedback"
+- "Fix issues raised in discussion"
+- "Implement the agreed plan"
+- "Update per user request"
+
+**Write the concrete change instead.**
+
+| Diff shows | Bad | Good |
+| --- | --- | --- |
+| Null check added in `userService.ts` | fix: address review feedback | fix: guard null user in getProfile |
+| README install steps rewritten | docs: update per discussion | docs: add pnpm install steps |
+| Extract helper from handler | refactor: implement agreed plan | refactor: extract parsePayload helper |
+
 ## `--conventional` formatting rules
 
 - **Format:** `type: description`
