@@ -17,6 +17,7 @@ npx skills@latest add prathamdby/skills
 2. Pick the skills you want, and which coding agents you want to install them on.
 
 3. Invoke them in your agent:
+   - `/prath-mode`, route tasks to the right skill
    - `/commit`, commit with conventional or simple messages
    - `/deslop`, strip AI bloat and simplify
    - `/peer-review`, review a plan for gaps before building
@@ -78,18 +79,25 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/handoff`](./skills/handoff/SKILL.md) compacts the current conversation into a handoff document with open tasks, decisions, blockers, and suggested skills. Saved to `./handoffs/` inside the skill directory by default. Resume later with `/handoff --resume <path>`. Supports `--path <path>` to override the save location and a positional argument to describe what the next session should focus on.
 
+### #9: Agents Pick the Wrong Workflow
+
+**The Problem.** You have eight composable skills but the agent improvises commits, skips deslop, opens PRs with the wrong format, or uses the wrong skill for the task.
+
+**The Fix.** [`/prath-mode`](./skills/prath-mode/SKILL.md) routes each action to the owning leaf skill and documents workflow chains (ticket fix, planned work, quick save, and more). Read the matched skill in full. Do not restate its steps.
+
 ## Reference
 
-| Skill                                                      | Description                                                                                                           |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`.    |
-| [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                              |
-| [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.        |
+| Skill                                                      | Description                                                                                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| [`prath-mode`](./skills/prath-mode/SKILL.md)               | Route tasks to the right skill and run workflow chains. Invoke before or alongside other skills.                                |
+| [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`.              |
+| [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                        |
+| [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.                  |
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`. |
-| [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                        |
-| [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, and `--list`.                                   |
-| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` and `--model <provider/model>`.        |
-| [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument. |
+| [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                  |
+| [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, and `--list`.                                             |
+| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` and `--model <provider/model>`.                  |
+| [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.           |
 
 ## License
 

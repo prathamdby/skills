@@ -14,11 +14,11 @@ session.
 
 **Write the concrete change instead.**
 
-| Diff shows | Bad | Good |
-| --- | --- | --- |
-| Null check added in `userService.ts` | fix: address review feedback | fix: guard null user in getProfile |
-| README install steps rewritten | docs: update per discussion | docs: add pnpm install steps |
-| Extract helper from handler | refactor: implement agreed plan | refactor: extract parsePayload helper |
+| Diff shows                           | Bad                             | Good                                  |
+| ------------------------------------ | ------------------------------- | ------------------------------------- |
+| Null check added in `userService.ts` | fix: address review feedback    | fix: guard null user in getProfile    |
+| README install steps rewritten       | docs: update per discussion     | docs: add pnpm install steps          |
+| Extract helper from handler          | refactor: implement agreed plan | refactor: extract parsePayload helper |
 
 ## `--conventional` formatting rules
 

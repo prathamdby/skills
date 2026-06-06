@@ -19,10 +19,10 @@ or merge a branch.
 
 After activation, inspect the user's message for the following flags:
 
-| Flag / Arg             | Effect                                                                                   |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| `--target <branch>`    | Target branch for the PR. **Default: `main`** if not provided.                           |
-| `--ticket <ticket-id>` | Linear ticket ID to prefix the PR title with (e.g., `--ticket ABC-123`). Off by default. |
+| Flag / Arg             | Effect                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| `--target <branch>`    | Target branch for the PR. **Default: `main`** if not provided.                              |
+| `--ticket <ticket-id>` | Linear ticket ID to prefix the PR title with (e.g., `--ticket ABC-123`). Off by default.    |
 | `--conventional`       | Use conventional commit format for the title summary (`type: description`). Off by default. |
 
 **Defaults:** Plain-English title. No `feat:`, `fix:`, or other conventional
