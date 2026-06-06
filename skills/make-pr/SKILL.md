@@ -1,10 +1,11 @@
 ---
 name: make-pr
 description: >
-  Create a pull request. Use when the user asks to open a PR, create a pull
-  request, submit a PR, or merge a branch. Supports --target <branch>
-  (default: main) and --ticket <id> (prefixes title with ticket number, off by
-  default).
+  Create a pull request with plain-English titles by default. Use when the user
+  asks to open a PR, create a pull request, submit a PR, or merge a branch.
+  Supports --target <branch> (default: main), --ticket <id> (prefixes title with
+  ticket number, off by default), and --conventional (conventional commit title
+  format, off by default).
 ---
 
 # Make Pull Request
@@ -22,6 +23,10 @@ After activation, inspect the user's message for the following flags:
 | ---------------------- | ---------------------------------------------------------------------------------------- |
 | `--target <branch>`    | Target branch for the PR. **Default: `main`** if not provided.                           |
 | `--ticket <ticket-id>` | Linear ticket ID to prefix the PR title with (e.g., `--ticket ABC-123`). Off by default. |
+| `--conventional`       | Use conventional commit format for the title summary (`type: description`). Off by default. |
+
+**Defaults:** Plain-English title. No `feat:`, `fix:`, or other conventional
+prefix unless `--conventional` is passed.
 
 If `--ticket` is passed but no ticket ID is provided, stop and ask:
 "`--ticket` requires a ticket ID (e.g., `--ticket ABC-123`)."
@@ -43,15 +48,33 @@ name or commit messages. Use the explicit `--ticket` value directly.
 
 ## Step 2: Generate PR title
 
-- If `--ticket <id>` was passed: `[<TICKET-ID>] <concise summary>`
-  - Ticket ID uppercase as provided
-  - Concise summary of changes, max ~60 characters for the summary portion
-- If no `--ticket`: plain concise summary
+Base the title on the branch diff from Step 1, not commit messages or session
+context.
 
-Examples:
+**Default (no `--conventional`):** plain English. No conventional commit
+prefix.
+
+- Capitalize the first word; keep the rest lowercase except proper nouns and
+  technical terms
+- Describe what the branch changes
+- Do not write titles like `feat: add auth`, `fix: null check`, or `docs: update readme`
+
+**With `--conventional`:** conventional commit format for the summary portion.
+Follow formatting rules in `skills/commit/REFERENCE.md`.
+
+**Ticket prefix:** when `--ticket <id>` is passed, prepend `[<TICKET-ID>]` before
+the summary. Ticket ID uppercase as provided. Max ~60 characters for the summary
+portion when a ticket prefix is present.
+
+Examples (default):
 
 - `--ticket ABC-123`: `[ABC-123] Add user authentication flow`
 - No ticket: `Add user authentication flow`
+
+Examples (`--conventional`):
+
+- `--ticket ABC-123`: `[ABC-123] feat: add user authentication flow`
+- No ticket: `feat: add user authentication flow`
 
 ## Step 3: Generate PR body
 

@@ -46,7 +46,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Problem.** Agents open PRs with titles like "Changes" and bodies that list every commit. Or they target the wrong branch. Or they forget to link the ticket.
 
-**The Fix.** [`/make-pr`](./skills/make-pr/SKILL.md) generates thematic summaries grouped by related changes, not commit-by-commit. Supports `--target <branch>` (default: `main`) and `--ticket <id>` for Linear-linked titles like `[ABC-123] Add auth flow`.
+**The Fix.** [`/make-pr`](./skills/make-pr/SKILL.md) generates thematic summaries grouped by related changes, not commit-by-commit. Plain-English PR titles by default. Supports `--target <branch>` (default: `main`), `--ticket <id>` for Linear-linked titles like `[ABC-123] Add auth flow`, and `--conventional` when you want commit-style titles.
 
 ### #4: Ticket-to-Code Is Scattershot
 
@@ -85,7 +85,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 | [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`.    |
 | [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                              |
 | [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.        |
-| [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with thematic summaries. Supports `--target <branch>` and `--ticket <id>`.                                   |
+| [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`. |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                        |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, and `--list`.                                   |
 | [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` and `--model <provider/model>`.        |
