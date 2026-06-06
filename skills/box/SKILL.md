@@ -19,6 +19,14 @@ Activate when:
 2. The user mentions a repo name that exists in the local manifest.
 3. The user explicitly asks to clone, search, or explore a git repo.
 
+## Step 0: Read REFERENCE.md (mandatory)
+
+**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
+
+1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
+2. Treat every role, barrier, template, and constraint in that file as binding for this session.
+3. If you have not read it yet, stop and read it now. Skipping this step causes missed subagent contracts and wrong output.
+
 ## Execution model
 
 This skill is a coordinator + subagent pipeline. The main thread never
@@ -85,3 +93,4 @@ Summarize in 2-4 sentences: repo, local path, prepare status, persist status, an
 - **Search subagents are read-only.** They MUST NOT write to the sandbox, manifest, clone, or `AGENTS.md`.
 - **Stage barriers hold.** Prepare returns before search. All search returns before persist.
 - **Every subagent brief** includes anchor, slug, and url explicitly.
+- **Never skip Step 0.** REFERENCE.md holds subagent roles, stage barriers, and briefing contracts this skill depends on.

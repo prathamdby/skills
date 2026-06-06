@@ -19,11 +19,11 @@ to a new agent, or resume from a previously saved handoff document.
 
 After activation, inspect the user's message for the following flags:
 
-| Flag / Arg | Effect |
-| --- | --- |
-| `--resume <path>` | Load an existing handoff doc and restore its context. No new doc is written. |
-| `--path <path>` | Save the new handoff doc to `<path>` instead of the default handoffs dir. |
-| Positional arg | Description of what the next session will focus on. Tailors the new doc or narrows a resumed session. |
+| Flag / Arg        | Effect                                                                                                |
+| ----------------- | ----------------------------------------------------------------------------------------------------- |
+| `--resume <path>` | Load an existing handoff doc and restore its context. No new doc is written.                          |
+| `--path <path>`   | Save the new handoff doc to `<path>` instead of the default handoffs dir.                             |
+| Positional arg    | Description of what the next session will focus on. Tailors the new doc or narrows a resumed session. |
 
 **Defaults:** If no flags are provided, create a new handoff document in the
 default handoffs directory.
@@ -45,6 +45,14 @@ containing `SKILL.md` as the anchor (same pattern as `box`'s `./sandbox/`):
 - File naming: `./handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`
 
 `--path <path>` overrides this entirely.
+
+## Step 0: Read REFERENCE.md (mandatory)
+
+**Do not proceed to Workflow A, Workflow B, or any later step until you have read `REFERENCE.md` in full.**
+
+1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
+2. Treat every document format rule and example in that file as binding for this session.
+3. If you have not read it yet, stop and read it now. Skipping this step causes malformed handoff documents.
 
 ## Workflow A: Create handoff (default)
 
@@ -136,5 +144,4 @@ re-deriving content already captured elsewhere.
   URL instead.
 - Redact any sensitive information before saving.
 - When resuming, do not write a new handoff unless the user explicitly asks.
-
-See REFERENCE.md for the handoff document format and examples.
+- Never skip Step 0. REFERENCE.md holds the handoff document format and examples this skill depends on.

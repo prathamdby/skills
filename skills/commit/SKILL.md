@@ -32,6 +32,14 @@ was passed.
 `/commit --unstaged --simple` diffs unstaged changes and writes a simple
 message.
 
+## Step 0: Read REFERENCE.md (mandatory)
+
+**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
+
+1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
+2. Treat every formatting rule and example in that file as binding for this session.
+3. If you have not read it yet, stop and read it now. Skipping this step causes malformed commit messages.
+
 ## Step 1: Diff the changes
 
 Choose the diff command based on the detected flags:

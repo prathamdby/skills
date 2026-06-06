@@ -6,8 +6,8 @@ Each row is a supported agent. The invocation command is the full shell
 command piped from stdin. The coordinator writes the prompt to
 `./assign-prompt.tmp` and runs `cat ./assign-prompt.tmp | <command>`.
 
-| Agent | Invocation command | Default model |
-| --- | --- | --- |
+| Agent      | Invocation command                                                            | Default model           |
+| ---------- | ----------------------------------------------------------------------------- | ----------------------- |
 | `opencode` | `opencode run --model '<model>' --dir '<dir>' --dangerously-skip-permissions` | `opencode-go/kimi-k2.6` |
 
 ### Notes per agent
@@ -51,6 +51,7 @@ permissions without prompting.
 or special characters terminate or corrupt the argument.
 
 **Fix:** Always write the prompt to `./assign-prompt.tmp` and pipe it:
+
 ```bash
 cat ./assign-prompt.tmp | opencode run --model '<model>' --dangerously-skip-permissions
 ```
@@ -58,6 +59,7 @@ cat ./assign-prompt.tmp | opencode run --model '<model>' --dangerously-skip-perm
 ### Agent exits with non-zero code
 
 Check the agent's output for the last error message. Common causes:
+
 - Model not found: run `opencode models` and verify the model slug.
 - No API key: ensure the provider credentials are configured.
 - Working directory not found: verify `--dir` points to an existing path.

@@ -43,9 +43,9 @@ or URL — do not paste diffs or full plan text.>
 
 ## Artifacts
 
-| Artifact | Path or URL |
-| --- | --- |
-| <type> | <path or URL> |
+| Artifact | Path or URL   |
+| -------- | ------------- |
+| <type>   | <path or URL> |
 ```
 
 ## Section rules
@@ -89,12 +89,12 @@ List every external artifact the next agent will need. Common types:
 
 Replace sensitive values before saving:
 
-| Type | Replacement |
-| --- | --- |
-| API keys / tokens | `[REDACTED: api-key]` |
-| Passwords | `[REDACTED: password]` |
-| Email addresses | `[REDACTED: email]` |
-| Internal URLs with auth | `[REDACTED: url]` |
+| Type                    | Replacement            |
+| ----------------------- | ---------------------- |
+| API keys / tokens       | `[REDACTED: api-key]`  |
+| Passwords               | `[REDACTED: password]` |
+| Email addresses         | `[REDACTED: email]`    |
+| Internal URLs with auth | `[REDACTED: url]`      |
 
 ## Example (abbreviated)
 
@@ -136,11 +136,11 @@ validation to protected routes.
 
 ## Artifacts
 
-| Artifact | Path or URL |
-| --- | --- |
-| Plan | `.cursor/plans/auth-middleware.plan.md` |
-| Branch | `pd/feat/auth-middleware` |
-| Middleware | `src/middleware/auth.ts` |
+| Artifact   | Path or URL                             |
+| ---------- | --------------------------------------- |
+| Plan       | `.cursor/plans/auth-middleware.plan.md` |
+| Branch     | `pd/feat/auth-middleware`               |
+| Middleware | `src/middleware/auth.ts`                |
 ```
 
 ## Resume behavior

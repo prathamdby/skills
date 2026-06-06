@@ -17,14 +17,22 @@ description: >
 
 ## Flag detection
 
-| Flag | Effect |
-| --- | --- |
-| `--agent <name>` | Agent to delegate to. **Default: `opencode`**. |
+| Flag                       | Effect                                                                     |
+| -------------------------- | -------------------------------------------------------------------------- |
+| `--agent <name>`           | Agent to delegate to. **Default: `opencode`**.                             |
 | `--model <provider/model>` | Model to use. Agent-specific default applies if omitted. See REFERENCE.md. |
-| `--dir <path>` | Working directory for the agent. Default: current directory. |
+| `--dir <path>`             | Working directory for the agent. Default: current directory.               |
 
 If `--agent` names an unsupported agent, stop and report:
 "Unknown agent `<name>`. Supported agents: opencode. See REFERENCE.md."
+
+## Step 0: Read REFERENCE.md (mandatory)
+
+**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
+
+1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
+2. Treat every agent invocation template, model default, and troubleshooting note in that file as binding for this session.
+3. If you have not read it yet, stop and read it now. Skipping this step causes broken invocations and silent hangs.
 
 ## Step 1: Write the prompt file
 
@@ -64,3 +72,4 @@ After the agent exits:
 
 - Never infer or expand the task. Delegate exactly the prompt provided.
 - Never commit, push, or build unless the prompt explicitly asked for it.
+- Never skip Step 0. REFERENCE.md holds agent invocation templates and troubleshooting this skill depends on.

@@ -30,7 +30,31 @@ Do not commit the skill without the README update.
 - Skills live in `skills/<name>/SKILL.md` (project-level)
 - Never use `.agents/skills/` for this repo
 - Each skill is a directory containing `SKILL.md` at minimum
-- Optional: `scripts/`, `references/`, `assets/`
+- Optional: `REFERENCE.md`, `scripts/`, `references/`, `assets/`
+
+## REFERENCE.md gate
+
+If a skill ships a `REFERENCE.md`, **always add Step 0 to `SKILL.md`** before any
+workflow step. Place it after flag detection (or the intro section) and before
+Step 1 or Workflow A. Do not rely on inline "See REFERENCE.md" links alone.
+
+Use this template. Customize bullet 2 and 3 for the skill's reference content:
+
+```markdown
+## Step 0: Read REFERENCE.md (mandatory)
+
+**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
+
+1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
+2. Treat every [rule / format / constraint type] in that file as binding for this session.
+3. If you have not read it yet, stop and read it now. Skipping this step causes [specific failure mode].
+```
+
+If the skill has a Constraints section, add: **Never skip Step 0.** REFERENCE.md
+holds [what the reference contains] this skill depends on.
+
+When adding Step 0 to an existing skill that already has `REFERENCE.md`, apply
+the same gate.
 
 ## Frontmatter
 
@@ -57,7 +81,8 @@ them as flags in the user's invocation message:
 ## Content Principles
 
 - Keep `SKILL.md` under 500 lines / 5000 tokens
-- Use progressive disclosure: essentials in `SKILL.md`, detail in `references/`
+- Use progressive disclosure: essentials in `SKILL.md`, detail in `REFERENCE.md`
+  or `references/`; enforce the read with Step 0 when using `REFERENCE.md`
 - Prefer procedures over declarations: teach _how to approach_, not _what to
   produce_
 - Match specificity to fragility: guidelines for flexible tasks, exact steps for

@@ -24,6 +24,14 @@ implement a Linear ticket, or resolve a Linear bug.
 
 If the ticket ID is not found, stop and ask: "Which Linear ticket should I fix? Please provide the ticket ID."
 
+## Step 0: Read REFERENCE.md (mandatory)
+
+**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
+
+1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
+2. Treat every branch-naming rule, search strategy, and review check in that file as binding for this session.
+3. If you have not read it yet, stop and read it now. Skipping this step causes wrong branch names and incomplete plans.
+
 ## Step 1: Fetch ticket details
 
 Use available Linear MCP tools to fetch the full ticket record. Request: title, description, comments, attachments, linked issues, labels / state / priority.
@@ -89,3 +97,4 @@ Report: what was implemented, how it addresses the ticket, any regressions or ed
 - **Never push.** Do not run `git push` at any point.
 - **Never infer ticket content.** Always fetch from Linear.
 - **If the ticket or branch name cannot be found, stop and ask.**
+- **Never skip Step 0.** REFERENCE.md holds branch examples, search strategy, and review checks this skill depends on.

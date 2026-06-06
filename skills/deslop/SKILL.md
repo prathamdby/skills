@@ -18,17 +18,25 @@ unstaged changes for bloat, or make changes clearer without changing behavior.
 
 ## Flag detection
 
-| Flag              | Effect                                                                                          |
-| ----------------- | ----------------------------------------------------------------------------------------------- |
+| Flag              | Effect                                                                              |
+| ----------------- | ----------------------------------------------------------------------------------- |
 | `--staged`        | Diff staged changes (`git diff --cached`). **Default** if no diff flag is provided. |
-| `--unstaged`      | Diff unstaged changes (`git diff`).                                                             |
-| `--base <branch>` | Diff changes since merge base with `<branch>`: `git diff <branch>...HEAD`.    |
+| `--unstaged`      | Diff unstaged changes (`git diff`).                                                 |
+| `--base <branch>` | Diff changes since merge base with `<branch>`: `git diff <branch>...HEAD`.          |
 
 **Defaults:** If no diff flag is provided, behave as if `--staged` was passed.
 
 **Mutual exclusivity:** `--staged`, `--unstaged`, and `--base` are mutually exclusive. Use the first one detected.
 
 **Base argument:** `--base` requires a branch name (e.g., `--base main`). If missing, stop and report: `--base requires a branch name (e.g., --base main)`.
+
+## Step 0: Read REFERENCE.md (mandatory)
+
+**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
+
+1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
+2. Treat every slop category, guardrail, and constraint in that file as binding for this session.
+3. If you have not read it yet, stop and read it now. Skipping this step causes missed slop categories and wrong edits.
 
 ## Step 1: Diff the changes
 
