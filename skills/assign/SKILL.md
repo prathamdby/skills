@@ -24,7 +24,7 @@ description: >
 | `--dir <path>`             | Working directory for the agent. Default: current directory.               |
 
 If `--agent` names an unsupported agent, stop and report:
-"Unknown agent `<name>`. Supported agents: opencode. See REFERENCE.md."
+"Unknown agent `<name>`. Supported agents: opencode, codex. See REFERENCE.md."
 
 ## Step 0: Read REFERENCE.md (mandatory)
 

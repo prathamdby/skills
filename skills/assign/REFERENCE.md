@@ -6,9 +6,10 @@ Each row is a supported agent. The invocation command is the full shell
 command piped from stdin. The coordinator writes the prompt to
 `./assign-prompt.tmp` and runs `cat ./assign-prompt.tmp | <command>`.
 
-| Agent      | Invocation command                                                            | Default model           |
-| ---------- | ----------------------------------------------------------------------------- | ----------------------- |
-| `opencode` | `opencode run --model '<model>' --dir '<dir>' --dangerously-skip-permissions` | `opencode-go/kimi-k2.6` |
+| Agent      | Invocation command                                                                               | Default model                  |
+| ---------- | ------------------------------------------------------------------------------------------------ | ------------------------------ |
+| `opencode` | `opencode run --model '<model>' --dir '<dir>' --dangerously-skip-permissions`                    | `opencode-go/kimi-k2.6`        |
+| `codex`    | `codex exec --sandbox workspace-write -c approval_policy=never --cd '<dir>' --model '<model>' -` | Codex default (omit `--model`) |
 
 ### Notes per agent
 
@@ -23,6 +24,23 @@ command piped from stdin. The coordinator writes the prompt to
   not specified by the user; opencode defaults to the current directory.
 - Model format: `<provider>/<model>` (e.g., `opencode-go/kimi-k2.6`,
   `anthropic/claude-sonnet-4`). Run `opencode models` to list available models.
+
+**codex**
+
+- Prompt must be piped via stdin using the `-` sentinel. The explicit `-` forces
+  stdin as the full prompt and sidesteps the non-TTY stdin-detection hang.
+- `-c approval_policy=never` is required. Without it, Codex can block on approval
+  prompts that are invisible in non-interactive mode, causing a silent hang with
+  no output. (`codex exec` does not accept `--ask-for-approval`; use the config
+  override.)
+- `--sandbox workspace-write` grants edit access. Default `exec` sandbox is
+  read-only. Avoid `--dangerously-bypass-approvals-and-sandbox` / `--yolo`.
+- `-m/--model` is optional and takes a plain model name (not `provider/model`);
+  omit to use Codex's configured default.
+- `-C/--cd '<dir>'` sets the working directory. Omit it entirely if `--dir` was
+  not specified by the user; Codex defaults to the current directory.
+- Codex requires a Git repository by default. Pass `--skip-git-repo-check` to run
+  outside one. `--full-auto` is deprecated (prints a warning); do not use it.
 
 ## Adding a new agent
 
@@ -44,6 +62,10 @@ visible in non-interactive mode.
 **Fix for opencode:** Ensure `--dangerously-skip-permissions` is included in
 the invocation command. This flag auto-approves all file-write and tool-use
 permissions without prompting.
+
+**Fix for codex:** Ensure `-c approval_policy=never` is included in the
+invocation command. Use the `-` stdin sentinel (pipe the prompt) rather than
+passing it as an argument.
 
 ### Quoting failure — agent receives a truncated or garbled prompt
 
