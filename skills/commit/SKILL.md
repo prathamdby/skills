@@ -2,9 +2,10 @@
 name: commit
 description: >
   Generate commit messages from the git diff only and commit changes to git.
-  Ignores session context such as reviews or discussion. Use when the user types
-  /commit, asks to commit changes, save work to git, create a commit, or write
-  a commit message. Supports flags --staged/--unstaged for diff scope and
+  Ignores session context such as reviews or discussion. Always commits with -n
+  (--no-verify) to skip pre-commit hooks. Use when the user types /commit, asks
+  to commit changes, save work to git, create a commit, or write a commit
+  message. Supports flags --staged/--unstaged for diff scope and
   --conventional/--simple for message style.
 ---
 
@@ -14,6 +15,21 @@ description: >
 
 Activate when the user types `/commit`, asks to commit changes, save work to
 git, create a commit, or write a commit message.
+
+## Non-negotiables
+
+Every commit this skill runs **must** include `-n` (equivalent to
+`--no-verify`). This is not optional. Agents often drop it to "save time" or
+avoid hook failures. That is wrong for this skill.
+
+- **Always** pass `-n` on `git commit`
+- **Never** run `git commit` without `-n`
+- **Never** substitute `--no-verify` for `-n` unless the user's environment
+  documents otherwise; default to `-n`
+- **Never** skip hooks by any other means (amending outside this flow, staging
+  then committing elsewhere)
+- If the commit command fails, fix the underlying issue or report the failure.
+  Do not retry without `-n`
 
 ## Flag detection
 
@@ -25,6 +41,9 @@ After activation, inspect the user's message for the following flags:
 | `--unstaged`     | Diff unstaged changes (`git diff`).                                                                  |
 | `--conventional` | Generate a conventional commit message. **This is the default** if no style flag is provided.        |
 | `--simple`       | Generate a concise plain-English message without conventional commit formatting.                     |
+
+`-n` / `--no-verify` is **not** a user flag. It is always applied in Step 4.
+Do not wait for the user to request it.
 
 **Defaults:** If the user provides no flags, behave as if `--staged --conventional`
 was passed.
@@ -91,13 +110,25 @@ session wanted it.
 
 ## Step 4: Commit
 
-Run the commit command with the generated message:
+Run **exactly** this shape of command with the generated message:
 
 ```bash
 git commit -n -m "<generated message>"
 ```
 
-The `-n` flag skips pre-commit hooks. Do not modify this command.
+`-n` skips pre-commit and commit-msg hooks. It is mandatory.
+
+**Forbidden commands** (never run these when this skill is active):
+
+- `git commit -m "..."` (missing `-n`)
+- `git commit --no-verify -m "..."` only when you forgot `-n` on a prior attempt
+  and are correcting; prefer `-n` consistently
+- `git commit -am "..."` (missing `-n`)
+- Any wrapper that omits `-n`
+
+Before reporting success, confirm the shell command you ran contained `-n` or
+`--no-verify`. If it did not, the step failed even if git returned exit code 0
+via some other path. Re-run with `-n`.
 
 ## Step 5: Report
 
@@ -106,6 +137,7 @@ After committing, report to the user:
 1. The generated commit message (in a code block)
 2. The diff scope used (`--staged` or `--unstaged`)
 3. The style used (`--conventional` or `--simple`)
-4. Confirmation that the commit succeeded
+4. Confirmation that the commit succeeded **with `-n` / `--no-verify`**
+5. The exact `git commit` command run (so hook skip is auditable)
 
 See REFERENCE.md for a full example report.
