@@ -1,15 +1,24 @@
 # Commit Skill Reference
 
-## `-n` / `--no-verify` (mandatory)
+## Hook behavior (`-n` vs `--verify`)
 
-Every commit must skip hooks. The command always includes `-n`:
+**Default (no `--verify`):** skip hooks with `-n`:
 
 ```bash
 git commit -n -m "<message>"
 ```
 
-Agents often omit `-n` and let pre-commit hooks run or fail. That violates this
-skill. If you did not pass `-n`, you did not complete Step 4.
+Agents often omit `-n` and let hooks run or fail. That violates the default
+path. If you did not pass `-n` and the user did not pass `--verify`, Step 4
+failed.
+
+**With `--verify`:** run hooks. Do not pass `-n` or `--no-verify`:
+
+```bash
+git commit -m "<message>"
+```
+
+If the user passed `--verify` and you passed `-n`, Step 4 failed.
 
 ## Diff-only message rule
 
@@ -76,7 +85,9 @@ Examples:
 - "Fix null pointer exception in user service"
 - "Update README with install instructions"
 
-## Example report
+## Example reports
+
+**Default (hooks skipped):**
 
 ```
 Commit complete.
@@ -87,6 +98,29 @@ Hooks: skipped (-n)
 
 Command:
 git commit -n -m "feat: add password reset endpoint"
+
+Message:
+```
+
+```
+feat: add password reset endpoint
+
+- Implement token-based reset flow
+- Add email template for reset notifications
+- Update user model with reset token fields
+```
+
+**With `--verify` (hooks ran):**
+
+```
+Commit complete.
+
+Scope: staged
+Style: conventional
+Hooks: ran (--verify)
+
+Command:
+git commit -m "feat: add password reset endpoint"
 
 Message:
 ```

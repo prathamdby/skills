@@ -2,11 +2,12 @@
 name: commit
 description: >
   Generate commit messages from the git diff only and commit changes to git.
-  Ignores session context such as reviews or discussion. Always commits with -n
-  (--no-verify) to skip pre-commit hooks. Use when the user types /commit, asks
-  to commit changes, save work to git, create a commit, or write a commit
-  message. Supports flags --staged/--unstaged for diff scope and
-  --conventional/--simple for message style.
+  Ignores session context such as reviews or discussion. Commits with -n
+  (--no-verify) by default to skip pre-commit hooks; pass --verify to run hooks.
+  Use when the user types /commit, asks to commit changes, save work to git,
+  create a commit, or write a commit message. Supports flags --staged/--unstaged
+  for diff scope, --conventional/--simple for message style, and --verify to run
+  hooks.
 ---
 
 # Commit Changes
@@ -18,18 +19,26 @@ git, create a commit, or write a commit message.
 
 ## Non-negotiables
 
-Every commit this skill runs **must** include `-n` (equivalent to
-`--no-verify`). This is not optional. Agents often drop it to "save time" or
-avoid hook failures. That is wrong for this skill.
+Hook behavior is controlled by `--verify`. **Default (no `--verify`):** every
+commit **must** include `-n` (equivalent to `--no-verify`). Agents often drop
+`-n` to "save time" or avoid hook failures. That is wrong unless the user
+passed `--verify`.
+
+**Default path (no `--verify`):**
 
 - **Always** pass `-n` on `git commit`
 - **Never** run `git commit` without `-n`
-- **Never** substitute `--no-verify` for `-n` unless the user's environment
-  documents otherwise; default to `-n`
 - **Never** skip hooks by any other means (amending outside this flow, staging
   then committing elsewhere)
 - If the commit command fails, fix the underlying issue or report the failure.
   Do not retry without `-n`
+
+**With `--verify`:**
+
+- **Never** pass `-n` or `--no-verify`
+- Run `git commit -m "..."` so pre-commit and commit-msg hooks execute
+- If hooks fail, fix the underlying issue or report the failure. Do not fall
+  back to `-n` unless the user removes `--verify` and asks to commit again
 
 ## Flag detection
 
@@ -41,16 +50,14 @@ After activation, inspect the user's message for the following flags:
 | `--unstaged`     | Diff unstaged changes (`git diff`).                                                                  |
 | `--conventional` | Generate a conventional commit message. **This is the default** if no style flag is provided.        |
 | `--simple`       | Generate a concise plain-English message without conventional commit formatting.                     |
-
-`-n` / `--no-verify` is **not** a user flag. It is always applied in Step 4.
-Do not wait for the user to request it.
+| `--verify`       | Run pre-commit and commit-msg hooks. **Off by default**; without this flag, Step 4 uses `-n`.        |
 
 **Defaults:** If the user provides no flags, behave as if `--staged --conventional`
-was passed.
+was passed. Hook skip (`-n`) is also the default unless `--verify` is present.
 
 **Flag combinations:** Multiple flags can be combined. For example,
 `/commit --unstaged --simple` diffs unstaged changes and writes a simple
-message.
+message. `/commit --verify --staged` runs hooks on a conventional staged commit.
 
 ## Diff-only constraint
 
@@ -110,25 +117,40 @@ session wanted it.
 
 ## Step 4: Commit
 
-Run **exactly** this shape of command with the generated message:
+Choose the command from the detected hook flag:
+
+**Default (no `--verify`):**
 
 ```bash
 git commit -n -m "<generated message>"
 ```
 
-`-n` skips pre-commit and commit-msg hooks. It is mandatory.
+`-n` skips pre-commit and commit-msg hooks. It is mandatory on this path.
 
-**Forbidden commands** (never run these when this skill is active):
+**Forbidden on the default path:**
 
 - `git commit -m "..."` (missing `-n`)
-- `git commit --no-verify -m "..."` only when you forgot `-n` on a prior attempt
-  and are correcting; prefer `-n` consistently
 - `git commit -am "..."` (missing `-n`)
 - Any wrapper that omits `-n`
 
-Before reporting success, confirm the shell command you ran contained `-n` or
-`--no-verify`. If it did not, the step failed even if git returned exit code 0
-via some other path. Re-run with `-n`.
+Before reporting success, confirm the command contained `-n` or `--no-verify`.
+
+**With `--verify`:**
+
+```bash
+git commit -m "<generated message>"
+```
+
+Hooks must run. Do not pass `-n` or `--no-verify`.
+
+**Forbidden with `--verify`:**
+
+- `git commit -n -m "..."`
+- `git commit --no-verify -m "..."`
+- Any wrapper that skips hooks
+
+Before reporting success, confirm the command did **not** contain `-n` or
+`--no-verify`.
 
 ## Step 5: Report
 
@@ -137,7 +159,8 @@ After committing, report to the user:
 1. The generated commit message (in a code block)
 2. The diff scope used (`--staged` or `--unstaged`)
 3. The style used (`--conventional` or `--simple`)
-4. Confirmation that the commit succeeded **with `-n` / `--no-verify`**
-5. The exact `git commit` command run (so hook skip is auditable)
+4. Hook behavior (`skipped (-n)` by default, or `ran (--verify)`)
+5. Confirmation that the commit succeeded
+6. The exact `git commit` command run
 
-See REFERENCE.md for a full example report.
+See REFERENCE.md for full example reports.

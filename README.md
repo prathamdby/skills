@@ -35,7 +35,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Problem.** Ask an agent to commit and you get "update file", "fix stuff", or a paragraph-long message that says nothing.
 
-**The Fix.** [`/commit`](./skills/commit/SKILL.md) enforces your commit convention, conventional commits with strict formatting rules, or simple one-liners when you want speed. Flags for `--staged` vs `--unstaged`, `--conventional` vs `--simple`. Every commit runs with `-n` to skip hooks; agents cannot drop it.
+**The Fix.** [`/commit`](./skills/commit/SKILL.md) enforces your commit convention, conventional commits with strict formatting rules, or simple one-liners when you want speed. Flags for `--staged` vs `--unstaged`, `--conventional` vs `--simple`. Commits skip hooks with `-n` by default; pass `--verify` to run them.
 
 ### #2: AI Slop Creeps Into the Codebase
 
@@ -90,7 +90,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 | Skill                                                      | Description                                                                                                                     |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | [`prath-mode`](./skills/prath-mode/SKILL.md)               | Route tasks to the right skill and run workflow chains. Invoke before or alongside other skills.                                |
-| [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages with mandatory `-n`. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`. |
+| [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages. Skips hooks with `-n` by default; `--verify` runs hooks. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`. |
 | [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                        |
 | [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.                  |
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`. |
