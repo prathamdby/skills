@@ -40,6 +40,45 @@ session.
 | README install steps rewritten       | docs: update per discussion     | docs: add pnpm install steps          |
 | Extract helper from handler          | refactor: implement agreed plan | refactor: extract parsePayload helper |
 
+## Multiline commit invocation (single `-m` only)
+
+Git joins multiple `-m` arguments with **blank lines** between them. That is
+the most common cause of spaced-out bullet bodies.
+
+**Forbidden — produces blank lines between every line:**
+
+```bash
+git commit -n -m "feat: add auth flow" \
+  -m "- Implement OAuth login" \
+  -m "- Add JWT handling" \
+  -m "- Update login UI"
+```
+
+Result (wrong):
+
+```
+feat: add auth flow
+
+- Implement OAuth login
+
+- Add JWT handling
+
+- Update login UI
+```
+
+**Required — one `-m` with embedded newlines:**
+
+```bash
+git commit -n -m $'feat: add auth flow\n\n- Implement OAuth login\n- Add JWT handling\n- Update login UI'
+```
+
+Use `$'...\n...'` in bash so `\n` becomes real newlines inside one argument.
+Do not add extra `\n\n` between bullets — only one blank line after the
+subject.
+
+Before running `git commit`, scan the message string: consecutive body bullets
+must be separated by a single `\n`, never `\n\n`.
+
 ## `--conventional` formatting rules
 
 - **Format:** `type: description`
@@ -97,7 +136,7 @@ Style: conventional
 Hooks: skipped (-n)
 
 Command:
-git commit -n -m "feat: add password reset endpoint"
+git commit -n -m $'feat: add password reset endpoint\n\n- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
 
 Message:
 ```
@@ -120,7 +159,7 @@ Style: conventional
 Hooks: ran (--verify)
 
 Command:
-git commit -m "feat: add password reset endpoint"
+git commit -m $'feat: add password reset endpoint\n\n- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
 
 Message:
 ```

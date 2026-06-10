@@ -24,6 +24,12 @@ commit **must** include `-n` (equivalent to `--no-verify`). Agents often drop
 `-n` to "save time" or avoid hook failures. That is wrong unless the user
 passed `--verify`.
 
+**Body formatting:** use exactly **one** `-m` flag for the full message. Git
+inserts a blank line between every `-m` argument, so multiple `-m` flags produce
+spaced-out bullets even when each flag holds a single line. Never pass one
+bullet per `-m`. Never insert blank lines between body bullets in the message
+string.
+
 **Default path (no `--verify`):**
 
 - **Always** pass `-n` on `git commit`
@@ -117,12 +123,16 @@ session wanted it.
 
 ## Step 4: Commit
 
+Pass the full message in a **single** `-m` value. For multiline messages, use
+one quoted string with embedded newlines (bash `$'...'` is preferred). See
+REFERENCE.md for exact invocation patterns and anti-patterns.
+
 Choose the command from the detected hook flag:
 
 **Default (no `--verify`):**
 
 ```bash
-git commit -n -m "<generated message>"
+git commit -n -m $'type: description\n\n- First bullet\n- Second bullet'
 ```
 
 `-n` skips pre-commit and commit-msg hooks. It is mandatory on this path.
@@ -131,6 +141,7 @@ git commit -n -m "<generated message>"
 
 - `git commit -m "..."` (missing `-n`)
 - `git commit -am "..."` (missing `-n`)
+- `git commit -n -m "subject" -m "- bullet"` (multiple `-m`; inserts blank lines)
 - Any wrapper that omits `-n`
 
 Before reporting success, confirm the command contained `-n` or `--no-verify`.
@@ -138,7 +149,7 @@ Before reporting success, confirm the command contained `-n` or `--no-verify`.
 **With `--verify`:**
 
 ```bash
-git commit -m "<generated message>"
+git commit -m $'type: description\n\n- First bullet\n- Second bullet'
 ```
 
 Hooks must run. Do not pass `-n` or `--no-verify`.
@@ -147,6 +158,7 @@ Hooks must run. Do not pass `-n` or `--no-verify`.
 
 - `git commit -n -m "..."`
 - `git commit --no-verify -m "..."`
+- `git commit -m "subject" -m "- bullet"` (multiple `-m`; inserts blank lines)
 - Any wrapper that skips hooks
 
 Before reporting success, confirm the command did **not** contain `-n` or
