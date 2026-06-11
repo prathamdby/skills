@@ -5,7 +5,13 @@
 **Default (no `--verify`):** skip hooks with `-n`:
 
 ```bash
-git commit -n -m "<message>"
+git commit -n -m "<subject>"
+```
+
+With a body, add a second `-m`:
+
+```bash
+git commit -n -m "<subject>" -m $'- First bullet\n- Second bullet'
 ```
 
 Agents often omit `-n` and let hooks run or fail. That violates the default
@@ -15,7 +21,13 @@ failed.
 **With `--verify`:** run hooks. Do not pass `-n` or `--no-verify`:
 
 ```bash
-git commit -m "<message>"
+git commit -m "<subject>"
+```
+
+With a body:
+
+```bash
+git commit -m "<subject>" -m $'- First bullet\n- Second bullet'
 ```
 
 If the user passed `--verify` and you passed `-n`, Step 4 failed.
@@ -40,12 +52,40 @@ session.
 | README install steps rewritten       | docs: update per discussion     | docs: add pnpm install steps          |
 | Extract helper from handler          | refactor: implement agreed plan | refactor: extract parsePayload helper |
 
-## Multiline commit invocation (single `-m` only)
+## Commit invocation (`-m` count)
 
-Git joins multiple `-m` arguments with **blank lines** between them. That is
-the most common cause of spaced-out bullet bodies.
+Use **one or two** `-m` flags. First `-m` holds the subject. Second `-m`
+holds the full body when needed. Git inserts a blank line between `-m`
+arguments, so two flags produce the correct subject/body separation.
 
-**Forbidden — produces blank lines between every line:**
+**No body — one `-m`:**
+
+```bash
+git commit -n -m "feat: add password reset endpoint"
+```
+
+**With body — two `-m`:**
+
+```bash
+git commit -n -m "feat: add auth flow" \
+  -m $'- Implement OAuth login\n- Add JWT handling\n- Update login UI'
+```
+
+Result (correct):
+
+```
+feat: add auth flow
+
+- Implement OAuth login
+- Add JWT handling
+- Update login UI
+```
+
+Put all bullets in the second `-m`. Use `$'...\n...'` so `\n` becomes real
+newlines inside that argument. Bullets must be separated by a single `\n`,
+never `\n\n`.
+
+**Forbidden — 3+ `-m` produces blank lines between every line:**
 
 ```bash
 git commit -n -m "feat: add auth flow" \
@@ -66,18 +106,13 @@ feat: add auth flow
 - Update login UI
 ```
 
-**Required — one `-m` with embedded newlines:**
+**Forbidden — single `-m` with embedded body:**
 
 ```bash
-git commit -n -m $'feat: add auth flow\n\n- Implement OAuth login\n- Add JWT handling\n- Update login UI'
+git commit -n -m $'feat: add auth flow\n\n- Implement OAuth login\n- Add JWT handling'
 ```
 
-Use `$'...\n...'` in bash so `\n` becomes real newlines inside one argument.
-Do not add extra `\n\n` between bullets — only one blank line after the
-subject.
-
-Before running `git commit`, scan the message string: consecutive body bullets
-must be separated by a single `\n`, never `\n\n`.
+Agents skip bodies with this pattern. Use two `-m` flags instead.
 
 ## `--conventional` formatting rules
 
@@ -136,7 +171,7 @@ Style: conventional
 Hooks: skipped (-n)
 
 Command:
-git commit -n -m $'feat: add password reset endpoint\n\n- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
+git commit -n -m "feat: add password reset endpoint" -m $'- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
 
 Message:
 ```
@@ -159,7 +194,7 @@ Style: conventional
 Hooks: ran (--verify)
 
 Command:
-git commit -m $'feat: add password reset endpoint\n\n- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
+git commit -m "feat: add password reset endpoint" -m $'- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
 
 Message:
 ```

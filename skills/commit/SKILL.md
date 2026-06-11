@@ -24,11 +24,13 @@ commit **must** include `-n` (equivalent to `--no-verify`). Agents often drop
 `-n` to "save time" or avoid hook failures. That is wrong unless the user
 passed `--verify`.
 
-**Body formatting:** use exactly **one** `-m` flag for the full message. Git
-inserts a blank line between every `-m` argument, so multiple `-m` flags produce
-spaced-out bullets even when each flag holds a single line. Never pass one
-bullet per `-m`. Never insert blank lines between body bullets in the message
-string.
+**Body formatting:** use **one or two** `-m` flags, never three or more.
+
+- First `-m`: subject line only
+- Second `-m`: optional; entire body in one string; bullets separated by `\n`
+  inside that string
+- Forbidden: one bullet per `-m`; blank lines between bullets inside the body
+  string; single `-m` with embedded `\n\n` body
 
 **Default path (no `--verify`):**
 
@@ -116,23 +118,34 @@ If there are no changes to diff (empty output), stop and report:
 Base the message solely on Step 2. Describe what the diff does, not why the
 session wanted it.
 
-- `--conventional` path: Generate a conventional commit message. See REFERENCE.md
-  for full formatting rules.
-- `--simple` path: Generate a concise plain-English message. See REFERENCE.md
-  for full formatting rules.
+Produce two separate values before Step 4:
+
+- `subject`: first line only, no trailing newline
+- `body`: optional; bullet lines joined by single `\n`, no leading blank line
+
+- `--conventional` path: `subject` is `type: description`; add `body` when the
+  diff needs explanation beyond the first line. See REFERENCE.md for formatting
+  rules.
+- `--simple` path: `subject` only; never emit `body`. See REFERENCE.md for
+  formatting rules.
 
 ## Step 4: Commit
 
-Pass the full message in a **single** `-m` value. For multiline messages, use
-one quoted string with embedded newlines (bash `$'...'` is preferred). See
-REFERENCE.md for exact invocation patterns and anti-patterns.
+Pass `subject` in the first `-m`. Pass `body` in a second `-m` when present.
+See REFERENCE.md for exact invocation patterns and anti-patterns.
 
 Choose the command from the detected hook flag:
 
-**Default (no `--verify`):**
+**Default (no `--verify`), no body:**
 
 ```bash
-git commit -n -m $'type: description\n\n- First bullet\n- Second bullet'
+git commit -n -m "<subject>"
+```
+
+**Default (no `--verify`), with body:**
+
+```bash
+git commit -n -m "<subject>" -m $'- First bullet\n- Second bullet'
 ```
 
 `-n` skips pre-commit and commit-msg hooks. It is mandatory on this path.
@@ -141,15 +154,22 @@ git commit -n -m $'type: description\n\n- First bullet\n- Second bullet'
 
 - `git commit -m "..."` (missing `-n`)
 - `git commit -am "..."` (missing `-n`)
-- `git commit -n -m "subject" -m "- bullet"` (multiple `-m`; inserts blank lines)
+- `git commit -n -m $'subject\n\n- bullet'` (single `-m` with embedded body)
+- `git commit -n -m "subject" -m "- a" -m "- b"` (3+ `-m`; spaced bullets)
 - Any wrapper that omits `-n`
 
 Before reporting success, confirm the command contained `-n` or `--no-verify`.
 
-**With `--verify`:**
+**With `--verify`, no body:**
 
 ```bash
-git commit -m $'type: description\n\n- First bullet\n- Second bullet'
+git commit -m "<subject>"
+```
+
+**With `--verify`, with body:**
+
+```bash
+git commit -m "<subject>" -m $'- First bullet\n- Second bullet'
 ```
 
 Hooks must run. Do not pass `-n` or `--no-verify`.
@@ -158,7 +178,8 @@ Hooks must run. Do not pass `-n` or `--no-verify`.
 
 - `git commit -n -m "..."`
 - `git commit --no-verify -m "..."`
-- `git commit -m "subject" -m "- bullet"` (multiple `-m`; inserts blank lines)
+- `git commit -m $'subject\n\n- bullet'` (single `-m` with embedded body)
+- `git commit -m "subject" -m "- a" -m "- b"` (3+ `-m`; spaced bullets)
 - Any wrapper that skips hooks
 
 Before reporting success, confirm the command did **not** contain `-n` or
