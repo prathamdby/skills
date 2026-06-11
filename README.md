@@ -85,6 +85,18 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/prath-mode`](./skills/prath-mode/SKILL.md) routes each action to the owning leaf skill and documents workflow chains (ticket fix, planned work, quick save, and more). Read the matched skill in full. Do not restate its steps.
 
+## Development
+
+Before committing skill edits, run:
+
+```bash
+node scripts/validate-skills.mjs
+```
+
+This checks metadata, README coverage, local markdown references, the 100-line
+`SKILL.md` target, and the mandatory Step 0 gate for every skill with
+`REFERENCE.md`.
+
 ## Reference
 
 | Skill                                                      | Description                                                                                                                     |

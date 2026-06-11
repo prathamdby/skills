@@ -10,11 +10,6 @@ description: >
 
 # Make Pull Request
 
-## When to use this skill
-
-Activate when the user asks to open a pull request, create a PR, submit a PR,
-or merge a branch.
-
 ## Flag detection
 
 After activation, inspect the user's message for the following flags:
@@ -34,14 +29,8 @@ If `--ticket` is passed but no ticket ID is provided, stop and ask:
 ## Step 1: Gather context
 
 1. Identify the current branch name.
-2. Run the following to get commits on this branch:
-   ```bash
-   git log <target>..HEAD --oneline
-   ```
-3. Run the following to see the full diff:
-   ```bash
-   git diff <target>...HEAD
-   ```
+2. Run `git log <target>..HEAD --oneline` to get commits on this branch.
+3. Run `git diff <target>...HEAD` to see the full diff.
 
 If `--ticket` was passed, **do not search** for the ticket number in the branch
 name or commit messages. Use the explicit `--ticket` value directly.

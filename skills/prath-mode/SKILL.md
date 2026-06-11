@@ -10,12 +10,6 @@ disable-model-invocation: true
 
 # Prath mode
 
-## Activation
-
-Activate when the user types `/prath-mode` or wants Pratham's composable skill
-workflow for commits, PRs, tickets, reviews, repos, delegation, or session
-continuity.
-
 ## Non-negotiables
 
 Read the matched leaf skill in full before executing. Do not restate or

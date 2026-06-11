@@ -19,68 +19,37 @@ git, create a commit, or write a commit message.
 
 ## Non-negotiables
 
-Hook behavior is controlled by `--verify`. **Default (no `--verify`):** every
-commit **must** include `-n` (equivalent to `--no-verify`). Agents often drop
-`-n` to "save time" or avoid hook failures. That is wrong unless the user
-passed `--verify`.
+Hook behavior is controlled by `--verify`.
 
-**Body formatting:** use **one or two** `-m` flags, never three or more.
+- Default, without `--verify`: every commit command must include `-n`.
+- With `--verify`: run hooks and never pass `-n` or `--no-verify`.
+- Body formatting: use one or two `-m` flags, never three or more. The first
+  `-m` is the subject. The optional second `-m` is the whole body.
 
-- First `-m`: subject line only
-- Second `-m`: optional; entire body in one string; bullets separated by `\n`
-  inside that string
-- Forbidden: one bullet per `-m`; blank lines between bullets inside the body
-  string; single `-m` with embedded `\n\n` body
-
-**Default path (no `--verify`):**
-
-- **Always** pass `-n` on `git commit`
-- **Never** run `git commit` without `-n`
-- **Never** skip hooks by any other means (amending outside this flow, staging
-  then committing elsewhere)
-- If the commit command fails, fix the underlying issue or report the failure.
-  Do not retry without `-n`
-
-**With `--verify`:**
-
-- **Never** pass `-n` or `--no-verify`
-- Run `git commit -m "..."` so pre-commit and commit-msg hooks execute
-- If hooks fail, fix the underlying issue or report the failure. Do not fall
-  back to `-n` unless the user removes `--verify` and asks to commit again
+If the commit command fails, fix the underlying issue or report the failure. Do
+not switch hook behavior unless the user changes the flags and asks again.
 
 ## Flag detection
 
-After activation, inspect the user's message for the following flags:
+After activation, inspect the user's message for these flags:
 
 | Flag             | Effect                                                                                               |
 | ---------------- | ---------------------------------------------------------------------------------------------------- |
-| `--staged`       | Diff staged changes only (`git diff --cached`). **This is the default** if no diff flag is provided. |
+| `--staged`       | Diff staged changes only (`git diff --cached`). **Default** if no diff flag is provided.             |
 | `--unstaged`     | Diff unstaged changes (`git diff`).                                                                  |
-| `--conventional` | Generate a conventional commit message. **This is the default** if no style flag is provided.        |
+| `--conventional` | Generate a conventional commit message. **Default** if no style flag is provided.                    |
 | `--simple`       | Generate a concise plain-English message without conventional commit formatting.                     |
-| `--verify`       | Run pre-commit and commit-msg hooks. **Off by default**; without this flag, Step 4 uses `-n`.        |
+| `--verify`       | Run hooks. Off by default; without this flag, Step 4 uses `-n`.                                      |
 
-**Defaults:** If the user provides no flags, behave as if `--staged --conventional`
+**Defaults:** If no flags are provided, behave as if `--staged --conventional`
 was passed. Hook skip (`-n`) is also the default unless `--verify` is present.
-
-**Flag combinations:** Multiple flags can be combined. For example,
-`/commit --unstaged --simple` diffs unstaged changes and writes a simple
-message. `/commit --verify --staged` runs hooks on a conventional staged commit.
 
 ## Diff-only constraint
 
-The git diff is the **only** input for the commit message. Ignore everything
-else in the session.
-
-- Do not use conversation history, review threads, ticket text, or the user's
-  stated rationale
-- Do not write messages like "address review feedback", "as requested",
-  "fix issues from discussion", or "implement the plan"
-- Do not reference work that is not visible in the diff
-- Infer type and description solely from added, removed, and modified lines
-
-If the user message explains why they changed something, treat that as
-irrelevant unless the same fact appears in the diff.
+The git diff is the only input for the commit message. Ignore conversation
+history, review threads, ticket text, and stated rationale unless the same fact
+appears in the diff. Do not write messages like "address review feedback",
+"as requested", "fix issues from discussion", or "implement the plan".
 
 ## Step 0: Read REFERENCE.md (mandatory)
 
@@ -92,108 +61,39 @@ irrelevant unless the same fact appears in the diff.
 
 ## Step 1: Diff the changes
 
-Choose the diff command based on the detected flags:
-
-- `--staged` (or default): `git diff --cached | cat`
+- `--staged` or default: `git diff --cached | cat`
 - `--unstaged`: `git diff | cat`
 
-Run the selected command, capture the full output, and analyze the changes.
+Capture the full output. If there are no changes, stop and report:
+"No changes found to commit."
 
 ## Step 2: Analyze changes
 
-Read **only** the diff output. Do not use conversation context to interpret it.
-
-Identify from the diff alone:
-
-- What files were changed
-- The nature of the changes (added, modified, deleted, renamed)
-- What the diff actually does (new feature, bug fix, refactoring, documentation,
-  test, chore, style, performance improvement)
-
-If there are no changes to diff (empty output), stop and report:
-"No changes found to commit."
+Read only the diff output. Identify changed files, change type, and what the
+diff actually does: feature, fix, refactor, docs, test, chore, style, or perf.
 
 ## Step 3: Generate the commit message
 
-Base the message solely on Step 2. Describe what the diff does, not why the
-session wanted it.
+Base the message solely on Step 2. Produce two values before Step 4:
 
-Produce two separate values before Step 4:
+- `subject`: first line only, no trailing newline.
+- `body`: optional; bullet lines joined by single `\n`, no leading blank line.
 
-- `subject`: first line only, no trailing newline
-- `body`: optional; bullet lines joined by single `\n`, no leading blank line
-
-- `--conventional` path: `subject` is `type: description`; add `body` when the
-  diff needs explanation beyond the first line. See REFERENCE.md for formatting
-  rules.
-- `--simple` path: `subject` only; never emit `body`. See REFERENCE.md for
-  formatting rules.
+For `--conventional`, `subject` is `type: description`; add `body` only when
+the diff needs more explanation. For `--simple`, emit `subject` only. Follow
+`./REFERENCE.md` for exact formatting.
 
 ## Step 4: Commit
 
 Pass `subject` in the first `-m`. Pass `body` in a second `-m` when present.
-See REFERENCE.md for exact invocation patterns and anti-patterns.
+Use the exact invocation patterns in `./REFERENCE.md`.
 
-Choose the command from the detected hook flag:
-
-**Default (no `--verify`), no body:**
-
-```bash
-git commit -n -m "<subject>"
-```
-
-**Default (no `--verify`), with body:**
-
-```bash
-git commit -n -m "<subject>" -m $'- First bullet\n- Second bullet'
-```
-
-`-n` skips pre-commit and commit-msg hooks. It is mandatory on this path.
-
-**Forbidden on the default path:**
-
-- `git commit -m "..."` (missing `-n`)
-- `git commit -am "..."` (missing `-n`)
-- `git commit -n -m $'subject\n\n- bullet'` (single `-m` with embedded body)
-- `git commit -n -m "subject" -m "- a" -m "- b"` (3+ `-m`; spaced bullets)
-- Any wrapper that omits `-n`
-
-Before reporting success, confirm the command contained `-n` or `--no-verify`.
-
-**With `--verify`, no body:**
-
-```bash
-git commit -m "<subject>"
-```
-
-**With `--verify`, with body:**
-
-```bash
-git commit -m "<subject>" -m $'- First bullet\n- Second bullet'
-```
-
-Hooks must run. Do not pass `-n` or `--no-verify`.
-
-**Forbidden with `--verify`:**
-
-- `git commit -n -m "..."`
-- `git commit --no-verify -m "..."`
-- `git commit -m $'subject\n\n- bullet'` (single `-m` with embedded body)
-- `git commit -m "subject" -m "- a" -m "- b"` (3+ `-m`; spaced bullets)
-- Any wrapper that skips hooks
-
-Before reporting success, confirm the command did **not** contain `-n` or
-`--no-verify`.
+- Default, without `--verify`: run `git commit -n ...` and confirm `-n` or
+  `--no-verify` was present.
+- With `--verify`: run `git commit ...` and confirm neither `-n` nor
+  `--no-verify` was present.
 
 ## Step 5: Report
 
-After committing, report to the user:
-
-1. The generated commit message (in a code block)
-2. The diff scope used (`--staged` or `--unstaged`)
-3. The style used (`--conventional` or `--simple`)
-4. Hook behavior (`skipped (-n)` by default, or `ran (--verify)`)
-5. Confirmation that the commit succeeded
-6. The exact `git commit` command run
-
-See REFERENCE.md for full example reports.
+Report the generated message, diff scope, style, hook behavior, success, and
+the exact `git commit` command run. See `./REFERENCE.md` for example reports.
