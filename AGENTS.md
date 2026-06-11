@@ -23,6 +23,16 @@ This applies to every skill, no exceptions.
 
 Do not commit the skill without the README update.
 
+## Meta-Rule: Validate Skill Changes
+
+**After adding or updating any skill, run `node scripts/validate-skills.mjs` before committing.**
+
+1. Run the validator after the skill file, reference files, and README are updated.
+2. Fix every validation failure before committing.
+3. Treat this as a maintainer check only; skill users do not run it when invoking installed skills.
+
+Do not commit a skill addition or update until the validator passes.
+
 ---
 
 ## Project Structure
@@ -80,7 +90,7 @@ them as flags in the user's invocation message:
 
 ## Content Principles
 
-- Keep `SKILL.md` under 500 lines / 5000 tokens
+- Keep `SKILL.md` at or under 100 lines
 - Use progressive disclosure: essentials in `SKILL.md`, detail in `REFERENCE.md`
   or `references/`; enforce the read with Step 0 when using `REFERENCE.md`
 - Prefer procedures over declarations: teach _how to approach_, not _what to
