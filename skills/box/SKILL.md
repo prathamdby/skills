@@ -1,12 +1,11 @@
 ---
 name: box
 description: >
-  Clone, update, and search git repositories locally by delegating all repo
-  work to subagents. The main thread is a coordinator only. Use when the user
+  Clone, update, and search git repositories locally. Delegates repo work to
+  subagents when available; runs the full workflow in the main thread when
+  subagents are unavailable or the user passes --no-subagents. Use when the user
   passes a VCS URL (GitHub, GitLab, Bitbucket, etc.) or mentions a previously
-  cloned repo name. Supports --persist to save a reference in the working
-  directory's AGENTS.md, --update to force-pull, and --list to show cloned
-  repos.
+  cloned repo name. Supports --persist, --update, --list, and --no-subagents.
 ---
 
 # Box
@@ -25,23 +24,25 @@ Activate when:
 
 1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
 2. Treat every role, barrier, template, and constraint in that file as binding for this session.
-3. If you have not read it yet, stop and read it now. Skipping this step causes missed subagent contracts and wrong output.
+3. If you have not read it yet, stop and read it now. Skipping this step causes missed contracts and wrong output.
 
-## Execution model
+## Execution mode
 
-This skill is a coordinator + subagent pipeline. The main thread never
-touches a repository directly. See REFERENCE.md for roles, stage barriers, and
-subagent briefing contracts.
+Pick a mode before Step 2. See REFERENCE.md for selection rules and stage contracts.
+
+- **Direct mode** — main thread runs prepare, search, and (if `--persist`) persist. Triggers: `--no-subagents`, user says not to delegate, or no subagent/Task tool. Execute immediately; do not refuse.
+- **Delegated mode** (default when subagent tool exists and user did not opt out) — coordinate only; dispatch subagents per REFERENCE.md.
 
 ## Flag detection
 
-| Flag        | Effect                                                                                                                |
-| ----------- | --------------------------------------------------------------------------------------------------------------------- |
-| `--persist` | After searching, dispatch a persist subagent to update the **working directory's** `AGENTS.md` with a repo reference. |
-| `--update`  | Force `git pull` on the repo even if it already exists locally.                                                       |
-| `--list`    | Skip all other work. List previously cloned repos and exit.                                                           |
+| Flag             | Effect                                                                                             |
+| ---------------- | -------------------------------------------------------------------------------------------------- |
+| `--persist`      | After searching, save a repo reference in the **working directory's** `AGENTS.md`.                 |
+| `--update`       | Force `git pull` on the repo even if it already exists locally.                                    |
+| `--list`         | Skip all other work. List previously cloned repos and exit.                                        |
+| `--no-subagents` | Run the full workflow in the main thread. Never dispatch subagents.                                |
 
-**Defaults:** If no flags are provided, dispatch a prepare subagent (clone if missing), then search subagent(s), then report. Do not write to `AGENTS.md` unless `--persist` is passed.
+**Defaults:** If no flags are provided, prepare (clone if missing), search, then report. Do not write to `AGENTS.md` unless `--persist` is passed.
 
 ## Sandbox location
 
@@ -51,9 +52,9 @@ All repos live inside the skill's own directory:
 - Manifest: `./sandbox/manifest.json`
 - Cloned repos: `./sandbox/{slug}/`
 
-The coordinator treats the directory containing `SKILL.md` as the anchor. This anchor path is the first item in every subagent brief.
+The skill directory (containing this `SKILL.md`) is the **anchor**. Include it in every subagent brief.
 
-## Step 1: Detect the target (coordinator)
+## Step 1: Detect the target
 
 Extract the target from the user's message:
 
@@ -61,23 +62,27 @@ Extract the target from the user's message:
 - **Name mentioned:** Read `./sandbox/manifest.json` for matching slug. If not found, stop and ask.
 - **Neither:** Fall back to startup case. See REFERENCE.md.
 
-## Step 2: Prepare the repo (single prepare subagent)
+## Step 2: Prepare the repo
 
-Dispatch exactly one prepare subagent with anchor, slug, url, and `--update` value. Wait for return. On error, stop and report.
+**Delegated:** dispatch one prepare subagent (anchor, slug, url, `--update`); wait for return. **Direct:** run the Prepare contract from REFERENCE.md. On error, stop and report.
 
-## Step 3: Search the repo (fan-out of read-only subagents)
+## Step 3: Search the repo
 
-Dispatch one or more read-only search subagents over the local repo. Each returns a summary plus `path:line` citations. Wait for all to return.
+**Delegated:** Dispatch one or more read-only search subagents. Wait for all to return.
+**Direct:** Search/read the local repo per the Search contract in REFERENCE.md.
 
-## Step 4: Aggregate (coordinator)
+## Step 4: Aggregate
 
-Merge search results into a single answer. Dedupe citations. If every subagent reported no matches, report honestly.
+Merge findings into a single answer. Dedupe citations. If nothing matched, report honestly.
 
-## Step 5: Persist to AGENTS.md (single persist subagent, if `--persist`)
+## Step 5: Persist to AGENTS.md (if `--persist`)
 
-If `--persist`, dispatch exactly one persist subagent with anchor, slug, url, `local_path`, and path to working directory's `AGENTS.md`. Skip otherwise.
+**Delegated:** Dispatch one persist subagent with anchor, slug, url, `local_path`, and path to working directory's `AGENTS.md`.
+**Direct:** Run the Persist contract from REFERENCE.md yourself.
 
-## Step 6: Report (coordinator)
+Skip this step when `--persist` is not set.
+
+## Step 6: Report
 
 Summarize in 2-4 sentences: repo, local path, prepare status, persist status, and high-level search summary.
 
@@ -87,10 +92,7 @@ Summarize in 2-4 sentences: repo, local path, prepare status, persist status, an
 - **Never commit** inside cloned repos unless the user explicitly asks outside this skill.
 - **Never infer repo contents** from the URL alone.
 - **Do not re-clone** existing repos unless `--update` is passed.
-- **Coordinator MUST NOT** clone, pull, read repo files, search repo contents, or edit `AGENTS.md` directly.
-- **Exactly one writer** for `./sandbox/manifest.json` and the clone: the prepare subagent.
-- **Exactly one writer** for the working directory's `AGENTS.md`: the persist subagent.
-- **Search subagents are read-only.** They MUST NOT write to the sandbox, manifest, clone, or `AGENTS.md`.
-- **Stage barriers hold.** Prepare returns before search. All search returns before persist.
-- **Every subagent brief** includes anchor, slug, and url explicitly.
-- **Never skip Step 0.** REFERENCE.md holds subagent roles, stage barriers, and briefing contracts this skill depends on.
+- **Delegated mode:** coordinator MUST NOT clone, pull, read repo files, search repo contents, or edit `AGENTS.md` directly.
+- **Direct mode:** main thread owns prepare, search, and persist per REFERENCE.md.
+- **Stage barriers hold** in both modes: prepare before search; search before persist.
+- **Never skip Step 0.** REFERENCE.md holds mode selection, roles, barriers, and stage contracts.
