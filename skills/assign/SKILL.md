@@ -5,7 +5,7 @@ description: >
   stdin to dodge quoting failures and auto-approves permissions to avoid silent
   hangs. Triggers: run a task with an external agent, hand off to OpenCode,
   Claude Code, or similar, execute a plan non-interactively. Flags: --agent
-  <name> (default opencode) and --model <model>.
+  <name> (default opencode), --model <model>, and --dir <path>.
 ---
 
 # Assign
@@ -21,7 +21,7 @@ description: >
 | ----------------- | ------------------------------------------------------------ |
 | `--agent <name>`  | Agent to delegate to. **Default: `opencode`**.               |
 | `--model <model>` | Model to use. Agent default applies if omitted.              |
-| `--dir <path>`    | Working directory for the agent. Default: current directory. |
+| `--dir <path>`    | Agent working directory. **Default: current directory.** `assign-prompt.tmp` is always written to the current directory, not `--dir`. |
 
 If `--agent` names an unsupported agent, stop: "Unknown agent `<name>`.
 Supported agents: opencode, codex, claude. See `./REFERENCE.md`."
