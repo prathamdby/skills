@@ -26,6 +26,7 @@ npx skills@latest add prathamdby/skills
    - `/box`, clone and search any git repo locally
    - `/assign`, delegate tasks to external agents
    - `/handoff`, save session context or resume from a handoff document
+   - `/caveman`, ultra-compressed reply mode
 
 ## Why These Skills Exist
 
@@ -85,6 +86,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/prath-mode`](./skills/prath-mode/SKILL.md) routes each action to the owning leaf skill and documents workflow chains (ticket fix, planned work, quick save, and more). Read the matched skill in full. Do not restate its steps.
 
+### #10: Every Reply Is Bloated With Filler
+
+**The Problem.** Agents pad every answer with pleasantries, hedging, articles, and restatement. The signal is buried in tokens you pay for and have to read past.
+
+**The Fix.** [`/caveman`](./skills/caveman/SKILL.md) switches to an ultra-compressed reply mode that cuts ~75% of tokens by dropping filler, articles, and pleasantries while keeping full technical accuracy. Code blocks and error strings stay verbatim; it drops back to normal prose for security warnings and irreversible-action confirmations. Stays active every turn until you say "stop caveman" or "normal mode".
+
 ## Development
 
 Before committing skill edits, run the self-check in
@@ -105,6 +112,7 @@ markdown file resolves.
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                                                                       |
 | [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` (`opencode`, `codex`, `claude`), `--model <model>`, and `--dir <path>`.                       |
 | [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.                                                       |
+| [`caveman`](./skills/caveman/SKILL.md)                     | Ultra-compressed reply mode that cuts ~75% of tokens while keeping technical accuracy. User-invoked; toggle off with "stop caveman" or "normal mode".                       |
 
 ## License
 
