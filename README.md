@@ -71,7 +71,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Problem.** You hand a plan to an external agent like OpenCode and it either hangs silently for minutes (waiting on a hidden permission prompt), garbles the prompt (quoting issues with shell arguments), or exits immediately with no useful output.
 
-**The Fix.** [`/assign`](./skills/assign/SKILL.md) writes the prompt to a temp file and pipes it via stdin — avoiding all quoting failures. It auto-approves permissions with the right flags for each agent, monitors output for silent hangs, and cleans up after itself. Supports `--agent <name>` (default: `opencode`) and `--model <provider/model>`.
+**The Fix.** [`/assign`](./skills/assign/SKILL.md) writes the prompt to a temp file and pipes it via stdin, avoiding all quoting failures. It auto-approves permissions with the right flags for each agent, monitors output for silent hangs, and cleans up after itself. Supports `--agent <name>` (default: `opencode`) and `--model <provider/model>`.
 
 ### #8: Context Is Lost Between Sessions
 
@@ -87,29 +87,24 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 ## Development
 
-Before committing skill edits, run:
-
-```bash
-node scripts/validate-skills.mjs
-```
-
-This checks metadata, README coverage, local markdown references, the 100-line
-`SKILL.md` target, and the mandatory Step 0 gate for every skill with
-`REFERENCE.md`.
+Before committing skill edits, run the self-check in
+[`AGENTS.md`](./AGENTS.md): verify each skill's frontmatter name, description
+length, the 100-line `SKILL.md` target, README coverage, and that every linked
+markdown file resolves.
 
 ## Reference
 
-| Skill                                                      | Description                                                                                                                     |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| [`prath-mode`](./skills/prath-mode/SKILL.md)               | Route tasks to the right skill and run workflow chains. Invoke before or alongside other skills.                                |
+| Skill                                                      | Description                                                                                                                                                                 |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`prath-mode`](./skills/prath-mode/SKILL.md)               | Route tasks to the right skill and run workflow chains. Invoke before or alongside other skills.                                                                            |
 | [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages. Skips hooks with `-n` by default; `--verify` runs hooks. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`. |
-| [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                        |
-| [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.                  |
-| [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`. |
-| [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                  |
-| [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                           |
-| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` and `--model <provider/model>`.                  |
-| [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.           |
+| [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                                                                    |
+| [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.                                                              |
+| [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                             |
+| [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                                                              |
+| [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                                                                       |
+| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` and `--model <provider/model>`.                                                              |
+| [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.                                                       |
 
 ## License
 

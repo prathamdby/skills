@@ -1,96 +1,66 @@
 ---
 name: peer-review
 description: >
-  Review implementation plans, technical designs, and code changes for gaps,
-  risks, and completeness. Use when the user asks for a peer review,
-  review of a plan, review of an implementation, assess a design, or check
-  a proposal for issues. Focuses on what matters most and updates the plan
-  with fixes.
+  peer-review a plan, design, or implementation, find the one critical risk,
+  list other gaps, propose a fix for the critical risk, and update the plan.
+  Triggers: peer review a plan, review an implementation, assess a design, check
+  a proposal for gaps.
 ---
 
 # Peer Review
 
-## When to use this skill
-
-Activate when the user asks to peer review a plan, review an implementation,
-assess a design, check a proposal for gaps, or evaluate a technical approach.
-
 ## Step 1: Gather context
 
-Use available tools to pull everything relevant before analyzing:
+Read everything relevant before analyzing:
 
-- **Requirements**: Read the spec, ticket, or PR description that defines what must be built
-- **Implementation plan**: Read the plan, design doc, or proposed changes
-- **Code / changes**: Read the actual implementation, diff, or relevant source files
-- **API specs**: Read OpenAPI specs, protobuf definitions, or API documentation
-- **Dependencies**: Check `package.json`, `requirements.txt`, `Cargo.toml`, etc. for related libraries
-- **Recent incidents**: Search for related bugs, incidents, or post-mortems in the codebase or docs
-- **Tests**: Read existing test files to understand current coverage
+- **Requirements**: the spec, ticket, or PR description defining what must be built
+- **Plan**: the implementation plan, design doc, or proposed changes
+- **Code**: the actual implementation, diff, or relevant source
+- **Contracts**: OpenAPI/protobuf/API docs; `package.json`/`requirements.txt`/`Cargo.toml` for related libs
+- **History**: related bugs, incidents, or post-mortems
+- **Tests**: existing test files for current coverage
 
-Do not proceed to analysis until you have read all relevant materials.
+## Step 2: Analyze against requirements
 
-## Step 2: Analyze the plan against requirements
-
-Compare the implementation plan to the requirements. Check:
-
-- **Completeness**: Are all requirements addressed? What's missing?
-- **Edge cases**: What happens at boundaries, empty inputs, max values, race conditions?
-- **Error states**: How are failures handled? Are rollback paths defined?
-- **Failure modes**: What breaks if a downstream service is down, slow, or returns garbage?
-- **Dependencies**: Are there hidden ordering constraints? Circular imports? Version conflicts?
-- **Performance**: Will this scale? Are there N+1 queries, unbounded loops, or memory leaks?
-- **Security**: Are inputs validated? Is auth checked? Are secrets handled safely? Is data integrity protected?
-- **Testing**: Is the test strategy adequate? Are integration tests included? What about load or chaos testing?
+Compare the plan to the requirements. Check completeness, edge cases (boundaries,
+empty inputs, max values, races), error states and rollback, failure modes (a
+downstream service down/slow/returning garbage), hidden ordering or version
+conflicts, performance (N+1, unbounded loops, leaks), security (input validation,
+auth, secrets, data integrity), and test adequacy.
 
 Focus on what is **most likely to cause failure**, not every theoretical issue.
 
-## Step 3: Structure the response
+## Step 3: Write the review
 
-Format the review in exactly four sections. Be concise. Maximum clarity, minimum words.
+Exactly four sections. Maximum clarity, minimum words.
 
 ### Critical Risk
 
-A single paragraph identifying **the one thing most likely to cause failure**.
-Explain why it is dangerous and under what conditions it will break.
-Do not list multiple risks here. Pick the highest-impact, most probable one.
+One paragraph naming **the single thing most likely to cause failure**, why it
+is dangerous and under what conditions it breaks. Pick the highest-impact, most
+probable one; do not list several.
 
 ### Other Gaps
 
-A bulleted list of **secondary issues**, one line each. Format each bullet as:
-
-```
-- <issue> → <impact>
-```
-
-Only include issues that are real and material. Skip nitpicks and theoretical concerns.
+Bulleted secondary issues, one line each, formatted `- <issue> → <impact>`. Only
+real, material issues, no nitpicks or theoretical concerns.
 
 ### Fix
 
-Numbered steps to **address the critical risk only**. The fix must be concrete,
-actionable, and limited to the critical risk. Do not try to fix everything.
+Numbered, concrete, actionable steps that address **the critical risk only**.
 
 ### Verdict
 
-A single sentence choosing one of:
+One sentence, exactly one of: "Ship it." / "Fix the critical risk first, then
+ship." / "Needs rework." No explanation.
 
-- "Ship it."
-- "Fix the critical risk first, then ship."
-- "Needs rework."
+## Step 4: Update the plan
 
-No explanation. Just the sentence.
+Apply the Fix steps to the plan files directly, the smallest change that
+mitigates the critical risk. Report which files changed and the fix applied.
 
-## Step 4: Update the plan with fixes
+## Style
 
-Apply the fix steps to the implementation plan. Edit the plan files directly
-to incorporate the critical risk mitigation. Make the smallest necessary
-changes to address the critical risk.
-
-After updating, report what files were changed and summarize the fix applied.
-
-## Style rules
-
-- Use concrete language. No vague warnings ("be careful with X").
-- Every claim must be backed by evidence from the materials you read.
-- If you are unsure about something, say so explicitly rather than guessing.
-- Prefer brevity over completeness. A short, accurate review is more useful
-  than a long, diluted one.
+- Concrete language only. No vague warnings ("be careful with X").
+- Back every claim with evidence from what you read.
+- If unsure, say so rather than guess.

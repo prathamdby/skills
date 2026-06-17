@@ -21,7 +21,7 @@ workspace path if relevant.>
 ## Progress
 
 <What was completed in this session. Reference commits, PRs, and plans by path
-or URL — do not paste diffs or full plan text.>
+or URL, do not paste diffs or full plan text.>
 
 ## Decisions
 
@@ -38,8 +38,8 @@ or URL — do not paste diffs or full plan text.>
 
 ## Suggested skills
 
-- `<skill-name>` — <one-line rationale for why the next agent should invoke it>
-- `<skill-name>` — <one-line rationale>
+- `<skill-name>`, <one-line rationale for why the next agent should invoke it>
+- `<skill-name>`, <one-line rationale>
 
 ## Artifacts
 
@@ -71,11 +71,11 @@ Reference, do not duplicate:
 Pick skills the next agent should load early based on the remaining work.
 Examples:
 
-- `commit` — changes are staged and ready to commit
-- `make-pr` — branch work is complete, needs a PR
-- `peer-review` — plan exists but was not reviewed
-- `fix-linear-ticket` — work maps to a Linear ticket
-- `deslop` — implementation is done but diff needs cleanup
+- `commit`, changes are staged and ready to commit
+- `make-pr`, branch work is complete, needs a PR
+- `peer-review`, plan exists but was not reviewed
+- `fix-linear-ticket`, work maps to a Linear ticket
+- `deslop`, implementation is done but diff needs cleanup
 
 Use installed skill names exactly as they appear in frontmatter.
 
@@ -130,9 +130,9 @@ validation to protected routes.
 
 ## Suggested skills
 
-- `peer-review` — review the route integration plan before applying
-- `commit` — commit middleware changes after tests pass
-- `make-pr` — open PR once integration tests are green
+- `peer-review`, review the route integration plan before applying
+- `commit`, commit middleware changes after tests pass
+- `make-pr`, open PR once integration tests are green
 
 ## Artifacts
 
@@ -142,13 +142,3 @@ validation to protected routes.
 | Branch     | `pd/feat/auth-middleware`               |
 | Middleware | `src/middleware/auth.ts`                |
 ```
-
-## Resume behavior
-
-When `/handoff --resume <path>` is invoked:
-
-1. Parse all sections from the document.
-2. Present a brief restoration summary to the user.
-3. If a positional arg was passed, state the narrowed focus explicitly.
-4. Offer to invoke skills listed under `## Suggested skills`.
-5. Start on the highest-priority open task unless the user redirects.

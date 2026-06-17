@@ -1,100 +1,83 @@
 ---
 name: fix-linear-ticket
 description: >
-  Fetch a Linear ticket, create a branch, plan the fix with user confirmation,
-  implement it, and review changes. Use when the user asks to fix a Linear
-  ticket, work on a Linear issue, implement a Linear ticket, or resolve a
-  Linear bug. Supports --base <branch> (default: main) and explicit ticket
-  ID arguments.
+  fix a Linear ticket end to end, fetch it, branch, plan with confirmation,
+  implement, review. Triggers: fix a Linear ticket, work on a Linear issue,
+  implement a Linear ticket, resolve a Linear bug. Flags: --base <branch>
+  (default main) and an explicit ticket ID.
 ---
 
 # Fix Linear Ticket
 
-## When to use this skill
+## Flags
 
-Activate when the user asks to fix a Linear ticket, work on a Linear issue,
-implement a Linear ticket, or resolve a Linear bug.
+| Flag / Arg        | Effect                                                                 |
+| ----------------- | ---------------------------------------------------------------------- |
+| `<ticket-id>`     | Linear ticket identifier (e.g. `ENG-123`). Extracted from the message. |
+| `--base <branch>` | Base branch to branch from. **Default: `main`.**                       |
 
-## Flag detection
-
-| Flag / Arg        | Effect                                                                                                    |
-| ----------------- | --------------------------------------------------------------------------------------------------------- |
-| `<ticket-id>`     | The Linear ticket identifier (e.g., `ENG-123`, `TEAM-456`). Extracted from the user's message if present. |
-| `--base <branch>` | The base branch to branch from. **Default: `main`** if not provided.                                      |
-
-If the ticket ID is not found, stop and ask: "Which Linear ticket should I fix? Please provide the ticket ID."
-
-## Step 0: Read REFERENCE.md (mandatory)
-
-**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
-
-1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
-2. Treat every branch-naming rule, search strategy, and review check in that file as binding for this session.
-3. If you have not read it yet, stop and read it now. Skipping this step causes wrong branch names and incomplete plans.
+If no ticket ID is found, stop and ask: "Which Linear ticket should I fix?
+Please provide the ticket ID."
 
 ## Step 1: Fetch ticket details
 
-Use available Linear MCP tools to fetch the full ticket record. Request: title, description, comments, attachments, linked issues, labels / state / priority.
+Use Linear MCP tools to fetch the full record: title, description, comments,
+attachments, linked issues, labels, state, priority. Never infer ticket content
+from the ID alone. If Linear MCP is unavailable, the ticket is not found, or the
+API errors, stop and report.
 
-**Constraints:**
+## Step 2: Derive the branch name
 
-- Never infer ticket content from the ID alone. Always fetch from Linear.
-- If Linear MCP is unavailable, the ticket is not found, or the API returns an error, stop immediately and report to the user.
+Convention: `pd/<type>/<ticket-id>-<slug>`.
 
-## Step 2: Derive branch name
+- `<type>`: `fix` (bug/defect), `feat` (feature/enhancement), `chore`
+  (maintenance/tooling), `docs` (documentation). Default `fix` when unclear.
+- `<ticket-id>`: lowercase.
+- `<slug>`: kebab-case from the title, 4-5 words max.
 
-Use the convention: `pd/<type>/<ticket-id>-<slug>` where `<type>` is `fix` (bugs), `feat` (features), `chore` (maintenance), or `docs` (documentation), defaulting to `fix`; `<ticket-id>` is lowercase; and `<slug>` is kebab-case from the title, max 4-5 words. See REFERENCE.md for examples.
+Example: ENG-123 "Fix auth redirect loop" → `pd/fix/eng-123-fix-auth-redirect-loop`.
 
-If the branch name cannot be constructed, stop and ask the user for a branch name.
+If the name cannot be constructed, stop and ask the user for one.
 
-## Step 3: Create branch off base
+## Step 3: Create the branch off base
 
-1. Fetch the base branch:
-   ```bash
-   git fetch origin <base-branch>
-   ```
-2. Check out the base branch at its latest remote state:
-   ```bash
-   git checkout <base-branch>
-   git reset --hard origin/<base-branch>
-   ```
-3. Create and check out the derived branch:
-   ```bash
-   git checkout -b <derived-branch-name>
-   ```
+```bash
+git fetch origin <base-branch>
+git checkout <base-branch>
+git reset --hard origin/<base-branch>
+git checkout -b <derived-branch-name>
+```
 
-Report the branch created to the user.
+Report the branch created.
 
 ## Step 4: Plan the fix
 
-1. Search the codebase for related files.
-2. Outline affected files, changes needed, dependencies, and risks.
-3. Present the plan concisely to the user.
+Search the codebase for files related to the ticket, function/component/module
+names from the description, and the bug area or feature surface. Read them to
+understand the current implementation. Then outline: files to change, the change
+per file, dependencies/ordering, and risks or edge cases. See `./REFERENCE.md`
+for the full search strategy.
 
-**Wait for explicit user confirmation** before implementing. See REFERENCE.md for detailed search strategy.
+Present the plan, then **wait for explicit user confirmation** before writing
+any code.
 
 ## Step 5: Implement the fix
 
-- Apply approved changes to listed files
-- Make focused, minimal changes
-- Do not change unrelated code
-- Follow existing patterns and style
+Apply the approved changes only. Keep changes focused and minimal, follow
+existing patterns and style, and do not touch unrelated code.
 
 ## Step 6: Review
 
-1. Verify against ticket requirements
-2. Check for regressions
-3. Flag edge cases
-4. Compare style consistency with original code
+Re-read every changed file and check it against the four review checks in
+`./REFERENCE.md`: ticket requirements met, no regressions, edge cases covered,
+style consistent with surrounding code.
 
-Report: what was implemented, how it addresses the ticket, any regressions or edge cases, and follow-up work. See REFERENCE.md for detailed review checks.
+Report: what was implemented, how it addresses the ticket, any regressions or
+edge cases, and follow-up work.
 
-## Constraints (strict)
+## Constraints
 
-- **Never commit.** Do not run `git commit` at any point.
-- **Never build.** Do not run build commands unless the user explicitly asks outside this skill.
-- **Never run tests.** Do not run test commands unless the user explicitly asks outside this skill.
-- **Never push.** Do not run `git push` at any point.
+- **Never commit, build, run tests, or push.** Do none of these unless the user
+  asks outside this skill.
 - **Never infer ticket content.** Always fetch from Linear.
-- **If the ticket or branch name cannot be found, stop and ask.**
-- **Never skip Step 0.** REFERENCE.md holds branch examples, search strategy, and review checks this skill depends on.
+- If the ticket or branch name cannot be found, stop and ask.

@@ -1,7 +1,9 @@
 # Agent Skill Authoring Conventions
 
 > Rules specific to writing skills for this repository. For global agent
-> behavior, see the `global-rules` skill.
+> behavior, see the `global-rules` skill. These conventions follow the
+> `writing-great-skills` framework: a skill exists to make the agent take the
+> same _process_ every run. Predictability is the goal every rule below serves.
 
 ## Meta-Rule: Draft Before Writing
 
@@ -23,15 +25,26 @@ This applies to every skill, no exceptions.
 
 Do not commit the skill without the README update.
 
-## Meta-Rule: Validate Skill Changes
+## Meta-Rule: Self-Check Before Committing
 
-**After adding or updating any skill, run `node scripts/validate-skills.mjs` before committing.**
+**Before committing any skill addition or update, verify every rule below by
+reading the files. There is no validator script; you are the check.**
 
-1. Run the validator after the skill file, reference files, and README are updated.
-2. Fix every validation failure before committing.
-3. Treat this as a maintainer check only; skill users do not run it when invoking installed skills.
+For every skill you touched:
 
-Do not commit a skill addition or update until the validator passes.
+1. **name**, present in frontmatter, kebab-case (`^[a-z0-9]+(-[a-z0-9]+)*$`),
+   64 chars or fewer, and exactly matches the skill's directory name.
+2. **description**, present and 1024 characters or fewer.
+3. **SKILL.md length**, 100 lines or fewer.
+4. **README coverage**, the skill appears in the `README.md` quickstart list
+   (as `/<name>`) and has a row in the `## Reference` table linking
+   `./skills/<name>/SKILL.md`.
+5. **Markdown links resolve**, every real `.md` path linked or backticked in
+   `SKILL.md` points to a file that exists. Ignore template paths containing
+   `<...>` placeholders.
+
+Fix every failure before committing. Do not commit until all five pass.
+
 
 ---
 
@@ -40,38 +53,45 @@ Do not commit a skill addition or update until the validator passes.
 - Skills live in `skills/<name>/SKILL.md` (project-level)
 - Never use `.agents/skills/` for this repo
 - Each skill is a directory containing `SKILL.md` at minimum
-- Optional: `REFERENCE.md`, `scripts/`, `references/`, `assets/`
+- Optional: `REFERENCE.md`, `references/`, `assets/`
 
-## REFERENCE.md gate
+## Disclose by branch, not by gate
 
-If a skill ships a `REFERENCE.md`, **always add Step 0 to `SKILL.md`** before any
-workflow step. Place it after flag detection (or the intro section) and before
-Step 1 or Workflow A. Do not rely on inline "See REFERENCE.md" links alone.
+Material the agent needs on _every_ run stays inline in `SKILL.md`. Material
+only _some_ runs reach (a **branch**, a distinct way the skill is invoked) gets
+pushed into `REFERENCE.md` or `references/`, reached by a sharp **context
+pointer** at the step that needs it.
 
-Use this template. Customize bullet 2 and 3 for the skill's reference content:
-
-```markdown
-## Step 0: Read REFERENCE.md (mandatory)
-
-**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md` in full.**
-
-1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
-2. Treat every [rule / format / constraint type] in that file as binding for this session.
-3. If you have not read it yet, stop and read it now. Skipping this step causes [specific failure mode].
-```
-
-If the skill has a Constraints section, add: **Never skip Step 0.** REFERENCE.md
-holds [what the reference contains] this skill depends on.
-
-When adding Step 0 to an existing skill that already has `REFERENCE.md`, apply
-the same gate.
+- Inline what every branch needs; disclose what only some branches reach.
+- A pointer's _wording_ decides how reliably the agent follows it. Word it as an
+  instruction tied to its trigger condition: "classify every change against the
+  8 categories in `REFERENCE.md`", not "see REFERENCE.md".
+- Do not add a mandatory "read this file first" gate. A gate forces every run to
+  load reference some runs never use, defeating disclosure. If a pointer fires
+  unreliably on must-have material, sharpen its wording or inline the material.
+  Do not gate it.
+- If everything in a would-be `REFERENCE.md` is must-have on every run, keep it
+  inline and ship no `REFERENCE.md`.
 
 ## Frontmatter
 
-| Field         | Rule                                                                                             |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| `name`        | kebab-case, max 64 chars, match directory name                                                   |
-| `description` | WHAT the skill does + WHEN to use it + supported flags. Use imperative phrasing. Max 1024 chars. |
+| Field         | Rule                                                                                                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | kebab-case, max 64 chars, match directory name                                                                                                                  |
+| `description` | Triggers that fire the skill, plus a reach clause if other skills invoke it. Front-load the leading word. Omit it to make a skill user-invoked. Max 1024 chars. |
+
+### Writing the description
+
+The description sits in the context window every turn, so prune it harder than
+the body.
+
+- **Front-load the leading word**, the word you actually type when you want the
+  skill (`commit`, `deslop`, `handoff`). It anchors invocation.
+- **One trigger per branch.** Synonyms renaming a single branch are duplication;
+  collapse them. Keep only genuinely distinct triggers.
+- **Cut identity already stated in the body.** No mandated boilerplate phrase.
+- Do not restate the description as a "When to use this skill" section in the
+  body. That is duplication of a line the agent already holds.
 
 ## Flags Are Preferred
 
@@ -91,12 +111,19 @@ them as flags in the user's invocation message:
 ## Content Principles
 
 - Keep `SKILL.md` at or under 100 lines
-- Use progressive disclosure: essentials in `SKILL.md`, detail in `REFERENCE.md`
-  or `references/`; enforce the read with Step 0 when using `REFERENCE.md`
+- Use progressive disclosure: inline what every run needs; push branch-only
+  reference into `REFERENCE.md` or `references/` behind a sharp context pointer
+- Co-locate: keep a concept's definition, rules, and caveats under one heading
 - Prefer procedures over declarations: teach _how to approach_, not _what to
   produce_
 - Match specificity to fragility: guidelines for flexible tasks, exact steps for
   fragile ones
 - State defaults, not menus: pick one approach, mention alternatives briefly
-- Every instruction must be actionable. No vague advice.
-- Use concrete language with examples. No filler.
+- End each step on a checkable completion criterion, so the agent can tell done
+  from not-done and does not stop short
+- Reach for a leading word before a paragraph: a pretrained concept (`slop`,
+  `handoff`, `tracer bullets`) anchors behavior in one token
+- Keep each meaning in one place. The same fact in two files is duplication,
+  the leaf frontmatter owns its own triggers and flags, not a central catalog
+- Hunt no-ops: delete any sentence the agent would already obey by default
+- Every instruction must be actionable. No vague advice, no filler.

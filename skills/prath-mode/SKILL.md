@@ -1,99 +1,63 @@
 ---
 name: prath-mode
 description: >
-  Route tasks to the right skill in prathamdby/skills. Verifies the leaf skill
-  is installed before invoking it. Use when the user types /prath-mode or wants
-  Pratham's composable agent workflow. Read the matched leaf skill in full
-  before executing.
+  Route a task to the right skill in prathamdby/skills and run multi-step
+  workflow chains. Verifies the leaf skill is installed before invoking it.
 disable-model-invocation: true
 ---
 
 # Prath mode
 
-## Non-negotiables
-
 Read the matched leaf skill in full before executing. Do not restate or
-improvise its workflow.
+improvise its workflow. The leaf owns its own triggers, flags, and rules.
 
-- Commit or write a commit message → **commit** (`../commit/SKILL.md`)
-- Strip AI slop or simplify a diff → **deslop** (`../deslop/SKILL.md`)
-- Open a pull request → **make-pr** (`../make-pr/SKILL.md`)
-- Fix or implement a Linear ticket → **fix-linear-ticket**
-  (`../fix-linear-ticket/SKILL.md`)
-- Review a plan, design, or implementation → **peer-review**
-  (`../peer-review/SKILL.md`)
-- Clone or search an external git repo → **box** (`../box/SKILL.md`)
-- Delegate work to an external agent → **assign** (`../assign/SKILL.md`)
-- Save session context or resume a handoff → **handoff** (`../handoff/SKILL.md`)
+## Routing map
 
-When the user's request matches multiple skills, pick the leaf skill that owns
-the immediate action. Use workflow chains below for multi-step work.
+| Action                                   | Leaf skill                                              |
+| ---------------------------------------- | ------------------------------------------------------- |
+| Commit or write a commit message         | **commit** (`../commit/SKILL.md`)                       |
+| Strip AI slop or simplify a diff         | **deslop** (`../deslop/SKILL.md`)                       |
+| Open a pull request                      | **make-pr** (`../make-pr/SKILL.md`)                     |
+| Fix or implement a Linear ticket         | **fix-linear-ticket** (`../fix-linear-ticket/SKILL.md`) |
+| Review a plan, design, or implementation | **peer-review** (`../peer-review/SKILL.md`)             |
+| Clone or search an external git repo     | **box** (`../box/SKILL.md`)                             |
+| Delegate work to an external agent       | **assign** (`../assign/SKILL.md`)                       |
+| Save session context or resume a handoff | **handoff** (`../handoff/SKILL.md`)                     |
+
+When a request matches several skills, pick the leaf that owns the immediate
+action. For multi-step work, use a chain below.
 
 ## Workflow chains
 
-Run skills in order. Read each leaf skill before that step.
+Run in order. Read each leaf before its step. `implement` is not a skill.
 
-1. **Ship ticket work:** `fix-linear-ticket` → implement → `deslop` → `commit`
-   → `make-pr` (pass `--ticket` to make-pr when the ID is known)
-2. **Ship planned work:** `peer-review` → implement → `deslop` → `commit` →
-   `make-pr`
+1. **Ship ticket work:** `fix-linear-ticket` → implement → `deslop` → `commit` →
+   `make-pr` (pass `--ticket` to make-pr when the ID is known)
+2. **Ship planned work:** `peer-review` → implement → `deslop` → `commit` → `make-pr`
 3. **Quick save:** `deslop` (optional) → `commit`
 4. **Research external code:** `box`
 5. **Delegate heavy lift:** `assign`
 6. **End or resume session:** `handoff` or `handoff --resume <path>`
 
-## Composition rules
-
-- Do not improvise commit or PR formatting when **commit** or **make-pr** apply
-- **commit** uses the git diff only. Ignore session context for the message
-- **make-pr** never commits, builds, runs, or pushes
-- **make-pr** uses plain-English titles unless `--conventional` is passed
-- **fix-linear-ticket** plans the fix and waits for user confirmation before
-  writing code
-- **deslop** runs before **commit** when both apply in a chain
-- **peer-review** runs before implementation when a plan exists and has not been
-  reviewed
-
-## Step 0: Read REFERENCE.md (mandatory)
-
-**Do not proceed to Step 1 or any later step until you have read `REFERENCE.md`
-in full.**
-
-1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder
-   as this file).
-2. Treat every trigger, flag, never-rule, and workflow chain in that file as
-   binding for this session.
-3. If you have not read it yet, stop and read it now. Skipping this step causes
-   wrong skill selection.
-
 ## Step 1: Match
 
-Match the user's request to one leaf skill or one workflow chain from
-REFERENCE.md.
-
-If no skill matches, say so and ask what the user wants to do.
+Match the request to one leaf or one chain. If nothing matches, say so and ask
+what the user wants.
 
 ## Step 2: Verify installation
 
-Before reading or executing a leaf skill, confirm it is installed.
+Before reading or executing a leaf, confirm it is installed: resolve
+`../<skill-name>/SKILL.md` relative to this skill's directory and check it exists
+(`test -f` or the Read tool). For a chain, verify every leaf before the first
+step and re-check before each subsequent step, the user may install skills
+between steps.
 
-1. Resolve the path `../<skill-name>/SKILL.md` relative to this skill's
-   directory (same folder as this file).
-2. Check the file exists. Use the Read tool or
-   `test -f ../<skill-name>/SKILL.md` from this skill's directory.
-3. If the file is missing, stop. Report the skill name, the path you checked,
-   and tell the user to install it:
-   `npx skills@latest add prathamdby/skills`
-4. Do not improvise the leaf skill's workflow when it is not installed.
-
-**Chains:** verify every leaf skill in the chain before starting the first step.
-Skip `implement` (not a skill). If any skill is missing, list all missing names
-in one message.
-
-Re-check before each chain step. The user may install skills between steps.
+If any leaf is missing, stop and report its name and checked path, list all
+missing names in one message, and tell the user to install:
+`npx skills@latest add prathamdby/skills`. Never improvise a missing leaf's
+workflow.
 
 ## Step 3: Read and invoke
 
-1. Read the leaf skill's `SKILL.md` in full.
-2. Execute per the leaf skill. For chains, complete each step before starting
-   the next unless the user narrows scope.
+Read the matched leaf's `SKILL.md` in full, then execute per the leaf. For
+chains, complete each step before starting the next unless the user narrows scope.
