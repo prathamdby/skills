@@ -3,27 +3,28 @@ name: assign
 description: >
   assign a task to an external coding agent and monitor it. Pipes the prompt via
   stdin to dodge quoting failures and auto-approves permissions to avoid silent
-  hangs. Triggers: run a task with an external agent, hand off to OpenCode or
-  similar, execute a plan non-interactively. Flags: --agent <name> (default
-  opencode) and --model <provider/model>.
+  hangs. Triggers: run a task with an external agent, hand off to OpenCode,
+  Claude Code, or similar, execute a plan non-interactively. Flags: --agent
+  <name> (default opencode) and --model <model>.
 ---
 
 # Assign
 
 ```
 /assign "Fix the null check in auth.ts" --agent opencode --model opencode-go/kimi-k2.6
+/assign "Fix the null check in auth.ts" --agent claude
 ```
 
 ## Flags
 
-| Flag                       | Effect                                                       |
-| -------------------------- | ------------------------------------------------------------ |
-| `--agent <name>`           | Agent to delegate to. **Default: `opencode`**.               |
-| `--model <provider/model>` | Model to use. Agent default applies if omitted.              |
-| `--dir <path>`             | Working directory for the agent. Default: current directory. |
+| Flag              | Effect                                                       |
+| ----------------- | ------------------------------------------------------------ |
+| `--agent <name>`  | Agent to delegate to. **Default: `opencode`**.               |
+| `--model <model>` | Model to use. Agent default applies if omitted.              |
+| `--dir <path>`    | Working directory for the agent. Default: current directory. |
 
 If `--agent` names an unsupported agent, stop: "Unknown agent `<name>`.
-Supported agents: opencode, codex. See `./REFERENCE.md`."
+Supported agents: opencode, codex, claude. See `./REFERENCE.md`."
 
 ## Step 1: Write the prompt file
 

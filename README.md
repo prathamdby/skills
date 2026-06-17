@@ -24,7 +24,7 @@ npx skills@latest add prathamdby/skills
    - `/fix-linear-ticket`, fetch ticket, branch, plan, fix, review
    - `/make-pr`, open PRs with thematic summaries
    - `/box`, clone and search any git repo locally
-   - `/assign`, delegate tasks to external agents like OpenCode
+   - `/assign`, delegate tasks to external agents
    - `/handoff`, save session context or resume from a handoff document
 
 ## Why These Skills Exist
@@ -69,9 +69,9 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 ### #7: Delegating Tasks to External Agents Is Fragile
 
-**The Problem.** You hand a plan to an external agent like OpenCode and it either hangs silently for minutes (waiting on a hidden permission prompt), garbles the prompt (quoting issues with shell arguments), or exits immediately with no useful output.
+**The Problem.** You hand a plan to an external agent like OpenCode or Claude Code and it either hangs silently for minutes (waiting on a hidden permission prompt), garbles the prompt (quoting issues with shell arguments), or exits immediately with no useful output.
 
-**The Fix.** [`/assign`](./skills/assign/SKILL.md) writes the prompt to a temp file and pipes it via stdin, avoiding all quoting failures. It auto-approves permissions with the right flags for each agent, monitors output for silent hangs, and cleans up after itself. Supports `--agent <name>` (default: `opencode`) and `--model <provider/model>`.
+**The Fix.** [`/assign`](./skills/assign/SKILL.md) writes the prompt to a temp file and pipes it via stdin, avoiding all quoting failures. It auto-approves permissions with the right flags for each agent, monitors output for silent hangs, and cleans up after itself. Supports `--agent <name>` (`opencode`, `codex`, `claude`; default: `opencode`) and `--model <model>`.
 
 ### #8: Context Is Lost Between Sessions
 
@@ -103,7 +103,7 @@ markdown file resolves.
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                             |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                                                              |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                                                                       |
-| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` and `--model <provider/model>`.                                                              |
+| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` (`opencode`, `codex`, `claude`) and `--model <model>`.                                       |
 | [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.                                                       |
 
 ## License

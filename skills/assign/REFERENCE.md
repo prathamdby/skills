@@ -10,6 +10,7 @@ command piped from stdin. The coordinator writes the prompt to
 | ---------- | ------------------------------------------------------------------------------------------------ | ------------------------------ |
 | `opencode` | `opencode run --model '<model>' --dir '<dir>' --dangerously-skip-permissions`                    | `opencode-go/kimi-k2.6`        |
 | `codex`    | `codex exec --sandbox workspace-write -c approval_policy=never --cd '<dir>' --model '<model>' -` | Codex default (omit `--model`) |
+| `claude`   | `claude -p '<shim>' --model '<model>' --dangerously-skip-permissions`                            | `opus`                         |
 
 ### Notes per agent
 
@@ -42,6 +43,28 @@ command piped from stdin. The coordinator writes the prompt to
 - Codex requires a Git repository by default. Pass `--skip-git-repo-check` to run
   outside one. `--full-auto` is deprecated (prints a warning); do not use it.
 
+**claude**
+
+- Claude Code requires `-p` (print mode) for non-interactive delegation. The task
+  body is piped via stdin; `<shim>` is a fixed transport string, not task
+  expansion:
+  `The piped stdin is the complete task. Execute it exactly. Do not infer or expand scope.`
+- `--dangerously-skip-permissions` is required for tasks that use tools. Without
+  it, file edits and shell commands stall waiting for approval that never comes
+  in `-p` mode.
+- Claude has no `--cd` flag. When the user passes `--dir`, wrap the command:
+  `cat ./assign-prompt.tmp | (cd '<dir>' && claude -p '<shim>' --model '<model>' --dangerously-skip-permissions)`.
+  When `--dir` was not specified, omit the subshell and run from the current
+  directory.
+- Model format: alias (`opus`, `sonnet`, `haiku`, `fable`) or full model ID
+  (e.g., `claude-opus-4-8`). Not `provider/model`. When the user omits
+  `--model`, substitute `opus`.
+- Full project context loads by default (CLAUDE.md, skills, hooks, MCP). Do not
+  pass `--bare` unless the prompt explicitly asks for it.
+- Stdin is capped at 10MB (v2.1.128+). For larger prompts, reference a file
+  path in the task instead of piping the full body.
+- Requires `claude auth login` or `ANTHROPIC_API_KEY`.
+
 ## Adding a new agent
 
 1. Add a row to the registry table above with the agent name, full invocation
@@ -67,6 +90,9 @@ permissions without prompting.
 invocation command. Use the `-` stdin sentinel (pipe the prompt) rather than
 passing it as an argument.
 
+**Fix for claude:** Ensure `--dangerously-skip-permissions` is included. Without
+it, tool-using tasks fail or stall while waiting for permission approval.
+
 ### Quoting failure, agent receives a truncated or garbled prompt
 
 **Cause:** The prompt was passed as a shell argument. Single quotes, newlines,
@@ -83,5 +109,9 @@ cat ./assign-prompt.tmp | opencode run --model '<model>' --dangerously-skip-perm
 Check the agent's output for the last error message. Common causes:
 
 - Model not found: run `opencode models` and verify the model slug.
-- No API key: ensure the provider credentials are configured.
+- Claude model not found: use an alias (`opus`, `sonnet`) or a full model ID.
+- No API key: ensure the provider credentials are configured. For claude, run
+  `claude auth status`.
 - Working directory not found: verify `--dir` points to an existing path.
+- Claude edits land in the wrong directory: ensure the `(cd '<dir>' && ...)` wrapper
+  is present when `--dir` was specified.
