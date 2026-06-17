@@ -17,11 +17,11 @@ description: >
 
 ## Flags
 
-| Flag                       | Effect                                                       |
-| -------------------------- | ------------------------------------------------------------ |
-| `--agent <name>`           | Agent to delegate to. **Default: `opencode`**.               |
-| `--model <model>`          | Model to use. Agent default applies if omitted.              |
-| `--dir <path>`             | Working directory for the agent. Default: current directory. |
+| Flag              | Effect                                                       |
+| ----------------- | ------------------------------------------------------------ |
+| `--agent <name>`  | Agent to delegate to. **Default: `opencode`**.               |
+| `--model <model>` | Model to use. Agent default applies if omitted.              |
+| `--dir <path>`    | Working directory for the agent. Default: current directory. |
 
 If `--agent` names an unsupported agent, stop: "Unknown agent `<name>`.
 Supported agents: opencode, codex, claude. See `./REFERENCE.md`."

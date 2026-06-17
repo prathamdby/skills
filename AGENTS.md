@@ -45,7 +45,6 @@ For every skill you touched:
 
 Fix every failure before committing. Do not commit until all five pass.
 
-
 ---
 
 ## Project Structure
