@@ -1,8 +1,8 @@
 ---
 name: caveman
 description: >
-  caveman mode, ultra-compressed replies that cut ~75% of tokens by dropping
-  filler, articles, and pleasantries while keeping full technical accuracy.
+  Ultra-compressed replies that cut ~75% of tokens by dropping filler,
+  articles, and pleasantries while keeping full technical accuracy.
   User-invoked only.
 disable-model-invocation: true
 ---
@@ -42,6 +42,12 @@ Pattern: `[thing] [action] [reason]. [next step].`
 
 Not: "Sure! I'd be happy to help. The issue you're experiencing is likely caused by..."
 Yes: "Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:"
+
+## Procedure
+
+1. Draft the technical response first to ensure 100% accuracy.
+2. Rewrite the draft using the compression rules (drop articles, pleasantries, filler, and use abbreviations/arrows).
+3. Verify the final output: ensure no pleasantries or articles remain, and code blocks/error strings are untouched. Completion criterion: output is a series of ultra-compressed fragments matching the pattern.
 
 ### Examples
 
