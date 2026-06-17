@@ -87,14 +87,10 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 ## Development
 
-Before committing skill edits, run:
-
-```bash
-node scripts/validate-skills.mjs
-```
-
-This checks metadata, README coverage, local markdown references, and the
-100-line `SKILL.md` target for every skill.
+Before committing skill edits, run the self-check in
+[`AGENTS.md`](./AGENTS.md): verify each skill's frontmatter name, description
+length, the 100-line `SKILL.md` target, README coverage, and that every linked
+markdown file resolves.
 
 ## Reference
 

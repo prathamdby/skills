@@ -25,15 +25,26 @@ This applies to every skill, no exceptions.
 
 Do not commit the skill without the README update.
 
-## Meta-Rule: Validate Skill Changes
+## Meta-Rule: Self-Check Before Committing
 
-**After adding or updating any skill, run `node scripts/validate-skills.mjs` before committing.**
+**Before committing any skill addition or update, verify every rule below by
+reading the files. There is no validator script; you are the check.**
 
-1. Run the validator after the skill file, reference files, and README are updated.
-2. Fix every validation failure before committing.
-3. Treat this as a maintainer check only; skill users do not run it when invoking installed skills.
+For every skill you touched:
 
-Do not commit a skill addition or update until the validator passes.
+1. **name**, present in frontmatter, kebab-case (`^[a-z0-9]+(-[a-z0-9]+)*$`),
+   64 chars or fewer, and exactly matches the skill's directory name.
+2. **description**, present and 1024 characters or fewer.
+3. **SKILL.md length**, 100 lines or fewer.
+4. **README coverage**, the skill appears in the `README.md` quickstart list
+   (as `/<name>`) and has a row in the `## Reference` table linking
+   `./skills/<name>/SKILL.md`.
+5. **Markdown links resolve**, every real `.md` path linked or backticked in
+   `SKILL.md` points to a file that exists. Ignore template paths containing
+   `<...>` placeholders.
+
+Fix every failure before committing. Do not commit until all five pass.
+
 
 ---
 
@@ -42,7 +53,7 @@ Do not commit a skill addition or update until the validator passes.
 - Skills live in `skills/<name>/SKILL.md` (project-level)
 - Never use `.agents/skills/` for this repo
 - Each skill is a directory containing `SKILL.md` at minimum
-- Optional: `REFERENCE.md`, `scripts/`, `references/`, `assets/`
+- Optional: `REFERENCE.md`, `references/`, `assets/`
 
 ## Disclose by branch, not by gate
 
