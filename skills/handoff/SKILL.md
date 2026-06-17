@@ -1,90 +1,65 @@
 ---
 name: handoff
 description: >
-  Compact the current conversation into a handoff document so a fresh agent
-  can continue the work, or restore context from a previously saved handoff.
-  Use when the user types /handoff, wants to save session context, hand off
-  to a new agent, or resume from a handoff file. Supports --resume <path>,
-  --path <path>, and a positional focus argument.
+  handoff the session — compact the conversation into a document a fresh agent
+  can resume from, or restore context from a saved handoff. Triggers: /handoff,
+  save session context, hand off to a new agent, resume from a handoff file.
+  Flags: --resume <path>, --path <path>, and a positional focus argument.
 ---
 
 # Handoff
 
-## When to use this skill
+## Flags
 
-Activate when the user types `/handoff`, asks to save session context, hand off
-to a new agent, or resume from a previously saved handoff document.
+| Flag / Arg        | Effect                                                                        |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `--resume <path>` | Load an existing handoff doc and restore context. Writes no new doc.          |
+| `--path <path>`   | Save the new doc to `<path>` instead of the default handoffs dir.             |
+| Positional arg    | What the next session should focus on. Tailors a new doc or narrows a resume. |
 
-## Flag detection
+No flags → create a new handoff doc in the default dir.
 
-| Flag / Arg        | Effect                                                                                                |
-| ----------------- | ----------------------------------------------------------------------------------------------------- |
-| `--resume <path>` | Load an existing handoff doc and restore its context. No new doc is written.                          |
-| `--path <path>`   | Save the new handoff doc to `<path>` instead of the default handoffs dir.                             |
-| Positional arg    | Description of what the next session will focus on. Tailors the new doc or narrows a resumed session. |
-
-**Defaults:** If no flags are provided, create a new handoff document in the
-default handoffs directory.
-
-`--resume` and `--path` are mutually exclusive. If both are passed, stop and
-report: "`--resume` and `--path` are mutually exclusive. Use `--resume` to load
-an existing handoff, or `--path` to save a new one."
-
-If `--resume` or `--path` is passed without a path argument, stop and ask for
-the missing path.
+`--resume` and `--path` are mutually exclusive; if both passed, stop: "`--resume`
+and `--path` are mutually exclusive." If `--resume` or `--path` is passed without
+a path, stop and ask for it.
 
 ## Handoffs directory
 
-Default save location is inside this skill's directory:
+Default save location is inside this skill's directory (the anchor):
 
-- Handoffs root: `./handoffs/`
-- File naming: `./handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`
+- Root: `./handoffs/`
+- Naming: `./handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`
 
 `--path <path>` overrides this entirely.
 
-## Step 0: Read REFERENCE.md (mandatory)
+## Workflow A: Create (default, no `--resume`)
 
-**Do not proceed to Workflow A, Workflow B, or any later step until you have read `REFERENCE.md` in full.**
-
-1. Use the Read tool on `./REFERENCE.md` in this skill's directory (same folder as this file).
-2. Treat every document format rule and example in that file as binding for this session.
-3. If you have not read it yet, stop and read it now. Skipping this step causes malformed handoff documents.
-
-## Workflow A: Create handoff (default)
-
-Run when `--resume` is not passed.
-
-1. Determine the save path. Use `--path <path>` when provided; otherwise use
-   `<anchor>/handoffs/handoff-<timestamp>.md`.
-2. Create `./handoffs/` if the default directory does not exist.
-3. Survey existing artifacts from the workspace or conversation: plans, PRDs,
-   ADRs, issues, PRs, commits, and diffs. Reference them by path or URL.
-4. Write the handoff document using the format in `./REFERENCE.md`. Keep it
-   compact enough for a fresh agent to read in under two minutes.
-5. Redact API keys, tokens, passwords, and personally identifiable information.
-6. If a positional argument was passed, add `## Next session focus` at the top
-   and tailor open tasks and suggested skills around that focus.
-7. Report the full save path, one-line capture summary, and resume command:
+1. Resolve the save path: `--path` if given, else
+   `<anchor>/handoffs/handoff-<timestamp>.md`. Create `./handoffs/` if absent.
+2. Survey artifacts from the workspace and conversation — plans, PRDs, ADRs,
+   issues, PRs, commits, diffs. You will reference them by path or URL, never
+   paste their contents.
+3. Write the doc using the format in `./REFERENCE.md`. Keep it readable by a
+   fresh agent in under two minutes.
+4. Redact API keys, tokens, passwords, and PII.
+5. If a positional arg was passed, add `## Next session focus` at the top and
+   frame open tasks and suggested skills around it.
+6. Report the save path, a one-line capture summary, and the resume command:
    `/handoff --resume <path>`.
 
-## Workflow B: Resume from handoff (`--resume`)
+## Workflow B: Resume (`--resume <path>`)
 
-Run when `--resume <path>` is passed.
-
-1. Read the file at `<path>`. If it does not exist, stop and report:
-   "Handoff file not found at `<path>`."
+1. Read the file. If absent, stop: "Handoff file not found at `<path>`."
 2. Summarize context, progress, key decisions, prioritized open tasks, and
    blockers for the user.
-3. If a positional argument was also passed, treat it as the narrowed focus for
-   this resumed session.
-4. Read `## Suggested skills` from the document. List each skill with its
-   rationale and offer to invoke the relevant ones for the current focus.
-5. Continue from the open tasks. Reference artifacts by path or URL instead of
-   re-deriving captured content.
+3. If a positional arg was also passed, treat it as the narrowed focus.
+4. From `## Suggested skills`, list each skill with its rationale and offer to
+   invoke the ones relevant to the focus.
+5. Continue from the open tasks, referencing artifacts by path or URL rather
+   than re-deriving captured content.
 
 ## Constraints
 
-- Never duplicate content already captured in artifacts. Reference by path or URL.
-- Redact sensitive information before saving.
-- When resuming, do not write a new handoff unless the user explicitly asks.
-- Never skip Step 0. REFERENCE.md holds the handoff document format and examples this skill depends on.
+- Never duplicate content already in artifacts. Reference by path or URL.
+- Redact sensitive values before saving.
+- When resuming, never write a new handoff unless the user explicitly asks.

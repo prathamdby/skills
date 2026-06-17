@@ -142,13 +142,3 @@ validation to protected routes.
 | Branch     | `pd/feat/auth-middleware`               |
 | Middleware | `src/middleware/auth.ts`                |
 ```
-
-## Resume behavior
-
-When `/handoff --resume <path>` is invoked:
-
-1. Parse all sections from the document.
-2. Present a brief restoration summary to the user.
-3. If a positional arg was passed, state the narrowed focus explicitly.
-4. Offer to invoke skills listed under `## Suggested skills`.
-5. Start on the highest-priority open task unless the user redirects.

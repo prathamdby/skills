@@ -1,208 +1,41 @@
 # Commit Skill Reference
 
-## Hook behavior (`-n` vs `--verify`)
-
-**Default (no `--verify`):** skip hooks with `-n`:
-
-```bash
-git commit -n -m "<subject>"
-```
-
-With a body, add a second `-m`:
-
-```bash
-git commit -n -m "<subject>" -m $'- First bullet\n- Second bullet'
-```
-
-Agents often omit `-n` and let hooks run or fail. That violates the default
-path. If you did not pass `-n` and the user did not pass `--verify`, Step 4
-failed.
-
-**With `--verify`:** run hooks. Do not pass `-n` or `--no-verify`:
-
-```bash
-git commit -m "<subject>"
-```
-
-With a body:
-
-```bash
-git commit -m "<subject>" -m $'- First bullet\n- Second bullet'
-```
-
-If the user passed `--verify` and you passed `-n`, Step 4 failed.
-
-## Diff-only message rule
-
-The commit message describes **what changed in the diff**, not the surrounding
-session.
-
-**Do not write:**
-
-- "Address review feedback"
-- "Fix issues raised in discussion"
-- "Implement the agreed plan"
-- "Update per user request"
-
-**Write the concrete change instead.**
-
-| Diff shows                           | Bad                             | Good                                  |
-| ------------------------------------ | ------------------------------- | ------------------------------------- |
-| Null check added in `userService.ts` | fix: address review feedback    | fix: guard null user in getProfile    |
-| README install steps rewritten       | docs: update per discussion     | docs: add pnpm install steps          |
-| Extract helper from handler          | refactor: implement agreed plan | refactor: extract parsePayload helper |
-
-## Commit invocation (`-m` count)
-
-Use **one or two** `-m` flags. First `-m` holds the subject. Second `-m`
-holds the full body when needed. Git inserts a blank line between `-m`
-arguments, so two flags produce the correct subject/body separation.
-
-**No body — one `-m`:**
-
-```bash
-git commit -n -m "feat: add password reset endpoint"
-```
-
-**With body — two `-m`:**
-
-```bash
-git commit -n -m "feat: add auth flow" \
-  -m $'- Implement OAuth login\n- Add JWT handling\n- Update login UI'
-```
-
-Result (correct):
-
-```
-feat: add auth flow
-
-- Implement OAuth login
-- Add JWT handling
-- Update login UI
-```
-
-Put all bullets in the second `-m`. Use `$'...\n...'` so `\n` becomes real
-newlines inside that argument. Bullets must be separated by a single `\n`,
-never `\n\n`.
-
-**Forbidden — 3+ `-m` produces blank lines between every line:**
-
-```bash
-git commit -n -m "feat: add auth flow" \
-  -m "- Implement OAuth login" \
-  -m "- Add JWT handling" \
-  -m "- Update login UI"
-```
-
-Result (wrong):
-
-```
-feat: add auth flow
-
-- Implement OAuth login
-
-- Add JWT handling
-
-- Update login UI
-```
-
-**Forbidden — single `-m` with embedded body:**
-
-```bash
-git commit -n -m $'feat: add auth flow\n\n- Implement OAuth login\n- Add JWT handling'
-```
-
-Agents skip bodies with this pattern. Use two `-m` flags instead.
+Per-style message format. Reached from Step 3 for the chosen style.
 
 ## `--conventional` formatting rules
 
 - **Format:** `type: description`
 - **Allowed types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`
-- **No scope notation** (e.g., no `feat(scope):` — just `feat:`)
-- **First line:**
-  - Maximum 50 characters
-  - All lowercase except proper nouns and technical terms
-    (e.g., OAuth, React, PostgreSQL, API, CLI, HTML, CSS, JSON, URL, HTTP)
-  - No period at the end
-- **Mandatory blank line** after the first line
-- **Body (if needed):**
-  - Use only when the change requires explanation beyond the first line
-  - Bullet points starting with `-`
-  - No blank lines between bullets
-  - Capitalize the first word of each bullet
-  - No periods at the end of bullets
-  - Explain _what_ changed and _why_, not _how_
-
-Example:
+- **No scope notation** (no `feat(scope):` — just `feat:`)
+- **First line:** max 50 chars; lowercase except proper nouns and technical
+  terms (OAuth, React, PostgreSQL, API, CLI, HTML, CSS, JSON, URL, HTTP); no
+  trailing period
+- **Body (if needed):** bullets starting with `-`; no blank lines between
+  bullets; capitalize the first word of each; no trailing periods; explain
+  _what_ and _why_, not _how_
 
 ```
 feat: add user authentication flow
 
 - Implement OAuth 2.0 login with Google and GitHub
 - Add JWT token handling for session management
-- Update login UI to match new design system
 ```
 
 ## `--simple` formatting rules
 
-Generate a concise plain-English commit message:
-
-- Single line, no type prefix
-- Maximum 72 characters
-- Capitalize the **first word** of the first line; keep everything else lowercase except proper nouns and technical terms
-- No period at the end
-- Describe what changed in plain language
+- Single line, no type prefix, max 72 chars
+- Capitalize the first word; rest lowercase except proper nouns and technical terms
+- No trailing period
 
 Examples:
 
 - "Add dark mode toggle to settings page"
 - "Fix null pointer exception in user service"
-- "Update README with install instructions"
 
-## Example reports
+## Concrete-change examples (diff-only)
 
-**Default (hooks skipped):**
-
-```
-Commit complete.
-
-Scope: staged
-Style: conventional
-Hooks: skipped (-n)
-
-Command:
-git commit -n -m "feat: add password reset endpoint" -m $'- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
-
-Message:
-```
-
-```
-feat: add password reset endpoint
-
-- Implement token-based reset flow
-- Add email template for reset notifications
-- Update user model with reset token fields
-```
-
-**With `--verify` (hooks ran):**
-
-```
-Commit complete.
-
-Scope: staged
-Style: conventional
-Hooks: ran (--verify)
-
-Command:
-git commit -m "feat: add password reset endpoint" -m $'- Implement token-based reset flow\n- Add email template for reset notifications\n- Update user model with reset token fields'
-
-Message:
-```
-
-```
-feat: add password reset endpoint
-
-- Implement token-based reset flow
-- Add email template for reset notifications
-- Update user model with reset token fields
-```
+| Diff shows                           | Bad                             | Good                                  |
+| ------------------------------------ | ------------------------------- | ------------------------------------- |
+| Null check added in `userService.ts` | fix: address review feedback    | fix: guard null user in getProfile    |
+| README install steps rewritten       | docs: update per discussion     | docs: add pnpm install steps          |
+| Extract helper from handler          | refactor: implement agreed plan | refactor: extract parsePayload helper |
