@@ -22,7 +22,7 @@ After implementation, re-read every changed file and verify:
 1. **Ticket requirements**: does the change satisfy the description, title, and
    acceptance criteria?
 2. **Regressions**: did it break existing behavior, tests, or adjacent code?
-3. **Edge cases**: any scenario the fix misses — race conditions, null states,
+3. **Edge cases**: any scenario the fix misses, race conditions, null states,
    error paths?
 4. **Style**: is the new code consistent with surrounding style, abstraction
    level, and naming?

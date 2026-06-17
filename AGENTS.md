@@ -47,7 +47,7 @@ Do not commit a skill addition or update until the validator passes.
 ## Disclose by branch, not by gate
 
 Material the agent needs on _every_ run stays inline in `SKILL.md`. Material
-only _some_ runs reach (a **branch** — a distinct way the skill is invoked) gets
+only _some_ runs reach (a **branch**, a distinct way the skill is invoked) gets
 pushed into `REFERENCE.md` or `references/`, reached by a sharp **context
 pointer** at the step that needs it.
 
@@ -57,8 +57,8 @@ pointer** at the step that needs it.
   8 categories in `REFERENCE.md`", not "see REFERENCE.md".
 - Do not add a mandatory "read this file first" gate. A gate forces every run to
   load reference some runs never use, defeating disclosure. If a pointer fires
-  unreliably on must-have material, sharpen its wording or inline the material —
-  do not gate it.
+  unreliably on must-have material, sharpen its wording or inline the material.
+  Do not gate it.
 - If everything in a would-be `REFERENCE.md` is must-have on every run, keep it
   inline and ship no `REFERENCE.md`.
 
@@ -74,13 +74,13 @@ pointer** at the step that needs it.
 The description sits in the context window every turn, so prune it harder than
 the body.
 
-- **Front-load the leading word** — the word you actually type when you want the
+- **Front-load the leading word**, the word you actually type when you want the
   skill (`commit`, `deslop`, `handoff`). It anchors invocation.
 - **One trigger per branch.** Synonyms renaming a single branch are duplication;
   collapse them. Keep only genuinely distinct triggers.
 - **Cut identity already stated in the body.** No mandated boilerplate phrase.
 - Do not restate the description as a "When to use this skill" section in the
-  body — that is duplication of a line the agent already holds.
+  body. That is duplication of a line the agent already holds.
 
 ## Flags Are Preferred
 
@@ -112,7 +112,7 @@ them as flags in the user's invocation message:
   from not-done and does not stop short
 - Reach for a leading word before a paragraph: a pretrained concept (`slop`,
   `handoff`, `tracer bullets`) anchors behavior in one token
-- Keep each meaning in one place. The same fact in two files is duplication —
+- Keep each meaning in one place. The same fact in two files is duplication,
   the leaf frontmatter owns its own triggers and flags, not a central catalog
 - Hunt no-ops: delete any sentence the agent would already obey by default
 - Every instruction must be actionable. No vague advice, no filler.

@@ -71,7 +71,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Problem.** You hand a plan to an external agent like OpenCode and it either hangs silently for minutes (waiting on a hidden permission prompt), garbles the prompt (quoting issues with shell arguments), or exits immediately with no useful output.
 
-**The Fix.** [`/assign`](./skills/assign/SKILL.md) writes the prompt to a temp file and pipes it via stdin — avoiding all quoting failures. It auto-approves permissions with the right flags for each agent, monitors output for silent hangs, and cleans up after itself. Supports `--agent <name>` (default: `opencode`) and `--model <provider/model>`.
+**The Fix.** [`/assign`](./skills/assign/SKILL.md) writes the prompt to a temp file and pipes it via stdin, avoiding all quoting failures. It auto-approves permissions with the right flags for each agent, monitors output for silent hangs, and cleans up after itself. Supports `--agent <name>` (default: `opencode`) and `--model <provider/model>`.
 
 ### #8: Context Is Lost Between Sessions
 

@@ -1,7 +1,7 @@
 ---
 name: box
 description: >
-  box a git repo — clone it locally and search the real source, with a tracked
+  box a git repo, clone it locally and search the real source, with a tracked
   manifest. Delegates repo work to subagents when available, runs in the main
   thread otherwise. Triggers: a VCS URL (GitHub, GitLab, Bitbucket), a
   previously cloned repo name, or a request to clone/search/explore a repo.
@@ -23,19 +23,19 @@ No flags → clone if missing, search, report. Never write `AGENTS.md` without `
 
 ## Execution mode
 
-The mode is a **branch** — pick it before Step 2. Full selection rules, role
+The mode is a **branch**. Pick it before Step 2. Full selection rules, role
 definitions, stage barriers, and stage contracts are in `./REFERENCE.md`; read
 the section for the mode you pick before running its stages.
 
-- **Direct mode** — main thread runs prepare, search, and (if `--persist`)
+- **Direct mode**, main thread runs prepare, search, and (if `--persist`)
   persist itself. Triggered by `--no-subagents`, the user declining delegation,
   or no subagent/Task tool. Execute immediately; never refuse for lack of subagents.
 - **Delegated mode** (default when a subagent tool exists and the user did not
-  opt out) — main thread coordinates only and dispatches a subagent per stage.
+  opt out), main thread coordinates only and dispatches a subagent per stage.
 
 ## Sandbox location
 
-All repos live in the skill's own directory — the **anchor** (the directory
+All repos live in the skill's own directory, the **anchor** (the directory
 holding this `SKILL.md`). Include the anchor in every subagent brief.
 
 - Sandbox root: `./sandbox/`
@@ -45,7 +45,7 @@ holding this `SKILL.md`). Include the anchor in every subagent brief.
 ## `--list` or bare invocation
 
 Read `./sandbox/manifest.json` and list cloned repos (or "No repos cloned yet."),
-then stop. Main thread handles this directly — no prepare/search/persist. See the
+then stop. Main thread handles this directly. No prepare/search/persist. See the
 startup template in `./REFERENCE.md`.
 
 ## Step 1: Detect the target
@@ -87,6 +87,6 @@ high-level search summary.
 - **Never infer repo contents** from the URL alone.
 - **Do not re-clone** existing repos unless `--update` is passed.
 - **Stage barriers hold** in both modes: prepare before search, search before
-  persist — exactly one writer for the clone/manifest and one for `AGENTS.md`.
+  persist, exactly one writer for the clone/manifest and one for `AGENTS.md`.
 - **Delegated mode:** the coordinator never clones, pulls, reads repo files,
-  searches repo contents, or edits `AGENTS.md` — subagents do that work.
+  searches repo contents, or edits `AGENTS.md`, subagents do that work.

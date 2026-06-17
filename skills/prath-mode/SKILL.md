@@ -9,7 +9,7 @@ disable-model-invocation: true
 # Prath mode
 
 Read the matched leaf skill in full before executing. Do not restate or
-improvise its workflow — the leaf owns its own triggers, flags, and rules.
+improvise its workflow. The leaf owns its own triggers, flags, and rules.
 
 ## Routing map
 
@@ -49,7 +49,7 @@ what the user wants.
 Before reading or executing a leaf, confirm it is installed: resolve
 `../<skill-name>/SKILL.md` relative to this skill's directory and check it exists
 (`test -f` or the Read tool). For a chain, verify every leaf before the first
-step and re-check before each subsequent step — the user may install skills
+step and re-check before each subsequent step, the user may install skills
 between steps.
 
 If any leaf is missing, stop and report its name and checked path, list all

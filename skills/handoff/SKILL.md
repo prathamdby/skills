@@ -1,7 +1,7 @@
 ---
 name: handoff
 description: >
-  handoff the session — compact the conversation into a document a fresh agent
+  handoff the session, compact the conversation into a document a fresh agent
   can resume from, or restore context from a saved handoff. Triggers: /handoff,
   save session context, hand off to a new agent, resume from a handoff file.
   Flags: --resume <path>, --path <path>, and a positional focus argument.
@@ -36,7 +36,7 @@ Default save location is inside this skill's directory (the anchor):
 
 1. Resolve the save path: `--path` if given, else
    `<anchor>/handoffs/handoff-<timestamp>.md`. Create `./handoffs/` if absent.
-2. Survey artifacts from the workspace and conversation — plans, PRDs, ADRs,
+2. Survey artifacts from the workspace and conversation, plans, PRDs, ADRs,
    issues, PRs, commits, diffs. You will reference them by path or URL, never
    paste their contents.
 3. Write the doc using the format in `./REFERENCE.md`. Keep it readable by a

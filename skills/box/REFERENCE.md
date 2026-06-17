@@ -17,7 +17,7 @@ contracts below directly. The main thread may read the manifest, run `git`,
 search repo files, and edit the working directory's `AGENTS.md` when persisting.
 
 Do not refuse box work because subagents are missing. Do not tell the user to
-wait for delegation — execute the contracts yourself.
+wait for delegation. Execute the contracts yourself.
 
 ### Delegated mode
 
@@ -31,13 +31,13 @@ aggregation, and reporting.
 
 ## Roles
 
-- **Coordinator / main thread** — detects the target and flags, picks execution
+- **Coordinator / main thread**, detects the target and flags, picks execution
   mode, runs or dispatches each stage, aggregates results, and reports.
-- **Prepare** — owns the sandbox, the clone/pull, and the manifest. The only
+- **Prepare**, owns the sandbox, the clone/pull, and the manifest. The only
   writer of `./sandbox/manifest.json`.
-- **Search** — read-only. Explores the local repo and returns a summary plus
+- **Search**, read-only. Explores the local repo and returns a summary plus
   `path:line` citations. Never writes to disk.
-- **Persist** — only when `--persist` is set. The only writer of the working
+- **Persist**, only when `--persist` is set. The only writer of the working
   directory's `AGENTS.md`.
 
 In **delegated mode**, Prepare, Search, and Persist are separate subagents.
@@ -48,10 +48,10 @@ In **direct mode**, the main thread performs all three roles itself.
 The pipeline runs in three gated stages. A stage does not start until the
 previous stage has fully returned:
 
-1. **Prepare** — local clone is on disk and the manifest is current.
-2. **Search** — all search work returns findings (one pass in direct mode; one
+1. **Prepare**, local clone is on disk and the manifest is current.
+2. **Search**, all search work returns findings (one pass in direct mode; one
    or more subagents in delegated mode).
-3. **Persist** — only if `--persist`, update the working directory's
+3. **Persist**, only if `--persist`, update the working directory's
    `AGENTS.md` using the template.
 
 These barriers guarantee there is exactly one writer for clone/manifest and
@@ -80,8 +80,8 @@ inferring from URL, no re-clone without `--update`.
 
 **Search (read-only).**
 
-- IN: anchor, slug, confirmed `local_path`, the user's question, and — in
-  delegated mode when fanning out — an **assigned scope** (subtree, file set, or
+- IN: anchor, slug, confirmed `local_path`, the user's question, and, in
+  delegated mode when fanning out, an **assigned scope** (subtree, file set, or
   sub-question). Parallel delegated scopes MUST NOT overlap.
 - DOES: search/read/summarize the local repo within scope. Use the local
   files, not the remote URL. Include code snippets with full context (imports,
@@ -119,7 +119,7 @@ explicitly:
 ## Startup case: bare invocation or `--list`
 
 If the user invokes `/box` with no URL, no repo name, or passes `--list`, the
-main thread handles this directly — no prepare/search/persist:
+main thread handles this directly. No prepare/search/persist:
 
 1. Read `./sandbox/manifest.json`. If it does not exist or is empty, report:
    "No repos cloned yet."

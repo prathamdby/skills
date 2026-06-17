@@ -15,7 +15,7 @@ description: >
 | ------------------- | --------------------------------------------------------------------- |
 | `--target <branch>` | Target branch. **Default: `main`.**                                   |
 | `--ticket <id>`     | Prefix the title with `[<TICKET-ID>]` (e.g. `--ticket ABC-123`). Off. |
-| `--conventional`    | Conventional-commit title format. Off — plain English by default.     |
+| `--conventional`    | Conventional-commit title format. Off, plain English by default.      |
 
 If `--ticket` is passed without an ID, stop: "`--ticket` requires a ticket ID
 (e.g., `--ticket ABC-123`)."
@@ -23,8 +23,8 @@ If `--ticket` is passed without an ID, stop: "`--ticket` requires a ticket ID
 ## Step 1: Gather context
 
 1. Identify the current branch.
-2. `git log <target>..HEAD --oneline` — commits on this branch.
-3. `git diff <target>...HEAD` — the full diff.
+2. `git log <target>..HEAD --oneline`, commits on this branch.
+3. `git diff <target>...HEAD`, the full diff.
 
 With `--ticket`, use the explicit value; never search the branch name or commits
 for a ticket number.
@@ -64,5 +64,5 @@ Report the PR URL.
 ## Constraints
 
 - **Never commit, build, run, or push.**
-- **Never auto-detect Linear issues** from branch names or commits — use the
+- **Never auto-detect Linear issues** from branch names or commits, use the
   explicit `--ticket` value only.

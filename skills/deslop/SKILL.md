@@ -1,7 +1,7 @@
 ---
 name: deslop
 description: >
-  deslop a diff — remove AI slop and over-engineering while preserving exact
+  deslop a diff, remove AI slop and over-engineering while preserving exact
   behavior. Triggers: /deslop, remove AI slop, clean AI artifacts, strip
   over-engineered patterns, simplify code, review changes for bloat. Flags:
   --staged, --unstaged, --base <branch>.
@@ -22,7 +22,7 @@ instance in a diff and removes it without changing behavior.
 | `--unstaged`      | Diff unstaged changes (`git diff`).                     |
 | `--base <branch>` | Diff since merge base: `git diff <branch>...HEAD`.      |
 
-Mutually exclusive; use the first detected. `--base` needs a branch name — if
+Mutually exclusive; use the first detected. `--base` needs a branch name. If
 missing, stop: `--base requires a branch name (e.g., --base main)`.
 
 ## Step 1: Diff the changes
@@ -60,7 +60,7 @@ Drop any instance whose removal would violate the maintainability guardrails in
 ## Step 6: Remove the slop
 
 Edit the source files to strip every kept instance. Make the smallest change
-that preserves exact functionality — logic, timing, side effects, and public
+that preserves exact functionality, logic, timing, side effects, and public
 APIs unchanged. Introduce no new complexity while removing.
 
 ## Step 7: Re-stage

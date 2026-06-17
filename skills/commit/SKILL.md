@@ -27,7 +27,7 @@ No flags → `--staged --conventional`, hooks skipped.
 The diff is the only input for the message. Ignore conversation history, review
 threads, ticket text, and stated rationale unless the same fact appears in the
 diff. Never write "address review feedback", "as requested", or "implement the
-plan" — describe the concrete change instead.
+plan". Describe the concrete change instead.
 
 ## Hook behavior
 
@@ -72,7 +72,7 @@ Base the message solely on Step 2. Produce:
 - `body`: optional; bullet lines joined by single `\n`.
 
 For the chosen style, follow the exact format rules and examples in
-`./REFERENCE.md` — conventional rules for `--conventional`, simple rules for
+`./REFERENCE.md`, conventional rules for `--conventional`, simple rules for
 `--simple`. For `--simple`, emit `subject` only.
 
 ## Step 4: Commit

@@ -6,7 +6,7 @@ Per-style message format. Reached from Step 3 for the chosen style.
 
 - **Format:** `type: description`
 - **Allowed types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`
-- **No scope notation** (no `feat(scope):` — just `feat:`)
+- **No scope notation** (no `feat(scope):`, just `feat:`)
 - **First line:** max 50 chars; lowercase except proper nouns and technical
   terms (OAuth, React, PostgreSQL, API, CLI, HTML, CSS, JSON, URL, HTTP); no
   trailing period

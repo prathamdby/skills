@@ -54,7 +54,7 @@ command piped from stdin. The coordinator writes the prompt to
 
 ## Troubleshooting
 
-### Silent hang — no output for >60s after startup
+### Silent hang, no output for >60s after startup
 
 **Cause:** The agent is waiting on an interactive permission prompt that is not
 visible in non-interactive mode.
@@ -67,7 +67,7 @@ permissions without prompting.
 invocation command. Use the `-` stdin sentinel (pipe the prompt) rather than
 passing it as an argument.
 
-### Quoting failure — agent receives a truncated or garbled prompt
+### Quoting failure, agent receives a truncated or garbled prompt
 
 **Cause:** The prompt was passed as a shell argument. Single quotes, newlines,
 or special characters terminate or corrupt the argument.

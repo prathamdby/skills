@@ -1,7 +1,7 @@
 ---
 name: fix-linear-ticket
 description: >
-  fix a Linear ticket end to end — fetch it, branch, plan with confirmation,
+  fix a Linear ticket end to end, fetch it, branch, plan with confirmation,
   implement, review. Triggers: fix a Linear ticket, work on a Linear issue,
   implement a Linear ticket, resolve a Linear bug. Flags: --base <branch>
   (default main) and an explicit ticket ID.
@@ -52,7 +52,7 @@ Report the branch created.
 
 ## Step 4: Plan the fix
 
-Search the codebase for files related to the ticket — function/component/module
+Search the codebase for files related to the ticket, function/component/module
 names from the description, and the bug area or feature surface. Read them to
 understand the current implementation. Then outline: files to change, the change
 per file, dependencies/ordering, and risks or edge cases. See `./REFERENCE.md`

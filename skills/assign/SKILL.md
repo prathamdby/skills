@@ -28,7 +28,7 @@ Supported agents: opencode, codex. See `./REFERENCE.md`."
 ## Step 1: Write the prompt file
 
 Write the full task prompt to `./assign-prompt.tmp` in the **current working
-directory** (not `--dir`). Never pass the prompt as a shell argument — quoting
+directory** (not `--dir`). Never pass the prompt as a shell argument, quoting
 breaks on multi-line or special-character prompts. Overwrite silently.
 
 ## Step 2: Invoke the agent
@@ -45,7 +45,7 @@ cat ./assign-prompt.tmp | <agent-command>
 ## Step 3: Monitor output
 
 Watch for progress (tool calls, file writes, step completions). If there is no
-output for >60s after startup, the agent is hung on a permission prompt — kill
+output for >60s after startup, the agent is hung on a permission prompt. Kill
 it and check the agent's troubleshooting notes in `./REFERENCE.md`.
 
 ## Step 4: Verify and clean up

@@ -1,7 +1,7 @@
 ---
 name: peer-review
 description: >
-  peer-review a plan, design, or implementation — find the one critical risk,
+  peer-review a plan, design, or implementation, find the one critical risk,
   list other gaps, propose a fix for the critical risk, and update the plan.
   Triggers: peer review a plan, review an implementation, assess a design, check
   a proposal for gaps.
@@ -36,14 +36,14 @@ Exactly four sections. Maximum clarity, minimum words.
 
 ### Critical Risk
 
-One paragraph naming **the single thing most likely to cause failure** — why it
+One paragraph naming **the single thing most likely to cause failure**, why it
 is dangerous and under what conditions it breaks. Pick the highest-impact, most
 probable one; do not list several.
 
 ### Other Gaps
 
 Bulleted secondary issues, one line each, formatted `- <issue> → <impact>`. Only
-real, material issues — no nitpicks or theoretical concerns.
+real, material issues, no nitpicks or theoretical concerns.
 
 ### Fix
 
@@ -56,7 +56,7 @@ ship." / "Needs rework." No explanation.
 
 ## Step 4: Update the plan
 
-Apply the Fix steps to the plan files directly — the smallest change that
+Apply the Fix steps to the plan files directly, the smallest change that
 mitigates the critical risk. Report which files changed and the fix applied.
 
 ## Style
