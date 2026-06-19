@@ -27,6 +27,7 @@ npx skills@latest add prathamdby/skills
    - `/assign`, delegate tasks to external agents
    - `/handoff`, save session context or resume from a handoff document
    - `/caveman`, ultra-compressed reply mode
+   - `/notify`, send a Discord embed when work finishes or needs input
 
 ## Why These Skills Exist
 
@@ -92,6 +93,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/caveman`](./skills/caveman/SKILL.md) switches to an ultra-compressed reply mode that cuts ~75% of tokens by dropping filler, articles, and pleasantries while keeping full technical accuracy. Code blocks and error strings stay verbatim; it drops back to normal prose for security warnings and irreversible-action confirmations. Stays active every turn until you say "stop caveman" or "normal mode".
 
+### #11: Agents Finish Work Silently
+
+**The Problem.** Long agent runs end while you are away. No ping. You poll the terminal.
+
+**The Fix.** [`/notify`](./skills/notify/SKILL.md) posts a Discord embed via webhook. Agent runs `notify.py send` with `--title` and `--description`. Task work requires `--task` and `--link` (PR, ticket, CI URL). Supports `--field`, `--dry-run`, and `--webhook` for config path.
+
 ## Development
 
 Before committing skill edits, run the self-check in
@@ -110,9 +117,10 @@ markdown file resolves.
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                             |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                                                              |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                                                                       |
-| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` (`opencode`, `codex`, `claude`), `--model <model>`, and `--dir <path>`.                       |
+| [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` (`opencode`, `codex`, `claude`), `--model <model>`, and `--dir <path>`.                      |
 | [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.                                                       |
 | [`caveman`](./skills/caveman/SKILL.md)                     | Ultra-compressed reply mode that cuts ~75% of tokens while keeping technical accuracy. User-invoked; toggle off with "stop caveman" or "normal mode".                       |
+| [`notify`](./skills/notify/SKILL.md)                       | Discord webhook embed notifications. Supports `--task`, `--link`, `--field`, `--dry-run`, and `--webhook` for config path.                                                  |
 
 ## License
 

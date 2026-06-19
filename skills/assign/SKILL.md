@@ -17,10 +17,10 @@ description: >
 
 ## Flags
 
-| Flag              | Effect                                                       |
-| ----------------- | ------------------------------------------------------------ |
-| `--agent <name>`  | Agent to delegate to. **Default: `opencode`**.               |
-| `--model <model>` | Model to use. Agent default applies if omitted.              |
+| Flag              | Effect                                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `--agent <name>`  | Agent to delegate to. **Default: `opencode`**.                                                                                        |
+| `--model <model>` | Model to use. Agent default applies if omitted.                                                                                       |
 | `--dir <path>`    | Agent working directory. **Default: current directory.** `assign-prompt.tmp` is always written to the current directory, not `--dir`. |
 
 If `--agent` names an unsupported agent, stop: "Unknown agent `<name>`.
