@@ -18,6 +18,7 @@ DEFAULT_COLOR = 5814783
 
 MAX_TITLE = 256
 MAX_DESCRIPTION = 4096
+MAX_CONTENT = 2000
 MAX_FIELDS = 10
 MAX_FIELD_NAME = 256
 MAX_FIELD_VALUE = 1024
@@ -44,7 +45,7 @@ def read_webhook(path: Path) -> str:
             "  Ask the user for their Discord webhook URL, write it to the file,\n"
             "  then rerun send. See notify SKILL.md Step 3.",
         )
-    url = path.read_text(encoding="utf-8").strip()
+    url = path.read_text(encoding="utf-8").strip().strip("'\"")
     if not url:
         die(
             1,
@@ -102,6 +103,8 @@ def build_payload(args: argparse.Namespace) -> dict[str, Any]:
         die(2, f"--description exceeds {MAX_DESCRIPTION} chars")
     if len(args.fields) > MAX_FIELDS:
         die(2, f"Max {MAX_FIELDS} --field entries")
+    if args.content and len(args.content) > MAX_CONTENT:
+        die(2, f"--content exceeds {MAX_CONTENT} chars")
 
     embed: dict[str, Any] = {
         "title": args.title,
@@ -129,7 +132,7 @@ def post_webhook(url: str, payload: dict[str, Any]) -> None:
         method="POST",
     )
     try:
-        with urlopen(req) as resp:
+        with urlopen(req, timeout=30) as resp:
             if resp.status != 204:
                 body = resp.read().decode("utf-8", errors="replace")
                 die(3, f"HTTP {resp.status}: {body}")
@@ -159,6 +162,25 @@ def cmd_send(args: argparse.Namespace) -> None:
         print(f"link: {args.link}")
 
 
+def parse_color(val: str) -> int:
+    val = val.strip()
+    if val.startswith("#"):
+        try:
+            color = int(val[1:], 16)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"Invalid hex color: {val}")
+    else:
+        try:
+            color = int(val, 0)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"Invalid color integer or hex: {val}")
+    if not 0 <= color <= 0xFFFFFF:
+        raise argparse.ArgumentTypeError(
+            "Color must be between 0 and 16777215 (0xFFFFFF)"
+        )
+    return color
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="notify.py",
@@ -184,9 +206,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     send.add_argument(
         "--color",
-        type=int,
+        type=parse_color,
         default=DEFAULT_COLOR,
-        help=f"Embed color integer (default: {DEFAULT_COLOR})",
+        help=f"Embed color integer or hex (default: {DEFAULT_COLOR})",
     )
     send.add_argument(
         "--field",

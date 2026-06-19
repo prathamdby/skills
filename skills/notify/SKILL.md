@@ -19,7 +19,7 @@ Skill flags map to CLI flags on `send`:
 | `--task`           | `--task`         | Task notification. Requires `--link`.          |
 | `--link <url>`     | `--link`         | URL in embed. Required with `--task`.          |
 | `--webhook <path>` | `--webhook-file` | URL file. **Default: `<anchor>/webhook.url`**. |
-| `--color <int>`    | `--color`        | Embed color. Default `5814783`.                |
+| `--color <int\|hex>` | `--color`      | Embed color. Default `5814783`.                |
 | `--field "N\|V"`   | `--field`        | Repeatable. Max 10.                            |
 | `--content <text>` | `--content`      | Message above embed.                           |
 | `--dry-run`        | `--dry-run`      | Print payload. No POST.                        |

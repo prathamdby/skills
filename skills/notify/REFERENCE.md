@@ -57,6 +57,7 @@ python3 scripts/notify.py send --task \
 | fields      | 10   |
 | field name  | 256  |
 | field value | 1024 |
+| content     | 2000 |
 
 ## Valid `--link` for task work
 
