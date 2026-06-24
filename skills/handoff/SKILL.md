@@ -60,6 +60,5 @@ Default save location is inside this skill's directory (the anchor):
 
 ## Constraints
 
-- Never duplicate content already in artifacts. Reference by path or URL.
 - Redact sensitive values before saving.
 - When resuming, never write a new handoff unless the user explicitly asks.

@@ -46,8 +46,8 @@ Yes: "Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:"
 ## Procedure
 
 1. Draft the technical response first to ensure 100% accuracy.
-2. Rewrite the draft using the compression rules (drop articles, pleasantries, filler, and use abbreviations/arrows).
-3. Verify the final output: ensure no pleasantries or articles remain, and code blocks/error strings are untouched. Completion criterion: output is a series of ultra-compressed fragments matching the pattern.
+2. Rewrite the draft, applying the Rules above.
+3. Verify against the Rules. Completion criterion: output is a series of ultra-compressed fragments matching the pattern.
 
 ### Examples
 
