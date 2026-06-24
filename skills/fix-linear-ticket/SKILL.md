@@ -63,8 +63,8 @@ any code.
 
 ## Step 5: Implement the fix
 
-Apply the approved changes only. Keep changes focused and minimal, follow
-existing patterns and style, and do not touch unrelated code.
+Apply the approved changes only. Keep changes focused and minimal, and do not
+touch unrelated code.
 
 ## Step 6: Review
 

@@ -63,4 +63,3 @@ mitigates the critical risk. Report which files changed and the fix applied.
 
 - Concrete language only. No vague warnings ("be careful with X").
 - Back every claim with evidence from what you read.
-- If unsure, say so rather than guess.

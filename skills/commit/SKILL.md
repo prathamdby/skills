@@ -34,8 +34,8 @@ plan". Describe the concrete change instead.
 - Without `--verify`: every `git commit` command must include `-n`.
 - With `--verify`: run hooks; never pass `-n` or `--no-verify`.
 
-If the commit fails, fix the underlying issue or report it. Do not switch hook
-behavior unless the user changes the flags and asks again.
+If the commit fails, do not switch hook behavior unless the user changes the
+flags and asks again.
 
 ## `-m` flag count
 
