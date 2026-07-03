@@ -16,7 +16,7 @@ disable-model-invocation: true
 You are the most expensive tokens in this session. Spend them on judgment only:
 scope, brief, verify, integrate. Every keystroke, every line of research, every
 edit goes to a subagent. Assumes a high-autonomy harness; this skill governs
-behavior, not permissions.
+behavior, not permissions. The positional argument is the task; no flags.
 
 ## Persistence
 
@@ -24,20 +24,18 @@ Once triggered, active every turn, no drift back to direct work. Off only when
 the user says "stop orchestrating" or "normal mode". Muster (Step 1) runs once
 per session; each new task from the user re-enters at Step 2 (Scope).
 
-## The task
-
-The positional argument is the task. No flags.
-
 ## Step 1: Muster
 
-Enumerate the harness's subagent types and read their configs for a model
-field. Classify each: read-only vs write-capable, and cost, an explicit cheap
-model is cheap, anything else (including unset) is expensive. Never hard-code
-delegate names in this skill; discover them at runtime, rosters change.
+Enumerate the harness's subagent types and how it selects a delegate's model:
+config field, dispatch parameter, or fixed. Classify each read-only vs
+write-capable. Downshift: pick the cheapest capable model as the delegate
+default. Never hard-code delegate or model names; discover them at runtime,
+rosters change.
 
-If no subagent tool exists at all, this is the one legitimate pause: report it
-and ask the user whether to proceed solo or stop. Completion: a roster of
-delegates with capability and cost, or the pause has been issued.
+If no subagent tool exists, this is the one legitimate pause: report it and
+ask the user whether to proceed solo or stop. Completion: a delegate roster
+with capability and a cheap default model (or confirmed no model control), or
+the pause has been issued.
 
 ## Step 2: Scope
 
@@ -60,12 +58,14 @@ yourself. Completion: every chunk has a brief with all seven fields filled.
 
 ## Step 4: Dispatch
 
-Send chunks in parallel waves where the harness allows it, the cheapest capable
-delegate per chunk. Keep every chunk's write scope disjoint, never let two
-delegates write overlapping files concurrently. Keep working while delegates
-run; intervene the moment a delegate's output drifts from its brief's goal or
-constraints. A delegate never sub-delegates, one level deep only. Completion:
-every chunk is dispatched, or queued behind a stated dependency.
+Send chunks in parallel waves where the harness allows it. Set the delegate's
+model explicitly on every dispatch the harness permits; unset inherits your
+own expensive model, never acceptable. Downshift to the Muster default;
+escalate only after one Verify failure, and record it. Keep write scopes
+disjoint, never let two delegates write overlapping files concurrently. Keep
+working while delegates run; intervene the moment a delegate's output drifts
+from its brief. A delegate never sub-delegates, one level deep only.
+Completion: every chunk is dispatched, or queued behind a stated dependency.
 
 ## Step 5: Verify
 
