@@ -56,7 +56,7 @@ Split the task into independent chunks. Each brief carries: the goal, the
 reason behind it, context pointers instead of pasted content, constraints,
 in-scope and out-of-scope files, the expected output, and what done means for
 that chunk alone. Route research legwork to read-only delegates, never do it
-yourself. Completion: every chunk has a brief with all six fields filled.
+yourself. Completion: every chunk has a brief with all seven fields filled.
 
 ## Step 4: Dispatch
 
