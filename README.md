@@ -28,6 +28,7 @@ npx skills@latest add prathamdby/skills
    - `/handoff`, save session context or resume from a handoff document
    - `/caveman`, ultra-compressed reply mode
    - `/notify`, send a Discord embed when work finishes or needs input
+   - `/orchestrate`, brain-only session: brief cheap subagents, verify everything
 
 ## Why These Skills Exist
 
@@ -99,6 +100,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/notify`](./skills/notify/SKILL.md) posts a Discord embed via webhook. Agent runs `notify.py send` with `--title` and `--description`. Task work requires `--task` and `--link` (PR, ticket, CI URL). Supports `--field`, `--dry-run`, and `--webhook` for config path.
 
+### #12: Frontier Models Burn Tokens on Grunt Work
+
+**The Problem.** The most capable model reads whole codebases, writes boilerplate, and grinds mechanical edits at frontier price, then trusts subagent reports unverified.
+
+**The Fix.** [`/orchestrate`](./skills/orchestrate/SKILL.md) locks the session into strict orchestrator mode: scope the task into acceptance criteria, brief the cheapest capable subagents in parallel, verify every deliverable against evidence you gather yourself, and report outcome-first with a mandatory Deviation block when a flawed task was corrected. Off with "stop orchestrating".
+
 ## Development
 
 Before committing skill edits, run the self-check in
@@ -121,6 +128,7 @@ markdown file resolves.
 | [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.                                                       |
 | [`caveman`](./skills/caveman/SKILL.md)                     | Ultra-compressed reply mode that cuts ~75% of tokens while keeping technical accuracy. User-invoked; toggle off with "stop caveman" or "normal mode".                       |
 | [`notify`](./skills/notify/SKILL.md)                       | Discord webhook embed notifications. Supports `--task`, `--link`, `--field`, `--dry-run`, and `--webhook` for config path.                                                  |
+| [`orchestrate`](./skills/orchestrate/SKILL.md)             | Session mode: main model briefs, dispatches, and verifies cheaper subagents; never writes code itself. Off with "stop orchestrating". No flags; the argument is the task.   |
 
 ## License
 
