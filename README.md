@@ -23,6 +23,7 @@ npx skills@latest add prathamdby/skills
    - `/peer-review`, review a plan for gaps before building
    - `/fix-linear-ticket`, fetch ticket, branch, plan, fix, review
    - `/make-pr`, open PRs with thematic summaries
+   - `/explain-diff`, rich HTML explanation of a diff or PR
    - `/box`, clone and search any git repo locally
    - `/assign`, delegate tasks to external agents
    - `/handoff`, save session context or resume from a handoff document
@@ -106,6 +107,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/orchestrate`](./skills/orchestrate/SKILL.md) locks the session into strict orchestrator mode: scope the task into acceptance criteria, brief the cheapest capable subagents in parallel, verify every deliverable against evidence you gather yourself, and report outcome-first with a mandatory Deviation block when a flawed task was corrected. Off with "stop orchestrating".
 
+### #13: Diffs Are Unreadable Teaching Artifacts
+
+**The Problem.** You want to understand a PR or branch change. The agent dumps a wall of diff hunks in chat or a one-paragraph summary that skips the surrounding system.
+
+**The Fix.** [`/explain-diff`](./skills/explain-diff/SKILL.md) explores surrounding code and writes a self-contained HTML page—Background, Intuition, Code walkthrough, and an interactive quiz—saved outside the repo (default `/tmp/YYYY-MM-DD-explain-<slug>.html`). Supports `--target <branch>`, `--pr`, `--staged`/`--unstaged`, and `--output <path>`.
+
 ## Development
 
 Before committing skill edits, run the self-check in
@@ -122,6 +129,7 @@ markdown file resolves.
 | [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                                                                    |
 | [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.                                                              |
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                             |
+| [`explain-diff`](./skills/explain-diff/SKILL.md)           | Rich HTML explanation of a diff or PR. Supports `--target <branch>`, `--pr`, `--staged`/`--unstaged`, and `--output <path>`.                                              |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                                                              |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                                                                       |
 | [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` (`opencode`, `codex`, `claude`), `--model <model>`, and `--dir <path>`.                      |

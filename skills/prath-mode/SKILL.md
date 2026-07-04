@@ -23,6 +23,7 @@ improvise its workflow. The leaf owns its own triggers, flags, and rules.
 | Clone or search an external git repo     | **box** (`../box/SKILL.md`)                             |
 | Delegate work to an external agent       | **assign** (`../assign/SKILL.md`)                       |
 | Save session context or resume a handoff | **handoff** (`../handoff/SKILL.md`)                     |
+| Explain a diff, branch, or PR (HTML)   | **explain-diff** (`../explain-diff/SKILL.md`)           |
 | Send a Discord notification or alert     | **notify** (`../notify/SKILL.md`)                       |
 
 When a request matches several skills, pick the leaf that owns the immediate
