@@ -1,10 +1,9 @@
 ---
 name: explain-diff
 description: >
-  explain a code change, diff, branch, or PR as a rich self-contained HTML page.
-  Triggers: /explain-diff, explain this diff, explain this PR, teach me this
-  change. Flags: --target <branch>, --pr <n>, --staged, --unstaged, --output
-  <path>.
+  explain-diff: explain a code change, diff, branch, or PR as a rich
+  self-contained HTML page. Flags: --target <branch>, --pr <n>, --staged,
+  --unstaged, --output <path>.
 ---
 
 # Explain Diff
@@ -25,7 +24,7 @@ prose—the reader opens the file in a browser.
 
 Diff source is mutually exclusive. Use the first detected among `--pr`, `--staged`,
 `--unstaged`; otherwise `--target`. `--pr` without a number when not on a PR
-branch: resolve with `gh pr view` or stop and ask.
+branch: try `gh pr view` to resolve; if it returns no PR, stop and ask.
 
 Slug: short kebab from the change topic (e.g. `rate-limit-api`).
 
@@ -59,8 +58,8 @@ the repo**). Never commit the HTML file.
 
 ## Step 5: Report
 
-Give the absolute path and a one-line open hint (`open <path>` on macOS). Do not
-paste the full HTML into chat.
+Give the absolute path and a one-line open hint (`open` on macOS, `xdg-open` on
+Linux, `start` on Windows). Do not paste the full HTML into chat.
 
 ## Constraints
 
