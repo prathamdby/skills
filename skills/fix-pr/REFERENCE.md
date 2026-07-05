@@ -8,7 +8,7 @@ Substitute `<OWNER>`, `<REPO>`, and `<NUMBER>` from Step 1.
 with `sed` before parsing JSON.
 
 ```bash
-THREADS_FILE=$(mktemp /tmp/pr_review_threads.XXXXXX.json)
+THREADS_FILE="$(mktemp /tmp/pr_review_threads.XXXXXX).json"
 CURSOR=""
 ALL_THREADS="[]"
 while true; do
