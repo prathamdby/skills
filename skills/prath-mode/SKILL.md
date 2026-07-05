@@ -18,6 +18,7 @@ improvise its workflow. The leaf owns its own triggers, flags, and rules.
 | Commit or write a commit message         | **commit** (`../commit/SKILL.md`)                       |
 | Strip AI slop or simplify a diff         | **deslop** (`../deslop/SKILL.md`)                       |
 | Open a pull request                      | **make-pr** (`../make-pr/SKILL.md`)                     |
+| Address PR review feedback               | **fix-pr** (`../fix-pr/SKILL.md`)                       |
 | Fix or implement a Linear ticket         | **fix-linear-ticket** (`../fix-linear-ticket/SKILL.md`) |
 | Review a plan, design, or implementation | **peer-review** (`../peer-review/SKILL.md`)             |
 | Clone or search an external git repo     | **box** (`../box/SKILL.md`)                             |
@@ -37,9 +38,10 @@ Run in order. Read each leaf before its step. `implement` is not a skill.
    `make-pr` (pass `--ticket` to make-pr when the ID is known)
 2. **Ship planned work:** `peer-review` → implement → `deslop` → `commit` → `make-pr`
 3. **Quick save:** `deslop` (optional) → `commit`
-4. **Research external code:** `box`
-5. **Delegate heavy lift:** `assign`
-6. **End or resume session:** `handoff` or `handoff --resume <path>`
+4. **Land PR feedback:** `fix-pr` → `commit` → push
+5. **Research external code:** `box`
+6. **Delegate heavy lift:** `assign`
+7. **End or resume session:** `handoff` or `handoff --resume <path>`
 
 ## Step 1: Match
 

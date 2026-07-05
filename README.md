@@ -23,6 +23,7 @@ npx skills@latest add prathamdby/skills
    - `/peer-review`, review a plan for gaps before building
    - `/fix-linear-ticket`, fetch ticket, branch, plan, fix, review
    - `/make-pr`, open PRs with thematic summaries
+   - `/fix-pr`, triage PR review feedback skeptically, fix, reply, commit, push
    - `/explain-diff`, rich HTML explanation of a diff or PR
    - `/box`, clone and search any git repo locally
    - `/assign`, delegate tasks to external agents
@@ -113,6 +114,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/explain-diff`](./skills/explain-diff/SKILL.md) explores surrounding code and writes a self-contained HTML page—Background, Intuition, Code walkthrough, and an interactive quiz—saved outside the repo (default `/tmp/YYYY-MM-DD-explain-<slug>.html`). Supports `--target <branch>`, `--pr`, `--staged`/`--unstaged`, and `--output <path>`.
 
+### #14: PR Review Feedback Loops Are Manual
+
+**The Problem.** After `make-pr`, AI reviewers comment on the PR. You re-paste the same skeptical-verify-fix-commit-push prompt every round, and replies come back bloated with bot voice.
+
+**The Fix.** [`/fix-pr`](./skills/fix-pr/SKILL.md) fetches unresolved threads, triages each finding skeptically, fixes what holds, posts concise humane replies (unslopped), then chains to `commit` and push. Supports `--pr <n|url>`, `--no-push`, and `--no-reply`.
+
 ## Development
 
 Before committing skill edits, run the self-check in
@@ -129,6 +136,7 @@ markdown file resolves.
 | [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                                                                    |
 | [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.                                                              |
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                             |
+| [`fix-pr`](./skills/fix-pr/SKILL.md)                       | Triage PR review feedback skeptically, fix, reply, commit, and push. Supports `--pr <n\|url>`, `--no-push`, and `--no-reply`.                                                |
 | [`explain-diff`](./skills/explain-diff/SKILL.md)           | Rich HTML explanation of a diff or PR. Supports `--target <branch>`, `--pr`, `--staged`/`--unstaged`, and `--output <path>`.                                              |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                                                              |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                                                                       |
