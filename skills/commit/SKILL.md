@@ -1,11 +1,10 @@
 ---
 name: commit
 description: >
-  commit changes to git with a message derived from the diff only, ignoring
-  session context like reviews or discussion. Skips hooks with -n by default;
-  --verify runs them. Triggers: /commit, commit changes, save work to git, write
-  a commit message. Flags: --staged/--unstaged for scope, --conventional/--simple
-  for style, --verify to run hooks.
+  commit changes to git with a clean-room message derived from the diff alone.
+  Skips hooks with -n by default; --verify runs them. Triggers: /commit, commit
+  changes, save work to git, write a commit message. Flags: --staged/--unstaged
+  for scope, --conventional/--simple for style, --verify to run hooks.
 ---
 
 # Commit Changes
@@ -22,12 +21,12 @@ description: >
 
 No flags → `--staged --conventional`, hooks skipped.
 
-## Diff-only constraint
+## Clean-room message
 
-The diff is the only input for the message. Ignore conversation history, review
-threads, ticket text, and stated rationale unless the same fact appears in the
-diff. Never write "address review feedback", "as requested", or "implement the
-plan". Describe the concrete change instead.
+Write the message clean-room: as a stranger who has seen only the diff and
+nothing of the session it came from. Every line of the message traces to a
+hunk in the diff, the hunk that proves the claim. A fact from elsewhere earns
+a place only if the same fact is visible in a hunk.
 
 ## Hook behavior
 
@@ -74,6 +73,11 @@ Base the message solely on Step 2. Produce:
 For the chosen style, follow the exact format rules and examples in
 `./REFERENCE.md`, conventional rules for `--conventional`, simple rules for
 `--simple`. For `--simple`, emit `subject` only.
+
+Then run the trace check: for each line of the draft, point at the hunk that
+proves it. A line that traces to nothing gets rewritten to name the concrete
+change until it does. Completion: every subject and body line traces to a
+specific hunk.
 
 ## Step 4: Commit
 

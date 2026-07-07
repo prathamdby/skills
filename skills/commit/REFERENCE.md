@@ -32,10 +32,12 @@ Examples:
 - "Add dark mode toggle to settings page"
 - "Fix null pointer exception in user service"
 
-## Concrete-change examples (diff-only)
+## Trace examples (clean-room)
 
-| Diff shows                           | Bad                             | Good                                  |
-| ------------------------------------ | ------------------------------- | ------------------------------------- |
-| Null check added in `userService.ts` | fix: address review feedback    | fix: guard null user in getProfile    |
-| README install steps rewritten       | docs: update per discussion     | docs: add pnpm install steps          |
-| Extract helper from handler          | refactor: implement agreed plan | refactor: extract parsePayload helper |
+Each message names the change its hunk proves, nothing more.
+
+| Diff shows                           | Message                               |
+| ------------------------------------ | ------------------------------------- |
+| Null check added in `userService.ts` | fix: guard null user in getProfile    |
+| README install steps rewritten       | docs: add pnpm install steps          |
+| Extract helper from handler          | refactor: extract parsePayload helper |
