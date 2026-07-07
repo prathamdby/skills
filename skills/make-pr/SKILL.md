@@ -1,8 +1,9 @@
 ---
 name: make-pr
 description: >
-  make a pull request with a plain-English title and a thematic summary built
-  from the branch diff. Triggers: open a PR, create a pull request, submit a PR.
+  make a pull request with a plain-English title and a clean-room thematic
+  summary built from the branch diff. Triggers: open a PR, create a pull
+  request, submit a PR.
   Flags: --target <branch> (default main), --ticket <id> (prefix title with the
   ticket), --conventional (conventional-commit title).
 ---
@@ -20,6 +21,12 @@ description: >
 If `--ticket` is passed without an ID, stop: "`--ticket` requires a ticket ID
 (e.g., `--ticket ABC-123`)."
 
+## Clean-room title and body
+
+Write the title and body clean-room: as a stranger who has seen only the
+branch diff, plus the explicit `--ticket` value. Every claim traces to a hunk
+in `git diff <target>...HEAD`, the hunk that proves it.
+
 ## Step 1: Gather context
 
 1. Identify the current branch.
@@ -30,8 +37,6 @@ With `--ticket`, use the explicit value; never search the branch name or commits
 for a ticket number.
 
 ## Step 2: Generate the title
-
-Base the title on the branch diff, not commit messages or session context.
 
 - **Default:** plain English. Capitalize the first word; rest lowercase except
   proper nouns and technical terms. No `feat:`/`fix:`/`docs:` prefix.
@@ -51,6 +56,10 @@ Examples:
 A concise, high-level summary of the branch changes relative to the target.
 Group related changes thematically, not commit-by-commit. Factual and brief, no
 filler. No Linear references unless `--ticket` was passed.
+
+Then run the trace check: for each theme in the body, point at the hunks that
+prove it. A theme that traces to nothing gets rewritten to name the concrete
+change. Completion: the title and every body theme trace to specific hunks.
 
 ## Step 4: Open the PR
 

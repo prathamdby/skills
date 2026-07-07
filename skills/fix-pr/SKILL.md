@@ -65,7 +65,7 @@ verdicts.
 
 ## Step 6: Commit
 
-Read `../commit/SKILL.md` in full. Commit per that skill (diff-only message).
+Read `../commit/SKILL.md` in full. Commit per that skill (clean-room message).
 
 **Done when:** Changes are committed, or there is nothing to commit.
 

@@ -53,7 +53,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Problem.** Agents open PRs with titles like "Changes" and bodies that list every commit. Or they target the wrong branch. Or they forget to link the ticket.
 
-**The Fix.** [`/make-pr`](./skills/make-pr/SKILL.md) generates thematic summaries grouped by related changes, not commit-by-commit. Plain-English PR titles by default. Supports `--target <branch>` (default: `main`), `--ticket <id>` for Linear-linked titles like `[ABC-123] Add auth flow`, and `--conventional` when you want commit-style titles.
+**The Fix.** [`/make-pr`](./skills/make-pr/SKILL.md) generates thematic summaries grouped by related changes, not commit-by-commit. Plain-English PR titles by default. Titles and summaries are written clean-room: every claim traces to a hunk in the branch diff, never to session context. Supports `--target <branch>` (default: `main`), `--ticket <id>` for Linear-linked titles like `[ABC-123] Add auth flow`, and `--conventional` when you want commit-style titles.
 
 ### #4: Ticket-to-Code Is Scattershot
 
@@ -142,7 +142,7 @@ markdown file resolves.
 | [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages. Skips hooks with `-n` by default; `--verify` runs hooks. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`. |
 | [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                                                                    |
 | [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, classify mode, plan fix with confirmation, implement, review. Supports `--base <branch>` and `--mode <mode>` (values: auto, scratch, modify, debug, trivial).                                                              |
-| [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                             |
+| [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and clean-room thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                  |
 | [`fix-pr`](./skills/fix-pr/SKILL.md)                       | Triage PR review feedback skeptically, fix, reply, commit, and push. Supports `--pr <n\|url>`, `--no-push`, and `--no-reply`.                                                |
 | [`explain-diff`](./skills/explain-diff/SKILL.md)           | Rich HTML explanation of a diff or PR. Supports `--target <branch>`, `--pr`, `--staged`/`--unstaged`, and `--output <path>`.                                              |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                                                              |
