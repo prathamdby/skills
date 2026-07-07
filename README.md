@@ -21,7 +21,7 @@ npx skills@latest add prathamdby/skills
    - `/commit`, commit with conventional or simple messages
    - `/deslop`, strip AI bloat and simplify
    - `/peer-review`, review a plan for gaps before building
-   - `/fix-linear-ticket`, fetch ticket, branch, plan, fix, review
+   - `/fix-linear-ticket`, fetch ticket, branch, classify mode, plan, fix, review
    - `/make-pr`, open PRs with thematic summaries
    - `/fix-pr`, triage PR review feedback skeptically, fix, reply, commit, push
    - `/explain-diff`, rich HTML explanation of a diff or PR
@@ -58,7 +58,7 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Problem.** Agents guess what a Linear ticket wants. They miss edge cases, skip linked issues, and build the wrong thing confidently.
 
-**The Fix.** [`/fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) fetches the real ticket from Linear, title, description, comments, attachments, linked issues. Creates a properly-named branch off any base you specify. Plans the fix and waits for your confirmation before writing code. Then reviews its own work against the ticket requirements.
+**The Fix.** [`/fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) fetches the real ticket from Linear, title, description, comments, attachments, linked issues, labels. Creates a properly-named branch off any base you specify. Classifies the ticket into a mode (debug, scratch, modify, trivial) automatically from its title, body, and labels, then adapts the workflow: debug requires reproduction before changing code, trivial uses a lighter path. Plans the fix and waits for your confirmation before writing code. Then reviews its own work against the ticket requirements.
 
 ### #5: Implementation Plans Go Unchallenged
 
@@ -134,7 +134,7 @@ markdown file resolves.
 | [`prath-mode`](./skills/prath-mode/SKILL.md)               | Route tasks to the right skill and run workflow chains. Invoke before or alongside other skills.                                                                            |
 | [`commit`](./skills/commit/SKILL.md)                       | Generate conventional or simple commit messages. Skips hooks with `-n` by default; `--verify` runs hooks. Supports `--staged`/`--unstaged` and `--conventional`/`--simple`. |
 | [`deslop`](./skills/deslop/SKILL.md)                       | Remove AI slop and simplify changes. Supports `--staged`/`--unstaged`/`--base <branch>`.                                                                                    |
-| [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, plan fix with confirmation, implement, review. Supports `--base <branch>`.                                                              |
+| [`fix-linear-ticket`](./skills/fix-linear-ticket/SKILL.md) | Fetch Linear ticket, create branch, classify mode, plan fix with confirmation, implement, review. Supports `--base <branch>` and `--mode <mode>` (values: auto, scratch, modify, debug, trivial).                                                              |
 | [`make-pr`](./skills/make-pr/SKILL.md)                     | Open PRs with plain-English titles and thematic summaries. Supports `--target <branch>`, `--ticket <id>`, and `--conventional`.                                             |
 | [`fix-pr`](./skills/fix-pr/SKILL.md)                       | Triage PR review feedback skeptically, fix, reply, commit, and push. Supports `--pr <n\|url>`, `--no-push`, and `--no-reply`.                                                |
 | [`explain-diff`](./skills/explain-diff/SKILL.md)           | Rich HTML explanation of a diff or PR. Supports `--target <branch>`, `--pr`, `--staged`/`--unstaged`, and `--output <path>`.                                              |
