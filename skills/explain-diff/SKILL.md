@@ -46,6 +46,11 @@ touches. Done when you can name the system before/after without guessing.
 Follow section rubrics, prose tone, diagram families, and quiz rules in
 `./REFERENCE.md`. Order on the page: Background → Intuition → Code → Quiz.
 
+Trace rule: claims about the change trace to diff hunks; claims about the
+surrounding system trace to code read in Step 2. A sentence that traces to
+neither gets cut or rewritten. Completion: every Background, Intuition, and
+Code claim traces to a hunk or a read file.
+
 ## Step 4: Write HTML
 
 Emit a **single self-contained** file: embedded CSS and JavaScript, table of
