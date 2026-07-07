@@ -26,6 +26,7 @@ npx skills@latest add prathamdby/skills
    - `/fix-pr`, triage PR review feedback skeptically, fix, reply, commit, push
    - `/explain-diff`, rich HTML explanation of a diff or PR
    - `/box`, clone and search any git repo locally
+   - `/recon`, explore a codebase once, remember it, verify only the drift on relaunch
    - `/assign`, delegate tasks to external agents
    - `/handoff`, save session context or resume from a handoff document
    - `/caveman`, ultra-compressed reply mode
@@ -120,6 +121,12 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 
 **The Fix.** [`/fix-pr`](./skills/fix-pr/SKILL.md) fetches unresolved threads, triages each finding skeptically, fixes what holds, posts concise humane replies (unslopped), then chains to `commit` and push. Supports `--pr <n|url>`, `--no-push`, and `--no-reply`.
 
+### #15: Agents Re-Explore the Same Repo Every Session
+
+**The Problem.** Every new session pays the full exploration cost again; the agent re-reads the same files to rebuild the same mental model it built yesterday, and on a big repo that burns minutes and tokens before any real work starts.
+
+**The Fix.** [`/recon`](./skills/recon/SKILL.md) persists a memory of the codebase in the skill folder along with the HEAD commit SHA; the next run diffs from that SHA to current HEAD and re-explores only the changed files, so verification cost scales with drift, not repo size; it falls back to a full re-exploration when the SHA is gone or the diff is huge; `--refresh` forces a rewrite.
+
 ## Development
 
 Before committing skill edits, run the self-check in
@@ -140,6 +147,7 @@ markdown file resolves.
 | [`explain-diff`](./skills/explain-diff/SKILL.md)           | Rich HTML explanation of a diff or PR. Supports `--target <branch>`, `--pr`, `--staged`/`--unstaged`, and `--output <path>`.                                              |
 | [`peer-review`](./skills/peer-review/SKILL.md)             | Review implementation plans for gaps, risks, and completeness.                                                                                                              |
 | [`box`](./skills/box/SKILL.md)                             | Clone and search git repos locally. Supports `--persist`, `--update`, `--list`, and `--no-subagents`.                                                                       |
+| [`recon`](./skills/recon/SKILL.md)                         | Persistent codebase memory: explore once, then verify only the git drift since the recorded SHA. Supports `--refresh` and a positional focus argument.                      |
 | [`assign`](./skills/assign/SKILL.md)                       | Delegate tasks to external agents non-interactively. Supports `--agent <name>` (`opencode`, `codex`, `claude`), `--model <model>`, and `--dir <path>`.                      |
 | [`handoff`](./skills/handoff/SKILL.md)                     | Save session context or resume from a handoff doc. Supports `--resume <path>`, `--path <path>`, and a focus argument.                                                       |
 | [`caveman`](./skills/caveman/SKILL.md)                     | Ultra-compressed reply mode that cuts ~75% of tokens while keeping technical accuracy. User-invoked; toggle off with "stop caveman" or "normal mode".                       |
