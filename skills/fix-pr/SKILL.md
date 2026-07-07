@@ -75,18 +75,15 @@ Unless `--no-push`: `git push`.
 
 Unless `--no-reply`, reply to **every** triaged item:
 
-1. Draft per verdict shape in `./REFERENCE.md`.
-2. Apply the unslop process in `~/.agents/skills/unslop/SKILL.md` to each
-   draft. Replies must be **concise** (fact or fix first, no preamble) and
-   **humane** (teammate tone, not a bot closing a ticket).
-3. Post using reply commands in `./REFERENCE.md`. For `fix` verdicts, push
-   before replying; reference the commit SHA. Never post platitudes
-   ("acknowledged", "will fix", "good point", "hope this helps").
-4. When author is `semgrep-code-scan`, use dismissal patterns in
+1. Draft per **Reply shapes** in `./REFERENCE.md`.
+2. Unslop each draft per `./references/unslop-reply-drafts.md`.
+3. Post per **Post thread replies** in `./REFERENCE.md`. For `fix` verdicts,
+   push before replying and reference the commit SHA.
+4. When author is `semgrep-code-scan`, use **Semgrep dismissal replies** in
    `./REFERENCE.md`.
 
 **Done when:** Push succeeded (or `--no-push`); every item has a posted reply
-(or `--no-reply`); every reply is concise, humane, and unslopped.
+(or `--no-reply`); every posted reply is unslopped.
 
 ## Step 8: Report
 

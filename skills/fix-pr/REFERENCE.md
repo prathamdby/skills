@@ -87,46 +87,28 @@ When author login is `semgrep-code-scan`:
 - Acceptable risk: `/ar <reason>`
 - Other: `/other <reason>`
 
-Keep the reason concrete and short. Run unslop on the draft before posting.
+Keep the reason concrete and short. Unslop the draft per `./references/unslop-reply-drafts.md` before posting.
 
 ## Reply shapes
 
-### fix (good)
+Lead with the fix, rejection, or fact. Examples by verdict:
+
+### fix
 
 ```
 Fixed in abc1234. Added a nil check before the DB call on line 42.
 ```
 
-### fix (bad)
-
-```
-Thank you for this insightful feedback! I've carefully addressed your concerns
-in the latest commit to ensure robustness going forward.
-```
-
-### reject (good)
+### reject
 
 ```
 This branch can't run. validate() returns early at auth.go:88 when id is empty.
 ```
 
-### reject (bad)
-
-```
-Great question! While your suggestion has merit, the current implementation
-already handles this case adequately.
-```
-
-### clarify (good)
+### clarify
 
 ```
 The retry only fires on 5xx. 4xx responses surface to the caller by design.
 See handleResponse at client.go:112.
 ```
 
-### clarify (bad)
-
-```
-I hope this helps clarify! Let me know if you have any other questions about
-the error handling approach.
-```
