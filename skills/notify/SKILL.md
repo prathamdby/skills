@@ -14,16 +14,16 @@ Send a Discord embed via `./scripts/notify.py send`. Never curl. Never hand-buil
 
 Skill flags map to CLI flags on `send`:
 
-| Flag               | CLI flag         | Effect                                         |
-| ------------------ | ---------------- | ---------------------------------------------- |
-| `--task`           | `--task`         | Task notification. Requires `--link`.          |
-| `--link <url>`     | `--link`         | URL in embed. Required with `--task`.          |
-| `--webhook <path>` | `--webhook-file` | URL file. **Default: `<anchor>/webhook.url`**. |
-| `--color <int\|hex>` | `--color`      | Embed color. Default `5814783`.                |
-| `--field "N\|V"`   | `--field`        | Repeatable. Max 10.                            |
-| `--content <text>` | `--content`      | Message above embed.                           |
-| `--dry-run`        | `--dry-run`      | Print payload. No POST.                        |
-| Positional arg     | `--description`  | Embed body if not passed as flag.              |
+| Flag                 | CLI flag         | Effect                                         |
+| -------------------- | ---------------- | ---------------------------------------------- |
+| `--task`             | `--task`         | Task notification. Requires `--link`.          |
+| `--link <url>`       | `--link`         | URL in embed. Required with `--task`.          |
+| `--webhook <path>`   | `--webhook-file` | URL file. **Default: `<anchor>/webhook.url`**. |
+| `--color <int\|hex>` | `--color`        | Embed color. Default `5814783`.                |
+| `--field "N\|V"`     | `--field`        | Repeatable. Max 10.                            |
+| `--content <text>`   | `--content`      | Message above embed.                           |
+| `--dry-run`          | `--dry-run`      | Print payload. No POST.                        |
+| Positional arg       | `--description`  | Embed body if not passed as flag.              |
 
 `--title` and `--description` are always required on the CLI.
 

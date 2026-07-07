@@ -11,11 +11,11 @@ description: >
 
 ## Flags
 
-| Flag / Arg        | Effect                                                                  |
-| ----------------- | ----------------------------------------------------------------------- |
-| `<ticket-id>`     | Linear ticket identifier (e.g. `ENG-123`). Extracted from the message.  |
-| `--base <branch>` | Base branch to branch from. **Default: `main`.**                        |
-| `--mode <mode>`   | `auto`, `scratch`, `modify`, `debug`, `trivial`. **Default: `auto`.**   |
+| Flag / Arg        | Effect                                                                 |
+| ----------------- | ---------------------------------------------------------------------- |
+| `<ticket-id>`     | Linear ticket identifier (e.g. `ENG-123`). Extracted from the message. |
+| `--base <branch>` | Base branch to branch from. **Default: `main`.**                       |
+| `--mode <mode>`   | `auto`, `scratch`, `modify`, `debug`, `trivial`. **Default: `auto`.**  |
 
 If no ticket ID is found, stop and ask: "Which Linear ticket should I fix?
 Please provide the ticket ID."

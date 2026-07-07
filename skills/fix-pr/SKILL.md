@@ -11,11 +11,11 @@ description: >
 
 ## Flags
 
-| Flag | Effect |
-| --- | --- |
+| Flag            | Effect                                                                        |
+| --------------- | ----------------------------------------------------------------------------- |
 | `--pr <n\|url>` | Target PR. **Default:** `gh pr view` on current branch; stop and ask if none. |
-| `--no-push` | Commit locally; skip push. Off by default. |
-| `--no-reply` | Fix code; skip GitHub thread replies. Off by default. |
+| `--no-push`     | Commit locally; skip push. Off by default.                                    |
+| `--no-reply`    | Fix code; skip GitHub thread replies. Off by default.                         |
 
 ## Step 1: Resolve PR
 

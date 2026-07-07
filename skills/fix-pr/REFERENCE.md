@@ -111,4 +111,3 @@ This branch can't run. validate() returns early at auth.go:88 when id is empty.
 The retry only fires on 5xx. 4xx responses surface to the caller by design.
 See handleResponse at client.go:112.
 ```
-

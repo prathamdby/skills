@@ -14,13 +14,13 @@ prose—the reader opens the file in a browser.
 
 ## Flags
 
-| Flag              | Effect                                                       |
-| ----------------- | ------------------------------------------------------------ |
-| `--target <branch>` | Branch diff: `git diff <branch>...HEAD`. **Default: `main`.** |
-| `--pr <n\|url>`   | PR diff via `gh pr diff` (and PR title/body for context).    |
-| `--staged`        | `git diff --cached` only.                                    |
-| `--unstaged`      | `git diff` only.                                             |
-| `--output <path>` | Write path. **Default:** `/tmp/YYYY-MM-DD-explain-<slug>.html` |
+| Flag                | Effect                                                         |
+| ------------------- | -------------------------------------------------------------- |
+| `--target <branch>` | Branch diff: `git diff <branch>...HEAD`. **Default: `main`.**  |
+| `--pr <n\|url>`     | PR diff via `gh pr diff` (and PR title/body for context).      |
+| `--staged`          | `git diff --cached` only.                                      |
+| `--unstaged`        | `git diff` only.                                               |
+| `--output <path>`   | Write path. **Default:** `/tmp/YYYY-MM-DD-explain-<slug>.html` |
 
 Diff source is mutually exclusive. Use the first detected among `--pr`, `--staged`,
 `--unstaged`; otherwise `--target`. `--pr` without a number when not on a PR
