@@ -8,6 +8,26 @@ These skills are designed to be small, opinionated, and composable. They work wi
 
 ## Quickstart (30-second setup)
 
+### Option A — Cursor plugin (recommended in Cursor)
+
+This repo is a Cursor plugin (`pratham-skills`). It ships the skills under `skills/` plus a local install command.
+
+**From a clone (local / marketplace-dev loop):**
+
+```bash
+git clone https://github.com/prathamdby/skills.git
+cd skills
+bash scripts/install-plugin.sh
+```
+
+Then restart Cursor. If skills or commands do not appear, enable third-party plugins under Settings > Features.
+
+Do not install only into `~/.cursor/skills/` — that loads skills but skips plugin registration (commands and manifest). Use `scripts/install-plugin.sh`, which copies into `~/.cursor/plugins/local/pratham-skills` (Cursor's local plugin path) and registers `pratham-skills@local` in `~/.claude/` for older builds.
+
+**After install**, invoke `/install-plugin` in the agent and point it at your **git clone** path to refresh (never run the script from inside `~/.cursor/plugins/`).
+
+### Option B — skills.sh (any coding agent)
+
 1. Run the skills.sh installer:
 
 ```bash
@@ -16,22 +36,24 @@ npx skills@latest add prathamdby/skills
 
 2. Pick the skills you want, and which coding agents you want to install them on.
 
-3. Invoke them in your agent:
-   - `/prath-mode`, route tasks to the right skill
-   - `/commit`, commit with conventional or simple messages
-   - `/deslop`, strip AI bloat and simplify
-   - `/peer-review`, review a plan for gaps before building
-   - `/fix-linear-ticket`, fetch ticket, branch, classify mode, plan, fix, review
-   - `/make-pr`, open PRs with thematic summaries
-   - `/fix-pr`, triage PR threads, conversation comments, and review bodies; fix, reply, commit, push
-   - `/explain-diff`, rich HTML explanation of a diff or PR
-   - `/box`, clone and search any git repo locally
-   - `/recon`, explore a codebase once, remember it, verify only the drift on relaunch
-   - `/assign`, delegate tasks to external agents
-   - `/handoff`, save session context or resume from a handoff document
-   - `/caveman`, ultra-compressed reply mode
-   - `/notify`, send a Discord embed when work finishes or needs input
-   - `/orchestrate`, brain-only session: brief cheap subagents, verify everything
+### Invoke
+
+- `/prath-mode`, route tasks to the right skill
+- `/commit`, commit with conventional or simple messages
+- `/deslop`, strip AI bloat and simplify
+- `/peer-review`, review a plan for gaps before building
+- `/fix-linear-ticket`, fetch ticket, branch, classify mode, plan, fix, review
+- `/make-pr`, open PRs with thematic summaries
+- `/fix-pr`, triage PR threads, conversation comments, and review bodies; fix, reply, commit, push
+- `/explain-diff`, rich HTML explanation of a diff or PR
+- `/box`, clone and search any git repo locally
+- `/recon`, explore a codebase once, remember it, verify only the drift on relaunch
+- `/assign`, delegate tasks to external agents
+- `/handoff`, save session context or resume from a handoff document
+- `/caveman`, ultra-compressed reply mode
+- `/notify`, send a Discord embed when work finishes or needs input
+- `/orchestrate`, brain-only session: brief cheap subagents, verify everything
+- `/install-plugin`, refresh the local Cursor plugin install (Option A only)
 
 ## Why These Skills Exist
 
@@ -128,6 +150,8 @@ I built these skills to fix failure modes I kept hitting with Claude Code, Codex
 **The Fix.** [`/recon`](./skills/recon/SKILL.md) persists a memory of the codebase in the skill folder along with the HEAD commit SHA; the next run diffs from that SHA to current HEAD and re-explores only the changed files, so verification cost scales with drift, not repo size; it falls back to a full re-exploration when the SHA is gone or the diff is huge; `--refresh` forces a rewrite.
 
 ## Development
+
+This repository is a single Cursor plugin. Manifest: [`.cursor-plugin/plugin.json`](./.cursor-plugin/plugin.json). Skills live in `skills/`; the local install command is `commands/install-plugin.md` backed by `scripts/install-plugin.sh`.
 
 Before committing skill edits, run the self-check in
 [`AGENTS.md`](./AGENTS.md): verify each skill's frontmatter name, description

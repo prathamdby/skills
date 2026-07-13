@@ -1,0 +1,21 @@
+{
+  "name": "pratham-skills",
+  "displayName": "Pratham's Skills",
+  "version": "1.0.0",
+  "description": "Opinionated agent skills for clean commits, clean PRs, and clean code — routing, deslop, ticket fixes, and more.",
+  "author": {
+    "name": "Pratham Dubey"
+  },
+  "homepage": "https://github.com/prathamdby/skills",
+  "repository": "https://github.com/prathamdby/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "commits",
+    "pull-requests",
+    "deslop",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/"
+}
