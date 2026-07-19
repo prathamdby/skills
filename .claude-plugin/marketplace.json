@@ -1,0 +1,39 @@
+{
+  "name": "pratham-skills",
+  "owner": {
+    "name": "Pratham Dubey"
+  },
+  "metadata": {
+    "description": "Coding-agent workflows for planning, git, review, and session continuity",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "skills",
+      "description": "Planning, git, review, delegation, and session-continuity skills",
+      "author": {
+        "name": "Pratham Dubey"
+      },
+      "source": "./",
+      "strict": false,
+      "homepage": "https://github.com/prathamdby/skills",
+      "license": "MIT",
+      "keywords": ["skills", "git", "review", "workflows"],
+      "category": "development",
+      "skills": [
+        "./skills/assign",
+        "./skills/box",
+        "./skills/commit",
+        "./skills/deslop",
+        "./skills/explain-diff",
+        "./skills/fix-pr",
+        "./skills/handoff",
+        "./skills/make-pr",
+        "./skills/orchestrate",
+        "./skills/peer-review",
+        "./skills/prath-mode",
+        "./skills/recon"
+      ]
+    }
+  ]
+}

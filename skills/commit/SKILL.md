@@ -49,7 +49,8 @@ optional bullet body.
 
 Before mutation, map every subject and body line to proving paths and hunks.
 Delete or rewrite unproved text. Reject ticket IDs, reviewer references,
-session rationale, scope notation, trailing periods, and over-limit subjects.
+session rationale, scope notation, trailing periods, over-limit subjects, and
+lowercase-leading conventional body bullets.
 
 Done when the message passes the style rules and every line has a trace.
 
