@@ -15,11 +15,13 @@ description: >
 | `--pr <n\|url>` | off | Explain one PR diff and metadata |
 | `--staged` | off | Explain the index |
 | `--unstaged` | off | Explain worktree changes |
-| `--output <path>` | dated `/tmp` file | Set the HTML path |
+| `--output <path>` | `/tmp/YYYY-MM-DD-explain-<slug>.html` | Set HTML path |
 
 The four source choices are mutually exclusive; conflicting or valueless flags
-are `BLOCKED`. With no source flag, use `--target main`. A bare `--pr` may
-resolve the current branch's PR; block if absent or ambiguous.
+are `BLOCKED`; bare `--pr` is the only value-less exception and may resolve the
+current branch PR. With no source flag, use the equivalent of `--target main`.
+Block when PR diff cannot be fetched. Missing optional PR metadata permits a
+diff-only page with no motive claims.
 
 ## 1. Lock source and output
 
@@ -27,13 +29,15 @@ Capture source identity, head SHA, exact diff, sorted paths, and SHA-256 diff
 hash. Empty diff is `NO_CHANGES`. Derive slug from sanitized branch name, PR
 number, or `change-<head8>`, capped at 40 characters.
 
-Resolve output to an absolute path outside the repo. Create a missing parent.
-Block before overwriting a user-supplied existing file. A default output may
-replace only a prior artifact containing this skill's generator marker.
+Resolve output to an absolute path outside the repo; an explicit in-repo path is
+`BLOCKED`, never relocated. Create a missing parent. Block before overwriting a
+user-supplied existing file. A default output may replace only a prior artifact
+containing this skill's generator marker.
 
 Record:
-`source/hash | themes | evidence | output | current gate | verification | terminal`.
-Persist it beside the output as `<output>.ledger` and remove it on success.
+`source/hash | themes | evidence | output | gate | verification | terminal`.
+Gate is `lock`, `research`, `build`, or `verify`. Persist beside the output as
+`<output>.ledger`; an active conflicting ledger is `BLOCKED`. Remove on success.
 
 Done when source and safe output are immutable.
 
@@ -41,7 +45,9 @@ Done when source and safe output are immutable.
 
 Assign every changed path to a functional theme before reading surrounding
 code. For more than 50 paths, explain themes through representative hunks and
-include a complete changed-file inventory. Use at most 12 themes, three
+include every sorted path without truncation. Represent a rename as
+`old → new`; list generated or binary paths under those themes and make no
+behavioral claim without text hunks. Use at most 12 themes, three
 surrounding files per theme, and 30 surrounding files total. Read direct
 definitions, callers, contracts, tests, and config only when a planned claim
 needs them.
@@ -67,7 +73,8 @@ quiz questions.
 Apply the reference checklist. Verify no external asset URL, all anchors,
 generator marker, code whitespace, evidence pointers, and quiz answer feedback.
 When a browser tool exists, load the file and test one correct and one incorrect
-answer; otherwise disclose static-only verification.
+answer for every question; otherwise parse JavaScript and HTML and disclose
+`verification: static-only`. A browser run reports `verification: browser`.
 
 After interruption, compare source hash and ledger. Restart changed themes;
 otherwise continue at the first incomplete gate.

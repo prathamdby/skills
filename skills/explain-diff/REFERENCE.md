@@ -11,6 +11,8 @@ Load this file only after source, themes, evidence, and output are locked.
 - Use sentence-case headings and concrete prose.
 - Put evidence on factual elements with
   `data-source="path:line"` or `data-hunk="path:hunk"`.
+- Give factual diagram labels, quiz options, and feedback the same evidence
+  attributes.
 
 ## Sections
 
@@ -43,7 +45,7 @@ must show the score and per-option feedback without reloading.
 ## Code and diagrams
 
 - Use `<pre><code>` and CSS `white-space: pre-wrap`.
-- Escape source text before inserting it into HTML.
+- Escape source text, quiz options, and feedback before inserting them.
 - Use callouts only for definitions, contracts, and important edge cases.
 - No top-level tabs, markdown syntax, decorative animation, or generated filler.
 
@@ -51,12 +53,15 @@ must show the score and per-option feedback without reloading.
 
 1. Generator marker appears once.
 2. All four sections and TOC anchors appear once and in order.
-3. Every factual paragraph, bullet, table row, question, and answer has evidence.
+3. Every factual paragraph, bullet, table row, diagram label, question, answer,
+   and feedback string has evidence.
 4. Every changed path appears in a theme or inventory.
-5. No `src`, `href`, CSS import, or script points to a network URL.
+5. No network URL appears in `src`, CSS `url()`, or `@import`; every `href` is a
+   local `#` anchor.
 6. HTML source is escaped and code whitespace is preserved.
 7. Five questions each have four options, one keyed answer, and four feedback
    strings.
-8. Browser check passes when available; otherwise JavaScript parses and static
-   structure passes.
-9. Default filename starts with `YYYY-MM-DD-explain-`.
+8. HTML parses without structural errors.
+9. Browser check passes every question when available; otherwise JavaScript
+   parses and static structure passes.
+10. Default filename starts with `YYYY-MM-DD-explain-`.

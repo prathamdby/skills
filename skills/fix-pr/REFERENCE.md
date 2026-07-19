@@ -8,7 +8,8 @@ Load Reply contracts only after the finding set is stable.
 Set `NO_COLOR=1`. Substitute owner, repo, number, and head SHA from the ledger.
 
 1. GraphQL: page `pullRequest.reviewThreads(first:100, after:$cursor)` until
-   `hasNextPage` is false. Keep unresolved nodes, including outdated ones.
+   `hasNextPage` is false. Keep unresolved nodes, including outdated ones. When
+   `totalCount` is available, collected thread count must match it.
 2. For each kept thread, page `comments(first:100, after:$cursor)` until false.
    Collect thread ID, root `databaseId`, author, path, line, body, URL, and every
    reply.
@@ -28,10 +29,10 @@ complete. Clean up temporary files on every exit.
 
 ## Normalization
 
-- Split a body containing several independent claims into one finding per
-  claim, preserving the parent reply target.
-- Deduplicate near-identical claims only when path, line range, and rule or
-  meaning match. Prefer thread, then review, then conversation, then check.
+- Split only claims that require different code paths or verdicts; keep
+  supporting sub-points in one finding and preserve the parent reply target.
+- Deduplicate only identical stable keys. Prefer thread, then review, then
+  conversation, then check.
 - Never discard another native reply target during deduplication.
 - Skip empty bodies, pure acknowledgments, resolved threads without new
   replies, and status messages with no requested action.
