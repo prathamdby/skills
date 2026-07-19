@@ -1,58 +1,33 @@
-# Commit Skill Reference
+# Commit reference
 
-Per-style message format and anti-patterns. Reached from Step 3 for the chosen
-style, and again when checking the draft against anti-patterns.
+Load only the selected style section, then run the shared rejection check.
 
 ## `--conventional` formatting rules
 
-- **Format:** `type: description`
-- **Allowed types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`
-- **No scope notation** (no `feat(scope):`, just `feat:`)
-- **First line:** max 50 chars; lowercase except proper nouns and technical
-  terms (OAuth, React, PostgreSQL, API, CLI, HTML, CSS, JSON, URL, HTTP); no
-  trailing period
-- **Body (if needed):** bullets starting with `-`; no blank lines between
-  bullets; capitalize the first word of each; no trailing periods; explain
-  _what_ and _why_, not _how_
-
-```
-feat: add user authentication flow
-
-- Implement OAuth 2.0 login with Google and GitHub
-- Add JWT token handling for session management
-```
+- Format: `type: description`
+- Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`
+- Pick the type that describes most changed lines. Use `chore` only when no
+  more specific type fits.
+- No scope notation.
+- Subject: at most 50 characters, lowercase except names and technical terms,
+  imperative, no trailing period.
+- Optional body: one to five `- ` bullets in one body argument, no blank lines
+  or trailing periods. Include only material diff details not in the subject.
 
 ## `--simple` formatting rules
 
-- Single line, no type prefix, max 72 chars
-- Capitalize the first word; rest lowercase except proper nouns and technical terms
-- No trailing period
+- One line, no type prefix or body, at most 72 characters.
+- Capitalize the first word; use sentence case; no trailing period.
 
-Examples:
+## Shared rejection check
 
-- "Add dark mode toggle to settings page"
-- "Fix null pointer exception in user service"
+Reject and rewrite a draft containing:
 
-## Trace examples (clean-room)
-
-Each message names the change its hunk proves, nothing more.
-
-| Diff shows                           | Message                               |
-| ------------------------------------ | ------------------------------------- |
-| Null check added in `userService.ts` | fix: guard null user in getProfile    |
-| README install steps rewritten       | docs: add pnpm install steps          |
-| Extract helper from handler          | refactor: extract parsePayload helper |
-
-## Anti-patterns (reject and rewrite)
-
-| Bad draft / command | Why it fails | Rewrite toward |
-| --- | --- | --- |
-| `fix: address Sarah's review feedback` | Session / reviewer, not in diff | Name the concrete code change |
-| `fix: implement ABC-99 auth plan` | Ticket / plan, not in diff | Name the hunk (e.g. null guard) |
-| `feat(api): add rate limiting middleware` | Scope notation forbidden | `feat: add rate limiting middleware` |
-| `refactor: extract helper.` | Trailing period; vague | `refactor: extract parsePayload helper` |
-| Subject > 50 chars (conventional) | Over limit | Shorten; move detail to body |
-| Three or more `-m` flags | Blank line between every bullet | One subject `-m` + one body `-m` |
-| Single `-m` with embedded `\n\n` body | Body often dropped | Two `-m` flags |
-| `git commit -F - <<EOF ...` / HEREDOC | Not this skill's recipe | Two `-m` + `$'...'` |
-| `git commit -m "..."` without `-n` when no `--verify` | Hooks must be skipped | Add `-n` |
+- ticket IDs, reviewer names, review or plan language, or unstated motives
+- a claim inferred from the branch name, commit history, or conversation
+- scope notation such as `feat(api):`
+- a vague verb such as update, change, address, or improve when a hunk supports
+  a concrete action
+- an untraced subject or body line
+- too many message arguments, embedded blank-line bodies, HEREDOC, or `-F`
+- hook behavior that disagrees with `--verify`

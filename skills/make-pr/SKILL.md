@@ -1,77 +1,74 @@
 ---
 name: make-pr
 description: >
-  make a pull request with a plain-English title and a clean-room thematic
-  summary built from the branch diff. Triggers: open a PR, create a pull
-  request, submit a PR.
-  Flags: --target <branch> (default main), --ticket <id> (prefix title with the
-  ticket), --conventional (conventional-commit title).
+  make-pr when publishing committed branch changes as a new pull request or
+  updating the existing pull request for that branch.
 ---
 
-# Make Pull Request
+# Make PR
 
 ## Flags
 
-| Flag / Arg          | Effect                                                                |
-| ------------------- | --------------------------------------------------------------------- |
-| `--target <branch>` | Target branch. **Default: `main`.**                                   |
-| `--ticket <id>`     | Prefix the title with `[<TICKET-ID>]` (e.g. `--ticket ABC-123`). Off. |
-| `--conventional`    | Conventional-commit title format. Off, plain English by default.      |
+| Flag | Default | Effect |
+|---|---|---|
+| `--target <branch>` | `main` | PR base and branch-diff target |
+| `--ticket <id>` | off | Prefix title with `[<id>]` |
+| `--conventional` | off | Use conventional title rules |
 
-If `--ticket` is passed without an ID, stop: "`--ticket` requires a ticket ID
-(e.g., `--ticket ABC-123`)."
+Missing flag values are `BLOCKED`. Never infer a ticket from branch names,
+commits, issues, or conversation.
 
-## Clean-room title and body
+## 1. Preflight
 
-Write the title and body clean-room: as a stranger who has seen only the
-branch diff, plus the explicit `--ticket` value. Every claim traces to a hunk
-in `git diff <target>...HEAD`, the hunk that proves it.
+Resolve current branch, target ref, working-tree status, upstream state, and an
+existing PR for the branch. Block on detached HEAD, current branch equal to
+target, missing target, any uncommitted or untracked file, or an existing PR
+whose base differs from target. Never hide work excluded from the branch diff.
 
-## Step 1: Gather context
+Record:
+`branch/target | diff hash | remote state | existing PR | title/body | mutation | terminal`.
 
-1. Identify the current branch.
-2. `git log <target>..HEAD --oneline`, commits on this branch.
-3. `git diff <target>...HEAD`, the full diff.
+Done when the branch is clean, the base is fixed, and create versus update is
+known.
 
-With `--ticket`, use the explicit value; never search the branch name or commits
-for a ticket number.
+## 2. Lock diff and write copy
 
-## Step 2: Generate the title
+Read `git diff <target>...HEAD` only. If empty, report `NO_CHANGES`. Draft as a
+stranger who has only this diff and the explicit ticket ID.
 
-- **Default:** plain English. Capitalize the first word; rest lowercase except
-  proper nouns and technical terms. No `feat:`/`fix:`/`docs:` prefix.
-- **`--conventional`:** conventional-commit format; follow
-  `skills/commit/REFERENCE.md`.
-- **`--ticket <id>`:** prepend `[<TICKET-ID>]` (uppercase as provided); keep the
-  summary portion ≤60 chars.
+- Default title: imperative sentence case, no type prefix, no trailing period,
+  summary at most 60 characters.
+- Conventional title: load only that section of
+  `../commit/REFERENCE.md`; keep its 50-character subject limit.
+- Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
+  ticket claims in the body.
+- Body: `## Summary` with one to five thematic bullets. Group related hunks,
+  never commits. Include no test, rollout, motive, or ticket claim the diff
+  cannot prove.
 
-Examples:
+Map every title phrase and bullet to proving paths and hunks. Rewrite untraced
+copy. Done when all copy passes its format and clean-room trace.
 
-- `[ABC-123] Add user authentication flow` (ticket, default)
-- `Add user authentication flow` (default)
-- `[ABC-123] feat: add user authentication flow` (ticket, `--conventional`)
+## 3. Publish
 
-## Step 3: Generate the body
+Recheck status and diff hash. If either changed, return to Step 1. Publish the
+committed branch with a normal upstream push when missing or ahead. Never force
+push. Block on remote divergence or push failure.
 
-A concise, high-level summary of the branch changes relative to the target.
-Group related changes thematically, not commit-by-commit. Factual and brief, no
-filler. No Linear references unless `--ticket` was passed.
+Create a PR when none exists. Otherwise update the existing title and body
+while preserving draft state and reviewers. Use the resolved target and
+current branch explicitly.
 
-Then run the trace check: for each theme in the body, point at the hunks that
-prove it. A theme that traces to nothing gets rewritten to name the concrete
-change. Completion: the title and every body theme trace to specific hunks.
+Done when the platform returns a PR URL or a captured mutation error.
 
-## Step 4: Open the PR
+## 4. Verify and report
 
-Use `gh pr create` (or equivalent) with the generated title and body, targeting
-`--target`.
+Read the PR back. Verify URL, base, head, title, body, and preserved draft state
+against the ledger. Report create or update, push status, URL, and trace
+summary.
 
-## Step 5: Report
+After interruption, re-run Preflight and verify remote and PR state before any
+retry. Do not duplicate a PR or repeat a successful push.
 
-Report the PR URL.
-
-## Constraints
-
-- **Never commit, build, run, or push.**
-- **Never auto-detect Linear issues** from branch names or commits, use the
-  explicit `--ticket` value only.
+Terminal values are `SUCCESS`, `NO_CHANGES`, and `BLOCKED`. Never commit, force
+push, run builds, or run tests.
