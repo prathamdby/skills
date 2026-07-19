@@ -1,64 +1,64 @@
 ---
 name: handoff
 description: >
-  handoff the session, compact the conversation into a document a fresh agent
-  can resume from, or restore context from a saved handoff. Triggers: /handoff,
-  save session context, hand off to a new agent, resume from a handoff file.
-  Flags: --resume <path>, --path <path>, and a positional focus argument.
+  handoff when saving resumable session state or continuing work from an
+  existing handoff document.
 ---
 
 # Handoff
 
 ## Flags
 
-| Flag / Arg        | Effect                                                                        |
-| ----------------- | ----------------------------------------------------------------------------- |
-| `--resume <path>` | Load an existing handoff doc and restore context. Writes no new doc.          |
-| `--path <path>`   | Save the new doc to `<path>` instead of the default handoffs dir.             |
-| Positional arg    | What the next session should focus on. Tailors a new doc or narrows a resume. |
+| Flag or argument | Default | Effect |
+|---|---|---|
+| `--resume <path>` | off | Validate a saved handoff and continue its work |
+| `--path <path>` | anchor path | Save a new handoff at this path |
+| positional focus | none | Prioritize this focus during create or resume |
 
-No flags → create a new handoff doc in the default dir.
+Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
+Default saves use
+`<anchor>/handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`.
 
-`--resume` and `--path` are mutually exclusive; if both passed, stop: "`--resume`
-and `--path` are mutually exclusive." If `--resume` or `--path` is passed without
-a path, stop and ask for it.
+`--resume` and `--path` conflict. Stop if both appear or either lacks a value.
+Without `--resume`, use Create.
 
-## Handoffs directory
+## Create
 
-Default save location is inside this skill's directory (the anchor):
+1. Resolve and create the parent directory. Record:
+   `create | output path | surveyed | redacted | written | terminal`.
+   Done when the absolute output path is writable.
+2. Select current facts, not a transcript. Keep at most eight open tasks and
+   twelve artifacts. Prefer the active plan, branch, PR, commits, dirty paths,
+   blockers, and durable decisions. Mark superseded material.
+   Done when each retained fact helps the next agent act.
+3. Read the create format and redaction rules in `./REFERENCE.md`, then write a
+   file no larger than 12 KB. Point to artifacts; never paste full diffs, plans,
+   logs, or terminal output. A positional focus goes first and controls task
+   order.
+   Done when all required sections exist and bounds hold.
+4. Scan the finished text for credentials, tokens, passwords, private keys,
+   authenticated URLs, email addresses, and copied environment values. Replace
+   values with the reference's redaction markers.
+   Done when a second scan finds no sensitive value.
+5. Report the path, what was captured, and
+   `/handoff --resume <absolute-path>`.
+   Success is the existing file plus the reported resume command.
 
-- Root: `./handoffs/`
-- Naming: `./handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`
+## Resume
 
-`--path <path>` overrides this entirely.
+1. Resolve and read the file. If absent, report
+   `BLOCKED: handoff not found at <path>`.
+   Record `resume | focus | validated artifacts | current task | terminal`.
+2. Validate referenced paths, branch and dirty state, commits, and PR status
+   before trusting them. Classify each as current, moved, missing, or
+   superseded. Verify a suggested skill exists before invoking it.
+   Done when stale facts cannot drive work.
+3. Apply a positional focus over the saved focus. Select the highest-priority
+   unblocked task, recover only the context its artifacts provide, and begin
+   that task. Do not stop after summarizing the file.
+   Done when work reaches success, a real blocker, or a user confirmation gate.
+4. Report reconciled drift and the work outcome. Do not create another handoff
+   unless the user explicitly asks.
 
-## Workflow A: Create (default, no `--resume`)
-
-1. Resolve the save path: `--path` if given, else
-   `<anchor>/handoffs/handoff-<timestamp>.md`. Create `./handoffs/` if absent.
-2. Survey artifacts from the workspace and conversation, plans, PRDs, ADRs,
-   issues, PRs, commits, diffs. You will reference them by path or URL, never
-   paste their contents.
-3. Write the doc using the format in `./REFERENCE.md`. Keep it readable by a
-   fresh agent in under two minutes.
-4. Redact API keys, tokens, passwords, and PII.
-5. If a positional arg was passed, add `## Next session focus` at the top and
-   frame open tasks and suggested skills around it.
-6. Report the save path, a one-line capture summary, and the resume command:
-   `/handoff --resume <path>`.
-
-## Workflow B: Resume (`--resume <path>`)
-
-1. Read the file. If absent, stop: "Handoff file not found at `<path>`."
-2. Summarize context, progress, key decisions, prioritized open tasks, and
-   blockers for the user.
-3. If a positional arg was also passed, treat it as the narrowed focus.
-4. From `## Suggested skills`, list each skill with its rationale and offer to
-   invoke the ones relevant to the focus.
-5. Continue from the open tasks, referencing artifacts by path or URL rather
-   than re-deriving captured content.
-
-## Constraints
-
-- Redact sensitive values before saving.
-- When resuming, never write a new handoff unless the user explicitly asks.
+After interruption, repeat Resume Step 2 for artifacts touched since the last
+ledger update.
