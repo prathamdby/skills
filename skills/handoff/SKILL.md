@@ -59,8 +59,10 @@ Without `--resume`, use Create.
 3. Apply a positional focus over the saved focus. Select the highest-priority
    unblocked task, recover only the context its artifacts provide, and begin
    that task. For a saved `prath-mode` chain, verify every remaining leaf before
-   its first step; for `orchestrate`, restore its ledger and roster. If no task
-   remains, report `BLOCKED` with validation evidence. Do not stop after summary.
+   its first step. For `orchestrate`, treat the saved ledger as a pointer, then
+   rebuild it from diffs, task results, and tests and refresh the roster before
+   work. If no task remains, report `BLOCKED` with validation evidence. Do not
+   stop after summary.
    Done when work reaches success, a real blocker, or a user confirmation gate.
 4. Report reconciled drift and the work outcome. Do not create another handoff
    unless the user explicitly asks.

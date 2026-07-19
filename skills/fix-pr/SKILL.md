@@ -64,9 +64,7 @@ Apply only `fix` verdicts in focused edits. Run the narrowest covering checks
 for each fixed cluster: test, type check, or linter covering its changed paths.
 A failed required check is `BLOCKED`; if none exists, record that evidence.
 Do not change code for rejected or clarification findings.
-
 Done when every fix has a verified diff or no code fix was needed.
-
 ## 5. Commit and push
 When a diff exists, read `../commit/SKILL.md` and run it once with `--unstaged`.
 Skip commit on a clean tree. Unless `--no-push`, push and verify remote SHA.
@@ -81,15 +79,17 @@ Repeat all six hunt passes after the last code or remote mutation. Normalize
 and triage arrivals, then repeat Steps 4–6. After any hunt whose actionable set
 changed, require two consecutive hunts with the same set.
 
-Done when no finding is new, untriaged, or waiting on a local fix.
+Done when no finding is new, untriaged, or waiting on a local fix and the
+required consecutive stable hunts have completed.
 
 ## 7. Reply and report
 Unless `--no-reply`, skip targets whose existing replies already satisfy the
 verdict, draft remaining native-surface replies using `./REFERENCE.md`, then
 apply `./references/unslop-reply-drafts.md`. Preserve bot command prefixes.
 Consolidate shared targets. Re-hunt after replies; new findings return to Step 3.
-Retry a failed reply once, then record its target and return `BLOCKED`. Do not
-resolve threads unless asked.
+Before retrying a failed reply, refetch its target; if the intended reply is
+present, mark it posted, otherwise retry once. A second failure is `BLOCKED`.
+Do not resolve threads unless asked.
 
 Report `source | finding | verdict | action | evidence`, PR URL, commit and push
 state, hunt counts, and unreplied items. Terminal values are `SUCCESS`,

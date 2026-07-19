@@ -38,8 +38,8 @@ Resolve the repo root, memory path, current HEAD, and dirty paths. Record:
 
 `route | stored head | current head | changed | current item | pending | terminal`
 
-Persist it at `<memory-path>.ledger` after each item and delete it on success.
-Done when paths and the cold, warm, or refresh route are known.
+Persist it after each item through a sibling temporary file and atomic rename at
+`<memory-path>.ledger`; delete it on success. Done when paths and route are known.
 
 ## 2. Cold or refresh
 
@@ -59,12 +59,12 @@ resolvable commit. Otherwise collect name-status changes from stored head to
 HEAD. Rebuild through Step 2 if more than 200 files changed or changes exceed
 25% of tracked files.
 
-Otherwise read changed files and memory claims citing them. Follow renames,
-rewrite every evidence path through the rename map, remove deleted evidence,
-and inspect one-hop importers when a package root, manifest, or exported entry
-changed. Remove or rewrite any claim contradicted by changed files. With a
-positional focus, reread that subtree within the same anchor cap. Do not read
-dirty paths to update memory; report them only as an uncommitted overlay.
+Otherwise read committed HEAD blobs for changed paths and memory claims citing
+them; never use dirty worktree content. Follow renames, rewrite every evidence
+path through the rename map, remove deleted evidence, and inspect one-hop
+importers when a package root, manifest, or exported entry changed. Remove or
+rewrite claims contradicted by changed files. With a positional focus, reread
+that subtree within the same cap. Report dirty paths only as an overlay.
 
 Done when each committed changed path is reflected, affected claims are
 revalidated or removed, limits hold, and frontmatter names current HEAD.
