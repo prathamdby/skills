@@ -13,6 +13,8 @@ Load only the selected style section, then run the shared rejection check.
   imperative, no trailing period.
 - Optional body: one to five `- ` bullets in one body argument, no blank lines
   or trailing periods. Include only material diff details not in the subject.
+  Capitalize the first letter of every bullet. Do not copy subject lowercase
+  onto body bullets.
 
 ## `--simple` formatting rules
 
@@ -29,5 +31,6 @@ Reject and rewrite a draft containing:
 - a vague verb such as update, change, address, or improve when a hunk supports
   a concrete action
 - an untraced subject or body line
+- a conventional body bullet whose first letter is lowercase
 - too many message arguments, embedded blank-line bodies, HEREDOC, or `-F`
 - hook behavior that disagrees with `--verify`
