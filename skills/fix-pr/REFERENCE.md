@@ -4,7 +4,8 @@ Substitute `<OWNER>`, `<REPO>`, and `<NUMBER>` from Step 1.
 
 ## Feedback surfaces
 
-Every run must gather all three. Dedup by meaning, not by API endpoint.
+Every run must gather all five hunt passes. Dedup by meaning, not by API
+endpoint.
 
 | Source    | What it is                                              | Reply target                         |
 | --------- | ------------------------------------------------------- | ------------------------------------ |
@@ -12,10 +13,29 @@ Every run must gather all three. Dedup by meaning, not by API endpoint.
 | `review`  | Top-level review body with actionable findings          | Review `id` (reply via issue comment)|
 | `comment` | PR conversation (issue) comment with actionable findings| Issue comment `id`                   |
 
+## Hunt checklist
+
+Discovery is incomplete until every box passes. Do not triage early.
+
+- [ ] GraphQL `reviewThreads` paginated until `hasNextPage` is false
+- [ ] Every unresolved thread (including outdated-unresolved) has comments
+      paginated until that thread's `comments.pageInfo.hasNextPage` is false
+- [ ] REST `GET .../pulls/<NUMBER>/comments` paginated and reconciled; any
+      REST-only root or reply chain missing from GraphQL is added
+- [ ] Review bodies fetched and exploded for uncovered findings
+- [ ] Issue conversation comments fetched and exploded for uncovered findings
+- [ ] Before posting replies: re-run this checklist once for mid-work arrivals
+
 ## Fetch unresolved review threads
 
 `gh api graphql` injects ANSI escapes even when piped. Set `NO_COLOR=1` and strip
 with `sed` before parsing JSON.
+
+### Thread pages
+
+Loop until `reviewThreads.pageInfo.hasNextPage` is false. Keep every node
+with `isResolved == false`, including outdated-unresolved (`isOutdated` may be
+true).
 
 ```bash
 THREADS_FILE="$(mktemp /tmp/pr_review_threads.XXXXXX).json"
@@ -33,8 +53,11 @@ while true; do
         reviewThreads(first: 50, after: $cursor) {
           pageInfo { hasNextPage endCursor }
           nodes {
+            id
             isResolved
+            isOutdated
             comments(first: 50) {
+              pageInfo { hasNextPage endCursor }
               nodes {
                 author { login }
                 path
@@ -60,9 +83,54 @@ done
 echo "$ALL_THREADS" | jq '[.[] | select(.isResolved == false)]' > "$THREADS_FILE"
 ```
 
+### Nested comment pages
+
+For **each** unresolved thread in `$THREADS_FILE`, while
+`comments.pageInfo.hasNextPage` is true, fetch the next comment page via the
+thread node id and append to that thread's `comments.nodes`:
+
+```bash
+NO_COLOR=1 gh api graphql -f threadId="<THREAD_NODE_ID>" -f cursor="<COMMENT_CURSOR>" -f query='
+query($threadId: ID!, $cursor: String) {
+  node(id: $threadId) {
+    ... on PullRequestReviewThread {
+      comments(first: 50, after: $cursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          author { login }
+          path
+          line
+          body
+          databaseId
+          url
+        }
+      }
+    }
+  }
+}' | sed 's/\x1b\[[0-9;]*m//g'
+```
+
+Stop only when that thread's comment `hasNextPage` is false. Do this for every
+unresolved thread before triage.
+
 Keep the first comment's `databaseId` as the reply target. Read **every**
 comment body in the thread (root + replies) before triage. Clean up
 `$THREADS_FILE` when done.
+
+## Cross-check REST pull review comments
+
+GraphQL alone is not enough. Paginate REST review comments and rebuild reply
+chains via `in_reply_to_id`. Any actionable root (or chain) missing from the
+GraphQL unresolved set becomes a `thread` finding.
+
+```bash
+NO_COLOR=1 gh api "repos/<OWNER>/<REPO>/pulls/<NUMBER>/comments" --paginate \
+  | jq '[.[] | {id, in_reply_to_id, path, line, body, user: .user.login, html_url}]'
+```
+
+Walk each `in_reply_to_id` chain to the root. Compare roots and bodies against
+GraphQL threads. Add REST-only actionable items; prefer GraphQL `databaseId`
+when both exist.
 
 ## Fetch review bodies
 
@@ -105,6 +173,18 @@ Build one triage list. For each raw payload:
    target; put the finding excerpt in `body`.
 4. Record: `source`, `reply_target_id`, `path`/`line` if cited, `author`,
    `body` (finding text), plus any reply text already on the thread for context.
+
+## Hunt rationalizations
+
+| Excuse | Reality |
+| ------ | ------- |
+| "Fix the obvious ones first; paginate later" | Hunt completes before triage. Partial lists miss blockers. |
+| "First GraphQL page is enough under time pressure" | Page until `hasNextPage` is false. Always. |
+| "50 comments covers the thread" | Nested-paginate until that thread's comment `hasNextPage` is false. |
+| "GraphQL is source of truth; ignore REST extras" | REST cross-check is mandatory; add REST-only actionable roots/chains. |
+| "Don't boil the ocean / senior said ship" | Exhaustive hunt is the job. Pressure does not shrink the checklist. |
+| "No need to re-hunt before replies" | Re-run the checklist once before posting; triage newcomers first. |
+| "Outdated threads don't count" | Unresolved includes outdated-unresolved. Collect them. |
 
 ## Post replies by surface
 
