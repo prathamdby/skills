@@ -1,75 +1,81 @@
 ---
 name: deslop
 description: >
-  deslop a diff, remove AI slop and over-engineering while preserving exact
-  behavior. Triggers: /deslop, remove AI slop, clean AI artifacts, strip
-  over-engineered patterns, simplify code, review changes for bloat. Flags:
-  --staged, --unstaged, --base <branch>.
+  deslop when removing AI-generated bloat, needless defenses, foreign patterns,
+  or avoidable complexity from a git diff without changing behavior.
 ---
 
-# Remove AI Slop & Simplify
-
-**Slop** is code heavier than it needs to be: comments stating the obvious,
-defensive checks the codebase does not use, single-use abstractions, type escape
-hatches, ceremony, cleverness that obscures intent. This skill finds every
-instance in a diff and removes it without changing behavior.
+# Deslop
 
 ## Flags
 
-| Flag              | Effect                                                  |
-| ----------------- | ------------------------------------------------------- |
-| `--staged`        | Diff staged changes (`git diff --cached`). **Default.** |
-| `--unstaged`      | Diff unstaged changes (`git diff`).                     |
-| `--base <branch>` | Diff since merge base: `git diff <branch>...HEAD`.      |
+| Flag | Default | Effect |
+|---|---|---|
+| `--staged` | yes | `git diff --cached` |
+| `--unstaged` | no | `git diff` |
+| `--base <branch>` | no | `git diff <branch>...HEAD` |
 
-Mutually exclusive; use the first detected. `--base` needs a branch name. If
-missing, stop: `--base requires a branch name (e.g., --base main)`.
+The scope flags are mutually exclusive. More than one, a missing base branch,
+or prose that conflicts with a flag is `BLOCKED`; ask which scope to use. Prose
+that names staged, unstaged, or a base branch selects that scope exactly as its
+flag; naming several is `BLOCKED`. Otherwise default to staged and never switch
+because another diff is non-empty.
 
-## Step 1: Diff the changes
+## 1. Lock scope
 
-- `--staged` or default: `git diff --cached | cat`
-- `--unstaged`: `git diff | cat`
-- `--base <branch>`: `git diff <branch>...HEAD | cat`
+Capture status, the selected diff, its lexicographically sorted file list, and
+the SHA-256 of the scope name plus complete diff as its fingerprint. Record:
 
-If empty, stop: "No changes found to deslop."
+`scope/fingerprint | current file | checked | kept instances | verification | terminal`
 
-## Step 2: Read the files
+If the diff is empty, report `NO_CHANGES` and mention other non-empty scopes
+from `git diff` without touching them. Before editing staged scope, block the
+whole run if any target file also has unstaged changes. `--base` covers commits
+only; block if a scoped path has staged or unstaged work.
 
-Read the full content of every file in the diff, plus adjacent files that reveal
-existing patterns: comment style, error-handling philosophy, type-safety level,
-abstraction level, validation/defensiveness, and project-standard imports,
-naming, and formatting. Slop is defined _relative to these local norms_.
+Done when the exact editable scope and original index state are recorded.
 
-## Step 3: Classify every change against all 8 slop categories
+## 2. Inspect and classify
 
-Check every changed line in every file against the 8 categories in
-`./REFERENCE.md`. Do not stop at the first hit. The step is done only when every
-file in the diff has been checked against every category.
+Read each changed file and at most two adjacent files per module that establish
+local norms; module means the changed file's directory and adjacent means files
+in that directory. Classify every changed hunk against the six categories in
+`./REFERENCE.md`. An instance is contiguous lines handled by one atomic edit.
+Record path, lines, primary category, local evidence, and smallest safe edit.
+For overlap, choose the category requiring the smallest edit; use a secondary
+only for another edit. Do not stop after the first category.
 
-## Step 4: Compile the instance list
+For large diffs, process the sorted order and update the ledger after each file.
+After any turn interruption before terminal state, recompute the fingerprint;
+restart a changed current file and preserve completed entries only when their
+hunks are unchanged.
 
-Record each instance: file path, line number(s), category (1-8), the issue, and
-why it violates local norms. If none found, stop: "No AI slop or simplification
-opportunities detected. The changes look clean."
+Done when every scoped hunk has six-category coverage. Zero instances is
+`CLEAN`.
 
-## Step 5: Filter against the guardrails
+## 3. Filter and edit
 
-Drop any instance whose removal would violate the maintainability guardrails in
-`./REFERENCE.md`. Keep only clear wins.
+Apply every guardrail in `./REFERENCE.md`. Drop uncertain instances. Edit only
+kept instances and use the smallest direct form that matches nearby code.
+Preserve logic, timing, errors, side effects, public APIs, and useful
+abstractions.
 
-## Step 6: Remove the slop
+`--unstaged` and `--base` never stage. For `--staged`, stage only edited target
+files after confirming they had no pre-existing unstaged hunks.
 
-Edit the source files to strip every kept instance. Make the smallest change
-that preserves exact functionality, logic, timing, side effects, and public
-APIs unchanged. Introduce no new complexity while removing.
+Done when each kept instance is changed; for unstaged/base the index matches
+the Step 1 snapshot, and for staged only clean target-file updates entered it.
 
-## Step 7: Re-stage
+## 4. Verify and report
 
-```bash
-git add <modified-files>
-```
+Re-run the selected diff and status. Confirm each kept instance is gone, no
+out-of-scope hunk moved layers, and the post-edit diff has no new slop. Any edit
+to executable code, types, control flow, error handling, validation, or an API
+runs the narrowest covering test for its file, symbol, or package. Only
+comments, docs, and whitespace may use the diff audit alone. Missing or failed
+required tests are `BLOCKED`.
 
-## Step 8: Report
+Report scope, files, category counts, preserved staging state, diff audit, and
+tests. Terminal values are `SUCCESS`, `CLEAN`, `NO_CHANGES`, and `BLOCKED`.
 
-In 2-4 sentences: which categories were addressed, how many files changed, why
-the code is cleaner, and any trade-off considered.
+Do not commit or expand beyond the selected diff.

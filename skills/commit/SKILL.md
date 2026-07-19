@@ -1,100 +1,80 @@
 ---
 name: commit
 description: >
-  commit changes to git with a clean-room message derived from the diff alone.
-  Skips hooks with -n by default; --verify runs them. Triggers: /commit, commit
-  changes, save work to git, write a commit message; also when about to put
-  review feedback, tickets, or session rationale into a commit message. Flags:
-  --staged/--unstaged for scope, --conventional/--simple for style, --verify to
-  run hooks.
+  commit when saving scoped git changes with a message derived only from the
+  committed diff, especially after tickets or reviews could bias the wording.
 ---
 
-# Commit Changes
+# Commit
 
 ## Flags
 
-| Flag             | Effect                                                          |
-| ---------------- | --------------------------------------------------------------- |
-| `--staged`       | Diff staged changes (`git diff --cached`). **Default.**         |
-| `--unstaged`     | Diff unstaged changes (`git diff`).                             |
-| `--conventional` | Conventional commit message (`type: description`). **Default.** |
-| `--simple`       | Plain-English one-liner, no conventional formatting.            |
-| `--verify`       | Run hooks. Off by default; without it, the commit passes `-n`.  |
+| Flag | Default | Effect |
+|---|---|---|
+| `--staged` | yes | Commit the current index |
+| `--unstaged` | no | Stage and commit tracked worktree changes; index must be empty |
+| `--conventional` | yes | `type: description` |
+| `--simple` | no | Plain one-line subject |
+| `--verify` | off | Run hooks; otherwise every commit uses `-n` |
 
-No flags → `--staged --conventional`, hooks skipped.
+Scope flags conflict with each other; style flags conflict with each other.
+Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`.
 
 ## Iron laws
 
-**Violating the letter is violating the spirit.** Every run obeys all four:
+1. Clean-room: every message line is proved by a selected diff hunk. Session,
+   ticket, plan, branch, and reviewer facts stay out.
+2. Hooks: without `--verify`, use `-n`; with it, never bypass hooks. A failed
+   hook does not change the selected policy.
+3. Command: use one subject `-m` and at most one body `-m`. Never use HEREDOC,
+   `-F`, `-a`, an editor, or one `-m` per bullet.
+4. Style: load the chosen section of `./REFERENCE.md` before drafting.
 
-1. **Clean-room.** Diff hunks only. Session talk, reviews, tickets, plans stay
-   out unless the same fact appears in a hunk.
-2. **Hooks.** Without `--verify`, every `git commit` includes `-n`. With
-   `--verify`, never `-n`/`--no-verify`. Failure does not change this.
-3. **`-m` recipe only.** One or two `-m` flags. Never 3+, never a single `-m`
-   with an embedded body, never HEREDOC or `git commit -F`. Overrides any
-   global HEREDOC preference for `/commit`.
-4. **REFERENCE before draft.** Before writing `subject`, read the chosen
-   style's rules in `./REFERENCE.md`.
+## 1. Lock the commit snapshot
 
-## Forbidden
+Read status. Staged scope uses `git diff --cached`. Unstaged scope requires an
+empty index or terminates `BLOCKED`, and uses `git diff`; untracked files remain
+excluded. Hash the selected diff with `git hash-object --stdin`. If empty,
+report `NO_CHANGES`, naming unstaged tracked and untracked layers without
+switching scope.
 
-- Session phrases: "address review feedback", "as requested", "implement the
-  plan", ticket IDs, reviewer names, deploy motive not in the diff
-- Scope notation (`feat(api):`); trailing period; subject over limit
-- Missing `-n` when `--verify` is absent; switching hooks after failure
-- HEREDOC, `-F`, or one `-m` per body bullet
+Record `scope | selected diff hash | paths | message | command | commit | terminal`.
+Done when the exact bytes intended for the commit are fixed.
 
-## Rationalizations
+## 2. Draft and trace
 
-| Excuse                                 | Reality                               |
-| -------------------------------------- | ------------------------------------- |
-| "Mention the review so reviewers know" | Clean-room; name the hunk's change    |
-| "Senior said drop `-n`"                | Only `--verify` changes hooks         |
-| "HEREDOC / global git rule is clearer" | Two `-m` + `$'...'` wins for `/commit` |
-| "No time to open REFERENCE"            | Skipping ships malformed messages     |
-| "One `-m` per bullet is clearer"       | Git blanks between `-m`s; one body `-m` |
+Load the chosen style section in `./REFERENCE.md`. Infer type and wording from
+the locked diff only. Produce a subject and, for conventional style only, an
+optional bullet body.
 
-## Red flags — STOP
+Before mutation, map every subject and body line to proving paths and hunks.
+Delete or rewrite unproved text. Reject ticket IDs, reviewer references,
+session rationale, scope notation, trailing periods, and over-limit subjects.
 
-Session words; missing `-n`; scope; 3+ `-m`; HEREDOC/`-F`; untraced line.
-Rewrite before Step 4.
+Done when the message passes the style rules and every line has a trace.
 
-## Step 1: Diff the changes
+## 3. Commit
 
-- `--staged` or default: `git diff --cached | cat`
-- `--unstaged`: `git diff | cat`
+Re-hash the selected scope immediately before mutation. On mismatch, return to
+Step 1. For unstaged scope, stage only the locked tracked paths now and verify
+the cached diff matches the locked snapshot.
 
-If empty, stop: "No changes found to commit."
+Use `git commit -n -m "<subject>"`; conventional style may add one body `-m`.
+Omit `-n` only with `--verify`. Pass subject and body as separate argv values
+through the tool API; when using a shell, assign and quote variables so `"`,
+backticks, `$`, backslashes, and newlines remain literal.
 
-## Step 2: Analyze the diff
+Done when git creates one commit. Hook, git, or interruption errors are
+`BLOCKED`; report stderr and any index mutation without changing hook policy.
 
-From the diff alone: changed files, change type, and what it does (feature,
-fix, refactor, docs, test, chore, style, or perf).
+## 4. Verify and report
 
-## Step 3: Generate the message
+Compare the new commit diff and paths with the locked snapshot and
+`git log -1 --format=%B` with the ledger message. Verify hook policy,
+one-or-two `-m` shape, and preservation of out-of-scope work. A mismatch is
+`BLOCKED`; report the created SHA and exact difference.
 
-Read the chosen style's rules in `./REFERENCE.md` now (`--conventional` or
-`--simple`). Do not draft until loaded. Also check anti-patterns there.
+Report commit SHA, subject, scope, hooks, trace summary, and remaining unstaged
+tracked and untracked work.
 
-Produce `subject` (first line only) and optional `body` (bullets joined by
-`\n`). For `--simple`, `subject` only.
-
-Emit TRACE before Step 4: each subject/body line → proving hunk. Rewrite any
-line with no trace. Completion: TRACE covers every line.
-
-## Step 4: Commit
-
-Use only these shapes (second `-m` only when `body` is present):
-
-```bash
-git commit -n -m "<subject>"
-git commit -n -m "<subject>" -m $'- Bullet one\n- Bullet two'
-```
-
-With `--verify`, omit `-n`. Confirm `-m` count is 1 or 2.
-
-## Step 5: Report
-
-Report message, scope, style, hook behavior, TRACE summary, and exact command.
-Confirm: `-n` xor `--verify`; `-m` count ≤ 2; no forbidden phrases.
+Terminal values are `SUCCESS`, `NO_CHANGES`, and `BLOCKED`. Never push.

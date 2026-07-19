@@ -1,99 +1,96 @@
 ---
 name: fix-pr
 description: >
-  fix PR review feedback: recursively hunt all open review threads, nested
-  replies, REST review-comment chains, conversation comments, and review
-  bodies; triage each finding skeptically; fix what holds; reply; commit and
-  push. Triggers: /fix-pr, address PR reviews. Reached by prath-mode after
-  make-pr. Flags: --pr <n|url>, --no-push, --no-reply.
+  fix-pr when exhaustively handling open pull-request feedback, including
+  nested discussions, invalid suggestions, new arrivals, fixes, and replies.
 ---
 
-# Fix PR
+# Fix PR feedback
 
 ## Flags
 
-| Flag            | Effect                                                                        |
-| --------------- | ----------------------------------------------------------------------------- |
-| `--pr <n\|url>` | Target PR. **Default:** `gh pr view` on current branch; stop and ask if none. |
-| `--no-push`     | Commit locally; skip push. Off by default.                                    |
-| `--no-reply`    | Fix code; skip GitHub replies. Off by default.                                |
+| Flag | Default | Effect |
+|---|---|---|
+| `--pr <n\|url>` | current branch PR | Target PR |
+| `--no-push` | off | Keep commits local |
+| `--no-reply` | off | Do not post review replies |
 
-## Step 1: Resolve PR
+Missing values are `BLOCKED`.
 
-`--pr` if passed; else `gh pr view --json number,headRefName,url,headRepository`.
+## 1. Resolve and synchronize
 
-Record owner, repo, number, head branch, URL. If `gh` errors or no PR exists,
-stop and ask.
+Resolve owner, repo, number, URL, base, head branch, and remote head SHA. Block
+on auth failure, missing or closed PR, dirty tree, or an unsafe head checkout.
+Fetch, check out the head, and fast-forward to the remote SHA. Never reset,
+force, or discard local work.
+Record:
+`PR/head SHA | hunt counts | current finding | verdicts | commit/push | replies | terminal`.
+Done when local HEAD equals the PR head SHA and the ledger identifies the PR.
 
-**Done when:** owner, repo, number, head branch, and URL are known.
+## 2. Hunt before editing
 
-## Step 2: Hunt all open feedback
+Collect every page from all applicable surfaces:
+1. unresolved review threads, including outdated ones
+2. every comment page inside each thread
+3. review-comment API chains reconciled to thread roots
+4. actionable top-level review bodies
+5. actionable PR conversation comments
+6. actionable check annotations attached to the PR head
+Every hunt reconciles review-comment chains unless thread discovery proves every
+root is present. When using GitHub CLI, load hunt recipes in `./REFERENCE.md`.
+Record counts and final page markers. Do not triage or edit before all six
+passes finish.
+Normalize one atomic finding per claim. Keep source, URL or ID, reply target,
+author, path/line, rule ID, body, and existing replies. Drop acknowledgments
+and status noise. Deduplicate only identical stable keys from `./REFERENCE.md`;
+preserve every native reply target.
+Done when pagination is exhausted and every normalized finding is in the ledger.
 
-Exhaustively collect every open finding. Run the full hunt contracts in
-`./REFERENCE.md` (thread pages, nested comment pages, REST review-comment
-cross-check, review bodies, issue comments). Substitute owner, repo, and
-number from Step 1. Do **not** triage, edit, or "start with the obvious ones"
-until the hunt checklist in `./REFERENCE.md` passes.
+## 3. Triage every finding
 
-Skip empty bodies, pure acknowledgments, and duplicates. Record each item with
-source (`thread` | `review` | `comment`), path/line if any, author, body, and
-reply target id.
+Read surrounding code and trace the claimed path. Reproduce with the narrowest
+test, type check, or call trace when possible. Assign exactly one verdict:
+`fix`, `reject`, `clarify`, or `already-fixed`, with one evidence line. If
+reproduction is skipped, record why. No edits until every finding has a verdict.
+Done when no finding is untriaged and invalid suggestions have concrete
+rejection evidence.
 
-**Done when:** Hunt checklist passes; every open finding is listed with source,
-author, body, and reply target.
+## 4. Fix and verify
 
-## Step 3: Checkout PR branch
+Apply only `fix` verdicts in focused edits. Run the narrowest covering checks
+for each fixed cluster. A failed required check is `BLOCKED`; if none exists,
+record that evidence. Do not change code for rejected or clarification findings.
+Done when every fix has a verified diff or no code fix was needed.
 
-`gh pr checkout <number>` or confirm the working tree is on `headRefName`.
+## 5. Commit and push
 
-**Done when:** Working tree is on the PR head branch.
+When a diff exists, read `../commit/SKILL.md` and run it once with `--unstaged`.
+Skip commit on a clean tree. Unless `--no-push`, push and verify remote SHA.
+Never force push. With `--no-push`, fixed findings become `AWAITING_PUSH` and
+receive no "fixed" reply. Remote movement or push rejection is `BLOCKED`.
+Done when there is no diff, or one verified commit is local and pushed.
 
-## Step 4: Triage skeptically
+## 6. Re-hunt until stable
 
-For **every** item from Step 2. No file edits until this step completes.
+Repeat all six hunt passes after the last code or remote mutation. Normalize
+and triage arrivals, then repeat Steps 4–6. After any hunt whose actionable set
+changed, require two consecutive hunts with the same set.
+Done when no finding is new, untriaged, or waiting on a local fix and the
+required consecutive stable hunts have completed.
 
-1. Read the cited file with surrounding context.
-2. Trace the code path the reviewer claims is wrong.
-3. Reproduce if possible (targeted test, call trace, type check).
-4. Assign verdict: `fix` | `reject` | `clarify`.
-5. Record one-line evidence.
+## 7. Reply and report
 
-**Done when:** Every item has verdict and evidence; no edits before this holds.
-
-## Step 5: Implement
-
-Apply only `fix` verdicts. Focused diffs; no drive-by refactors.
-
-**Done when:** Every `fix` item has a local change, or there were zero `fix`
-verdicts.
-
-## Step 6: Commit
-
-Read `../commit/SKILL.md` in full. Commit per that skill (clean-room message).
-
-**Done when:** Changes are committed, or there is nothing to commit.
-
-## Step 7: Push, re-hunt, reply
-
-Unless `--no-push`: `git push`.
-
-Unless `--no-reply`: re-run the hunt contracts in `./REFERENCE.md` and triage
-any newly found open items (Steps 4–6 as needed); then reply to **every**
-triaged item on its native surface. Draft per **Reply shapes** in
-`./REFERENCE.md`; unslop each draft per `./references/unslop-reply-drafts.md`;
-post per **Post replies by surface** in `./REFERENCE.md`. Consolidate items
-that share one conversation-comment reply target into a single reply. For
-`fix` verdicts, push before replying and reference the commit SHA. When author
-is `semgrep-code-scan`, use **Semgrep dismissal replies** in `./REFERENCE.md`.
-
-**Done when:** Push succeeded (or `--no-push`); hunt re-run found no untriaged
-open items; every item has a posted reply (or `--no-reply`); every posted reply
-is unslopped.
-
-## Step 8: Report
-
-Table: `source | item | verdict | action`. Include PR URL and commit SHA if any.
-
-**Done when:** What was fixed, rejected, or discussed is visible at a glance.
-
-Does not handle CI, merge conflicts, or stack restacking (`pr-babysit`); never invoke `make-pr`.
+Unless `--no-reply`, skip targets whose existing replies already satisfy the
+verdict, draft remaining replies using `./REFERENCE.md`, then apply
+`./references/unslop-reply-drafts.md`. Preserve bot command prefixes.
+Consolidate shared targets. Re-hunt after replies; new findings return to
+Step 3. Before retrying a failed reply, refetch its target; if the intended
+reply is present, mark it posted, otherwise retry once. A second failure is
+`BLOCKED`. Do not resolve threads unless asked.
+Report `source | finding | verdict | action | evidence`, PR URL, commit and push
+state, hunt counts, and unreplied items. Terminal values are `SUCCESS`,
+`NO_CODE_CHANGE`, `AWAITING_PUSH`, and `BLOCKED`. Use `NO_CODE_CHANGE` when no
+commit was created, and never `SUCCESS` with an unreplied required target.
+After interruption, restart at Step 1 and re-hunt before trusting the ledger.
+It does not fix CI, merge conflicts, or stacked-branch order, and never invokes
+`make-pr`.

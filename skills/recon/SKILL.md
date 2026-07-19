@@ -1,87 +1,86 @@
 ---
 name: recon
 description: >
-  recon builds a persistent memory of a codebase and keeps it current. Cold
-  start explores the unknown; every later run explores only the drift. Triggers:
-  /recon, explore or map a codebase, re-orient in a repo after time away. Flags:
-  --refresh, and a positional focus argument.
+  recon when mapping the current codebase, refreshing an earlier map, or
+  re-orienting after repository changes.
 ---
 
 # Recon
 
-Explore the known, then verify it; the cost of re-orienting scales with how much the repo drifted, not with how big it is.
-
 ## Flags
 
-| Flag / Arg     | Effect                                                                        |
-| -------------- | ----------------------------------------------------------------------------- |
-| `--refresh`    | Ignore existing memory; full re-exploration; rewrite the memory from scratch. |
-| Positional arg | A focus area to explore in extra depth this run; also woven into the report.  |
+| Flag or argument | Default | Effect |
+|---|---|---|
+| `--refresh` | off | Rebuild memory instead of patching it |
+| positional focus | none | Explore and report that area in more depth |
 
-No flags -> cold path if no memory exists, warm path otherwise.
+Without `--refresh`, use the warm path when memory exists and the cold path
+otherwise.
 
 ## Memory
 
-The skill folder (the directory holding this `SKILL.md`) is the **anchor**.
-Memory lives at `<anchor>/memory/<slug>.md`, where `<slug>` is the repo root's
-basename plus the first 8 chars of the sha256 of its absolute path (two clones
-never collide). Create `<anchor>/memory/` if absent.
+Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
+Memory lives at `<anchor>/memory/<basename>-<hash8>.md`; `hash8` is the first
+eight SHA-256 characters of the repo's absolute root, and `basename` is that
+root directory's name. Create the directory when needed. Never write memory
+inside the target repo.
 
-Each memory file starts with frontmatter:
+Frontmatter is `repo`, full commit `head`, and ISO date `updated`. The body has
+these headings: Layout, Entry points, Modules, Data flows, Commands,
+Conventions, Gotchas, Evidence. Every claim names one or more evidence paths.
+Keep at most 10 bullets per heading and 200 lines total. Merge duplicates and
+remove claims whose evidence no longer exists. Write to a sibling `.tmp` and
+rename it into place only after validation.
 
-- `repo:` absolute root path
-- `head:` full commit SHA
-- `updated:` `YYYY-MM-DD`
+## 1. Locate
 
-Followed by the map: layout and structure, entry points, key modules and their
-responsibilities, data flow, conventions, build/test/lint commands, gotchas.
-Memory is derived state about a target repo; it never gets committed into the
-target repo.
+Resolve the repo root, memory path, current HEAD, and dirty paths. Record:
 
-## Step 1: Locate
+`route | stored head | current head | changed | current item | pending | terminal`
 
-`git rev-parse --show-toplevel` for the repo root; compute the slug; check for
-the memory file. Missing file or `--refresh` -> Step 2 (cold). Present -> Step 3
-(warm). Completion: the path is decided, cold or warm.
+Persist it after each item through a sibling temporary file and atomic rename at
+`<memory-path>.ledger`; delete it on success. Done when paths and route are known.
 
-## Step 2: Cold path
+## 2. Cold or refresh
 
-Traditional full exploration: layout, entry points, key modules, data flow,
-conventions, build/test commands, gotchas. Use read-only subagents for legwork
-when the harness offers them. Then write the memory file with the current HEAD
-SHA (`git rev-parse HEAD`) and today's date. Completion: memory file exists on
-disk with all frontmatter fields and every map section filled. Go to Step 5.
+Explore breadth first: manifests, top-level layout, entry points, dependency
+boundaries, commands, and conventions. Read at most three representative anchor
+files for at most 30 modules named by workspace manifests; go deeper only for
+the positional focus. Use non-overlapping read-only subagents when available.
+Write every required section and evidence path, then prune to the limits.
 
-## Step 3: Warm path
+Done when the memory file exists, its `head` equals current HEAD, and every
+heading contains evidence or says `None found`.
 
-Read the memory file first; it is the map of the known. Then measure drift:
-verify the recorded SHA exists (`git cat-file -e <sha>^{commit}`), then
-`git diff --name-status <sha>..HEAD`. Fallback triggers, either one -> treat this
-run as Step 2 with `--refresh` semantics (full re-explore, rewrite): the SHA is
-gone (rebase, gc, shallow clone), or the diff is huge (more than 200 files, or
-more than 25% of tracked files per `git ls-files | wc -l`). Otherwise -> Step 4.
-Completion: drift is measured and the route (patch vs rewrite) is chosen.
+## 3. Warm drift
 
-## Step 4: Patch
+Read memory before repo files. Take the cold path if `head` is absent or not a
+resolvable commit. Otherwise collect name-status changes from stored head to
+HEAD. Rebuild through Step 2 if more than 200 files changed or changes exceed
+25% of tracked files.
 
-Re-explore only the changed paths from the diff: read added and modified files,
-drop memory claims about deleted ones, follow renames. Trust untouched sections
-of the memory; do not re-verify them. Patch the affected memory sections, set
-`head:` to current HEAD and `updated:` to today. Note uncommitted changes
-(`git status --porcelain`) in the report but never record a dirty state as
-`head:`; the SHA always names a real commit. Completion: every file in the diff
-is reflected in the memory, SHA and date updated.
+Otherwise read committed HEAD blobs for changed paths and memory claims citing
+them; never use dirty worktree content. Follow renames, rewrite every evidence
+path through the rename map, remove deleted evidence, and inspect one-hop
+importers when a package root, manifest, or exported entry changed. Remove or
+rewrite claims contradicted by changed files. With a positional focus, reread
+that subtree within the same cap. Report dirty paths only as an overlay.
 
-## Step 5: Report
+Done when each committed changed path is reflected, affected claims are
+revalidated or removed, limits hold, and frontmatter names current HEAD.
 
-Present the codebase overview from the (updated) memory, weighted toward the
-positional focus if given. On a warm run, end with a "Drift since last recon"
-section: what changed and how the memory moved. Completion: the user has the
-overview without needing to open the memory file.
+## 4. Resume and report
+
+After interruption, recompute HEAD and changed paths. If they differ from the
+ledger, restart the affected cold or warm step. Resume the first pending item
+from the persisted ledger. Present the updated map without requiring the user
+to open the memory file. On warm runs, end with `Drift since last recon`.
+
+Done when the report cites the memory snapshot, focus results, drift, and any
+unverified area; labels each heading rebuilt, patched, or representative-only;
+and discloses dirty paths.
 
 ## Constraints
 
-- Never write the memory into the target repo; it lives in the anchor only.
-- The recorded `head:` is always a commit that exists; never a dirty-tree
-  placeholder.
-- Warm runs read the memory before touching the repo; the known comes first.
+- `head` always names an existing commit, never a dirty-tree placeholder.
+- Do not turn the memory into a file inventory or append-only history.

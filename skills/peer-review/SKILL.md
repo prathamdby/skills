@@ -1,65 +1,80 @@
 ---
 name: peer-review
 description: >
-  peer-review a plan, design, or implementation, find the one critical risk,
-  list other gaps, propose a fix for the critical risk, and update the plan.
-  Triggers: peer review a plan, review an implementation, assess a design, check
-  a proposal for gaps.
+  peer-review when deciding whether an implementation plan, design, or proposed
+  change is ready to build.
 ---
 
-# Peer Review
+# Peer review
 
-## Step 1: Gather context
+There are no flags. A review request authorizes analysis, not file edits.
 
-Read everything relevant before analyzing:
+## 1. Resolve the review target
 
-- **Requirements**: the spec, ticket, or PR description defining what must be built
-- **Plan**: the implementation plan, design doc, or proposed changes
-- **Code**: the actual implementation, diff, or relevant source
-- **Contracts**: OpenAPI/protobuf/API docs; `package.json`/`requirements.txt`/`Cargo.toml` for related libs
-- **History**: related bugs, incidents, or post-mortems
-- **Tests**: existing test files for current coverage
+Require a plan, design, or proposed-change artifact and its governing
+requirements, pointed to by path, URL, pasted text, or attached IDE context in
+the request. If none is provided, report
+`BLOCKED: review target required` and ask for one pointer. Never reconstruct a
+target from conversation memory.
 
-## Step 2: Analyze against requirements
+Record:
+`target | requirements | evidence read | critical risk | verdict | edit authority`.
 
-Compare the plan to the requirements. Check completeness, edge cases (boundaries,
-empty inputs, max values, races), error states and rollback, failure modes (a
-downstream service down/slow/returning garbage), hidden ordering or version
-conflicts, performance (N+1, unbounded loops, leaks), security (input validation,
-auth, secrets, data integrity), and test adequacy.
+Done when the target and requirements are fixed, or the blocked report is sent.
 
-Focus on what is **most likely to cause failure**, not every theoretical issue.
+## 2. Gather bounded evidence
 
-## Step 3: Write the review
+Read the target, requirements, directly affected contracts, relevant source,
+and current tests. Read history only when the target cites a past failure or a
+current claim needs it. Stop gathering when every requirement and candidate
+risk has a source pointer. Do not survey unrelated architecture.
 
-Exactly four sections. Maximum clarity, minimum words.
+After interruption, confirm the target and requirements have not changed before
+using the ledger. If either changed, discard the ledger and restart Step 1.
 
-### Critical Risk
+Done when each review claim can cite a requirement, target section, source
+path, test, or history artifact.
 
-One paragraph naming **the single thing most likely to cause failure**, why it
-is dangerous and under what conditions it breaks. Pick the highest-impact, most
-probable one; do not list several.
+## 3. Analyze
 
-### Other Gaps
+Map each requirement to a proposed step and verification. Check boundaries,
+failure and rollback paths, ordering, compatibility, security, performance,
+and test coverage. Rank by probability times impact. Do not promote a
+theoretical concern over an evidenced failure. Treat unsupported security,
+compatibility, or performance claims in the target as gaps.
 
-Bulleted secondary issues, one line each, formatted `- <issue> → <impact>`. Only
-real, material issues, no nitpicks or theoretical concerns.
+Select at most one critical risk:
 
-### Fix
+- no critical risk: `Ship it.`
+- one repairable blocker: `Fix the critical risk first, then ship.` Repairable
+  means at most three steps without changing the approach or requirements.
+- wrong approach, missing core requirements, or several coupled blockers:
+  `Needs rework.`
 
-Numbered, concrete, actionable steps that address **the critical risk only**.
+If another must-fix blocker remains after the critical fix, use `Needs rework.`
 
-### Verdict
+Done when the verdict follows this mapping and every material requirement has
+been checked.
 
-One sentence, exactly one of: "Ship it." / "Fix the critical risk first, then
-ship." / "Needs rework." No explanation.
+## 4. Report
 
-## Step 4: Update the plan
+Write exactly four sections:
 
-Apply the Fix steps to the plan files directly, the smallest change that
-mitigates the critical risk. Report which files changed and the fix applied.
+1. `## Critical risk`: one evidence-backed paragraph, or `None found.`
+2. `## Other gaps`: at most five material `- <gap> → <impact>` bullets, or
+   `None.` Omit style and preference nits.
+3. `## Fix`: numbered steps for the critical risk or first rework decision, or
+   `None.`
+4. `## Verdict`: exactly one mapped sentence and no added explanation.
 
-## Style
+Done when the four-section contract holds and every finding has a citation.
 
-- Concrete language only. No vague warnings ("be careful with X").
-- Back every claim with evidence from what you read.
+## 5. Optional plan update
+
+Edit only when the user explicitly requested an update in the review request or
+confirms after reading it. Apply only the reported Fix; broad rework requires a
+new approved design. Re-read the diff and report changed paths.
+
+Terminal values: missing target is `BLOCKED`; analysis-only is `REVIEWED`;
+requested confirmation is `AWAITING_CONFIRMATION`; a verified plan edit is
+`UPDATED`.

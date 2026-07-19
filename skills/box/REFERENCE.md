@@ -1,142 +1,66 @@
-# Box Skill Reference
+# Box reference
 
-## Execution modes
+Load the contract for the stage being entered. Do not load later stages early.
 
-### Mode selection
+## Prepare contract
 
-Apply the first matching rule:
+Input: absolute anchor, slug, URL, update boolean.
 
-1. User passes `--no-subagents`, or explicitly says not to use subagents / to run in the main thread → **direct mode**. Do not debate or refuse.
-2. No subagent or Task tool is available in this environment → **direct mode**.
-3. Otherwise → **delegated mode** (default).
+1. Create `<anchor>/sandbox/` and initialize a missing manifest as `[]`.
+2. Normalize comparison URLs by lowercasing the host, converting SCP-style
+   `git@host:owner/repo` to `host/owner/repo`, and stripping `.git` and a trailing
+   slash. If the slug belongs to another normalized URL, try `<owner>-<repo>`;
+   return `blocked:slug-collision` if that is still ambiguous.
+3. Validate an existing clone with `git -C <path> rev-parse --git-dir` and
+   `git -C <path> remote get-url origin`. A manifest-listed invalid clone or
+   origin mismatch returns `blocked:invalid-clone` or
+   `blocked:origin-mismatch` without moving or deleting it.
+4. Reuse a valid clone without `--update`. With `--update`, run
+   `git -C <path> pull --ff-only`; failure returns
+   `blocked:non-fast-forward` or the exact transport error.
+5. If a manifest-free path is not a valid clone, move it to
+   `<path>.partial-<timestamp>` before one clone retry.
+6. Clone missing repos with `git clone --depth 1 <url> <absolute-path>`.
+7. Only after validation, upsert
+   `{slug, url, local_path, cloned_at}`. Write the manifest through a temporary
+   sibling and rename it atomically.
 
-### Direct mode
+Output: resolved slug, URL, absolute path, and exactly one status:
+`cloned | updated | reused | blocked:<reason>`. A blocked result ends the run.
 
-The main thread runs the full pipeline. Follow the Prepare, Search, and Persist
-contracts below directly. The main thread may read the manifest, run `git`,
-search repo files, and edit the working directory's `AGENTS.md` when persisting.
+## Search contract
 
-Do not refuse box work because subagents are missing. Do not tell the user to
-wait for delegation. Execute the contracts yourself.
+Input: absolute clone path, exact user question, and one assigned scope.
 
-### Delegated mode
+- Search local files only. Never infer from URL or remote snippets.
+- Write nothing.
+- A parallel scope must not overlap another worker's paths or sub-question.
+- For an open-ended request, inspect README, manifests, top-level structure,
+  and primary entry points.
+- Return a short finding list with enough surrounding code to interpret it.
+  Every finding cites `path:line`. Return `no matches in <scope>` when empty.
 
-The main thread is a coordinator only. It reads only the small sandbox manifest
-for target detection and `--list`; it never reads repo files, never runs `git`,
-and never edits the working directory's `AGENTS.md`. Dispatch a subagent for
-every prepare, search, and persist action.
+Output: assigned scope, searched paths, findings, citations, and omissions.
 
-Coordinator-only work: flag/target detection, mode selection, subagent dispatch,
-aggregation, and reporting.
+## Persist contract
 
-## Roles
+Input: absolute anchor, slug, URL, local path, and absolute target `AGENTS.md`.
 
-- **Coordinator / main thread**, detects the target and flags, picks execution
-  mode, runs or dispatches each stage, aggregates results, and reports.
-- **Prepare**, owns the sandbox, the clone/pull, and the manifest. The only
-  writer of `./sandbox/manifest.json`.
-- **Search**, read-only. Explores the local repo and returns a summary plus
-  `path:line` citations. Never writes to disk.
-- **Persist**, only when `--persist` is set. The only writer of the working
-  directory's `AGENTS.md`.
+1. Read `<anchor>/references/agents-md-template.md`.
+2. Substitute slug, URL, and local path.
+3. Replace the block between `<!-- box:begin <slug> -->` and
+   `<!-- box:end <slug> -->` when present.
+4. Otherwise append it once under `## External references`, creating the file
+   or heading when absent.
+5. A missing end marker or duplicate marker returns `blocked:marker-corrupt`.
+   If Search is incomplete, return `blocked:search-incomplete`.
+6. Write through a temporary sibling, rename atomically, then verify exactly
+   one complete marker block exists.
 
-In **delegated mode**, Prepare, Search, and Persist are separate subagents.
-In **direct mode**, the main thread performs all three roles itself.
+Output: target path and `created | updated | appended | blocked:<reason>`.
 
-## Stage barriers
+## Delegated briefs
 
-The pipeline runs in three gated stages. A stage does not start until the
-previous stage has fully returned:
-
-1. **Prepare**, local clone is on disk and the manifest is current.
-2. **Search**, all search work returns findings (one pass in direct mode; one
-   or more subagents in delegated mode).
-3. **Persist**, only if `--persist`, update the working directory's
-   `AGENTS.md` using the template.
-
-These barriers guarantee there is exactly one writer for clone/manifest and
-exactly one writer for `AGENTS.md`.
-
-## Stage contracts
-
-Standing constraints for every stage: no push, no commits in clones, no
-inferring from URL, no re-clone without `--update`.
-
-**Prepare (exactly one).**
-
-- IN: anchor, slug, url, `--update` value, "no re-clone without `--update`".
-- DOES: `mkdir -p ./sandbox`; create `manifest.json` as `[]` if absent; if
-  missing, `git clone --depth 1 <url> ./sandbox/<slug>`; if present and
-  `--update` was passed, `cd ./sandbox/<slug> && git pull`; otherwise skip git
-  operations; upsert the manifest entry `{slug, url, local_path, cloned_at}`
-  and write the manifest back.
-- OUT: `local_path`, resolved slug/url, and status
-  (`cloned | updated | reused | error:<reason>`).
-- On `error:*`, stop and report; do not search a nonexistent path.
-- **Slug collisions:** if a manifest entry already exists for `slug` with a
-  **different** `url`, do not overwrite. Use an owner-qualified slug
-  (`{owner}-{repo}`) and return the resolved slug. If a collision still
-  resolves ambiguously, stop and ask the user.
-
-**Search (read-only).**
-
-- IN: anchor, slug, confirmed `local_path`, the user's question, and, in
-  delegated mode when fanning out, an **assigned scope** (subtree, file set, or
-  sub-question). Parallel delegated scopes MUST NOT overlap.
-- DOES: search/read/summarize the local repo within scope. Use the local
-  files, not the remote URL. Include code snippets with full context (imports,
-  function signatures, file paths). Cite file paths and line numbers. If the
-  user's prompt is open-ended, explore the repo structure, README, and main
-  source files before answering.
-- **Hard rule: write nothing** during search. No edits to the sandbox, the
-  manifest, the clone, or `AGENTS.md`.
-- OUT: a summary, the relevant snippets, and `path:line` citations within
-  scope. If nothing matches, return an explicit `no matches in <scope>`.
-
-**Persist (exactly one, only if `--persist`).**
-
-- IN: anchor (to find the template), slug, url, `local_path`, the path to the
-  working directory's `AGENTS.md`.
-- DOES: read `./references/agents-md-template.md` from the skill directory;
-  substitute `{slug}`, `{url}`, and `{local_path}`; if `AGENTS.md` exists,
-  find `<!-- box:begin {slug} -->` and replace everything up to
-  `<!-- box:end {slug} -->` with the new block; if the marker is absent,
-  append the block under an `## External References` section (creating it if
-  needed); if `AGENTS.md` does not exist, create it with the
-  `## External References` section followed by the substituted block.
-- OUT: status (`created | updated-block | appended`) and the path written.
-
-## Subagent briefing (delegated mode only)
-
-Subagents do not inherit the coordinator's context. Every brief must include,
-explicitly:
-
-- The sandbox **anchor path** (the directory containing this `SKILL.md`).
-- The target **slug**.
-- The target **url**.
-- The standing constraints above.
-
-## Startup case: bare invocation or `--list`
-
-If the user invokes `/box` with no URL, no repo name, or passes `--list`, the
-main thread handles this directly. No prepare/search/persist:
-
-1. Read `./sandbox/manifest.json`. If it does not exist or is empty, report:
-   "No repos cloned yet."
-2. Print a concise list:
-
-```markdown
-# Box
-
-_local repo search & context_
-
-Previously cloned:
-
-- abc (github.com/john-doe/abc)
-- xyz (gitlab.com/acme/xyz)
-
-Give me a repo URL or name to search, or pass --persist to save a reference.
-```
-
-Then stop. This stays in the main thread because it is a trivial manifest
-read with no repo content and no shared-state write.
+Every delegated brief contains the absolute anchor, slug, URL, local path when
+known, assigned stage, write boundary, input values, expected output fields,
+and the rule that subagents may not delegate again.

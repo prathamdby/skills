@@ -1,110 +1,66 @@
-# Deslop Skill Reference
+# Deslop reference
 
-## All 8 slop categories
+Load the categories while classifying and the guardrails before editing.
 
-### Category 1: Comment & Documentation Issues
+## Six categories
 
-- Comments that break existing documentation style
-- Redundant comments explaining what the code obviously does
-- AI-generated header blocks or boilerplate comments
-- Comments in a different tone or format from the rest of the file
+### 1. Commentary noise
 
-### Category 2: Trust Model & Defensive Mismatches
+- Comments or doc blocks that restate the code
+- Generated headings, boilerplate, or a voice absent from nearby files
+- Commented-out code and stale explanations
 
-- Defensive checks (null checks, type guards, validation) in code surrounded by
-  direct, trusting code
-- Try-catch blocks where the codebase uses error propagation or early returns
-- Exception swallowing (empty catch blocks or generic logging without action)
-- Patterns that assume fragility where the codebase assumes correctness
-- Unreachable branches or duplicate validations beyond project norms
+### 2. Trust and type noise
 
-### Category 3: Type Safety & Conversion Noise
+- Guards, validation, or normalization already guaranteed by callers or types
+- Try-catch blocks that swallow errors or contradict local propagation
+- `any`, ignores, assertions, or conversion chains used to silence the type
+  system rather than model the value
 
-- `any` casts where the codebase uses proper types
-- Type assertions (`as Type`) that bypass the compiler where surrounding code
-  does not
-- `@ts-ignore` or `@ts-expect-error` without strong justification
-- Assertion bypasses (`!` non-null assertions) in strict code
-- Unnecessary parsing / stringifying / type conversion chains
-- Redundant type assertions that add no value
+### 3. Foreign dialect
 
-### Category 4: Dialect & Project Standard Violations
+- Naming, imports, libraries, error handling, or function style that conflicts
+  with the same module
+- A design pattern or architecture not used by adjacent code
+- Formatting churn unrelated to the change
 
-- Imported patterns that feel foreign to the codebase's style
-- Naming conventions that differ from surrounding code (e.g., camelCase in a
-  snake_case file, or `isFoo` predicates where the codebase uses `foo?`)
-- Library usage that differs from existing patterns (e.g., using lodash where
-  the codebase uses native methods)
-- Architectural patterns not used elsewhere in the module
-- Import style, function style, error handling style, or formatting that
-  violates project conventions
+### 4. Needless indirection
 
-### Category 5: Over-Engineering & Abstraction Bloat
+- Single-use wrappers, interfaces, factories, helpers, or pass-through layers
+- Configuration for one fixed use
+- Dependency injection, reflection, decorators, queues, or pools where the
+  module uses direct calls
 
-- Abstractions, interfaces, or design patterns where simple code exists elsewhere
-- Helper functions or classes for one-liners or trivial operations
-- Single-use wrapper functions or pass-through parameters
-- Indirection layers that do not add value over direct code
-- Premature generalization (e.g., making something configurable when it has
-  only one use)
-- Dependency injection or factory patterns where direct instantiation is used
-  elsewhere
+### 5. Mechanical bloat
 
-### Category 6: Over-Caution & Redundancy
+- One-use variables that add no meaning
+- Repeated computation, duplicate state, redundant branches, or dead code
+- Multi-step ceremony around a direct local operation
 
-- Validation or sanitization beyond what the codebase normally does
-- Excessive null checks on values that are guaranteed by construction
-- Redundant guards that duplicate runtime or compile-time checks
-- Input normalization that the rest of the pipeline already handles
-- Duplicate validations or defensive checks already covered by the type system
-  or caller contract
+### 6. Obscured control flow
 
-### Category 7: Bloat & Verbose Ceremony
+- Deep nesting that a local early-return pattern can flatten
+- Nested ternaries or dense boolean expressions
+- Clever one-liners, manual collection building, or extraction that makes the
+  path harder to debug
 
-- Simple operations expanded into multiple lines unnecessarily
-- Unnecessary variable declarations (e.g., `const result = expr; return result;`)
-- Verbose conditionals that could be direct expressions
-- Extra whitespace, blank lines, or formatting changes not matching project style
-- Dead code, unreachable branches, or commented-out code left behind
-- Intermediate variables used once with no clarity benefit
+Use one primary category per instance. Mention a secondary category only when
+it requires a separate edit.
 
-### Category 8: Complexity & Clarity Anti-Patterns
+## Guardrails
 
-- Sophisticated solutions where the codebase uses direct approaches
-- Nested conditionals that can flatten with early returns or guard clauses
-- Complex boolean expressions that can be reduced or extracted
-- Nested ternaries that should be `if/else`, `switch`, or direct expressions
-- Overly compact one-liners that obscure intent
-- Clever tricks or cryptic patterns that sacrifice readability
-- Manual array building where `map`/`filter`/`reduce` fits naturally and is
-  used elsewhere in the project
-- Async abstractions (wrappers, queues, pools) where direct calls are the norm
-- Meta-programming (reflection, proxies, decorators) absent from the rest of
-  the module
+Drop the instance when any answer is uncertain:
 
-## Step 5 balancing guardrails
+1. Can the existing behavior be stated and shown to remain identical?
+2. Does adjacent code establish the proposed replacement as local practice?
+3. Does the edit preserve timing, errors, side effects, API shape, and data
+   validation?
+4. Does a named helper or abstraction explain domain intent or support more
+   than one real use?
+5. Does the shorter form remain easier to read and debug?
+6. Is every changed line inside the selected diff's purpose?
 
-- **Prefer explicit, readable code over compact cleverness.**
-- **Preserve helpful abstractions and logical groupings.**
-  Do not inline a well-named helper just to save lines if it explains intent.
-- **Do not combine unrelated concerns for the sake of fewer lines.**
-- **Choose switch statements or if/else chains over nested ternaries.**
-- **Keep code debuggable and extensible.**
-  A slightly longer but straightforward path is better than a compressed
-  expression that requires mental unpacking.
-- **Preserve existing behavior exactly.**
-  Simplification must not change logic, timing, side effects, or public APIs.
-
-If a potential simplification violates any of these guardrails, leave it out
-of the final removal list. Only keep instances where removal is a clear win.
-
-## Example reports
-
-- "Removed defensive try-catch blocks and null guards that contradicted the
-  codebase's direct style. Flattened nested conditionals with early returns.
-  Preserved a helper function that explains domain intent. Three files
-  cleaned and re-staged."
-- "Stripped verbose comments and collapsed a bloated variable chain into a
-  single expression. Aligned naming with project conventions. One file
-  cleaned and re-staged."
-- "No AI slop or simplification opportunities detected. The changes look clean."
+Prefer explicit code over compact code. Do not combine unrelated concerns to
+save lines. Do not remove a safety check merely because it is verbose; remove
+it only when types, verified callers, or an existing test prove the same
+contract. A comment or assumption is not proof.

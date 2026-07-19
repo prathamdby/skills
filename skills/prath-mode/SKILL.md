@@ -1,67 +1,82 @@
 ---
 name: prath-mode
 description: >
-  Route a task to the right skill in prathamdby/skills and run multi-step
-  workflow chains. Verifies the leaf skill is installed before invoking it.
+  Route user-invoked work to the owning skill in prathamdby/skills, including
+  multi-step delivery workflows.
 disable-model-invocation: true
 ---
 
 # Prath mode
 
-Read the matched leaf skill in full before executing. Do not restate or
-improvise its workflow. The leaf owns its own triggers, flags, and rules.
+The leaf owns its triggers, flags, procedure, and terminal states. Read it
+before acting. Never recreate a missing leaf or copy its procedure here.
 
 ## Routing map
 
-| Action                                   | Leaf skill                                              |
-| ---------------------------------------- | ------------------------------------------------------- |
-| Commit or write a commit message         | **commit** (`../commit/SKILL.md`)                       |
-| Strip AI slop or simplify a diff         | **deslop** (`../deslop/SKILL.md`)                       |
-| Open a pull request                      | **make-pr** (`../make-pr/SKILL.md`)                     |
-| Address PR review feedback               | **fix-pr** (`../fix-pr/SKILL.md`)                       |
-| Fix or implement a Linear ticket         | **fix-linear-ticket** (`../fix-linear-ticket/SKILL.md`) |
-| Review a plan, design, or implementation | **peer-review** (`../peer-review/SKILL.md`)             |
-| Clone or search an external git repo     | **box** (`../box/SKILL.md`)                             |
-| Delegate work to an external agent       | **assign** (`../assign/SKILL.md`)                       |
-| Save session context or resume a handoff | **handoff** (`../handoff/SKILL.md`)                     |
-| Explain a diff, branch, or PR (HTML)     | **explain-diff** (`../explain-diff/SKILL.md`)           |
-| Send a Discord notification or alert     | **notify** (`../notify/SKILL.md`)                       |
+| Immediate action | Leaf |
+|---|---|
+| Commit scoped changes | `commit` (`../commit/SKILL.md`) |
+| Remove code slop | `deslop` (`../deslop/SKILL.md`) |
+| Create or update a PR | `make-pr` (`../make-pr/SKILL.md`) |
+| Address PR feedback | `fix-pr` (`../fix-pr/SKILL.md`) |
+| Review an implementation plan | `peer-review` (`../peer-review/SKILL.md`) |
+| Explain a diff as HTML | `explain-diff` (`../explain-diff/SKILL.md`) |
+| Map or refresh the current repo | `recon` (`../recon/SKILL.md`) |
+| Clone or search an external repo | `box` (`../box/SKILL.md`) |
+| Run one task in an external CLI agent | `assign` (`../assign/SKILL.md`) |
+| Coordinate current-harness subagents | `orchestrate` (`../orchestrate/SKILL.md`) |
+| Save or resume session state | `handoff` (`../handoff/SKILL.md`) |
 
-When a request matches several skills, pick the leaf that owns the immediate
-action. For multi-step work, use a chain below.
+For one action, route to its leaf. Use `orchestrate` for several in-harness
+delegates and `assign` for one external CLI process. Use a chain only when the
+request asks for its complete terminal outcome. Several explicit outcomes,
+such as "commit and open a PR", select the matching chain.
 
 ## Workflow chains
 
-Run in order. Read each leaf before its step. `implement` is not a skill.
+| Requested outcome | Ordered owners | Complete when |
+|---|---|---|
+| Ship planned work | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | approved plan diff tested and PR URL verified |
+| Save current work | optional `deslop` → `commit` | new commit verified |
+| Finish PR feedback | `fix-pr` | `fix-pr` report complete |
+| Understand current repo | `recon` | memory and report verified |
+| Research external code | `box` | cited answer returned |
+| End or resume work | `handoff` | create or resume terminal state |
 
-1. **Ship ticket work:** `fix-linear-ticket` → implement → `deslop` → `commit` →
-   `make-pr` (pass `--ticket` to make-pr when the ID is known)
-2. **Ship planned work:** `peer-review` → implement → `deslop` → `commit` → `make-pr`
-3. **Quick save:** `deslop` (optional) → `commit`
-4. **Land PR feedback:** `fix-pr` → `commit` → push
-5. **Research external code:** `box`
-6. **Delegate heavy lift:** `assign`
-7. **End or resume session:** `handoff` or `handoff --resume <path>`
+Implementation is normal agent work, not a leaf. `fix-pr` already owns its
+fix, commit, push, re-hunt, and reply loop; never append those actions.
+`deslop` is required in Ship planned work and optional in custom or Save chains.
+Resolve mixed staged/unstaged paths before it. Implementation is done when the
+approved plan's diff and relevant tests are recorded.
 
-## Step 1: Match
+## 1. Match
 
-Match the request to one leaf or one chain. If nothing matches, say so and ask
-what the user wants.
+Record a run ledger:
 
-## Step 2: Verify installation
+`route | plan path/hash/verdict | current owner | completed owners | diff/tests | terminal`
 
-Before reading or executing a leaf, confirm it is installed: resolve
-`../<skill-name>/SKILL.md` relative to this skill's directory and check it exists
-(`test -f` or the Read tool). For a chain, verify every leaf before the first
-step and re-check before each subsequent step, the user may install skills
-between steps.
+If no route matches, ask one question about the intended outcome. Done when one
+leaf or chain and its terminal condition are recorded.
 
-If any leaf is missing, stop and report its name and checked path, list all
-missing names in one message, and tell the user to install:
-`npx skills@latest add prathamdby/skills`. Never improvise a missing leaf's
-workflow.
+## 2. Verify installation
 
-## Step 3: Read and invoke
+Resolve each leaf path relative to this file and verify it exists before the
+chain starts and before its turn. If any are missing, report every missing name
+and checked path, then stop with:
+`npx skills@latest add prathamdby/skills`
 
-Read the matched leaf's `SKILL.md` in full, then execute per the leaf. For
-chains, complete each step before starting the next unless the user narrows scope.
+Done when all required paths exist or the missing-skill report is sent.
+
+## 3. Invoke and resume
+
+Read the current leaf in full and run it to one of its terminal states. Advance
+only after success or no-op; pause the chain on blocked or waiting. After an
+interruption, verify the last owner's artifacts before continuing.
+
+In Ship planned work, continue past `peer-review` only on `Ship it.` An
+`UPDATED` plan is reviewed again. Lock its content hash before implementation;
+if it changes, return to `peer-review`. Before `make-pr`, require a clean tree.
+For implementation, verify the locked plan diff and test evidence in the ledger.
+
+Done when the recorded chain terminal condition is observed or the current
+leaf has reported why progress paused.
