@@ -12,7 +12,8 @@ There are no flags. A review request authorizes analysis, not file edits.
 ## 1. Resolve the review target
 
 Require a plan, design, or proposed-change artifact and its governing
-requirements. If none is provided or discoverable, report
+requirements, pointed to by path, URL, pasted text, or attached IDE context in
+the request. If none is provided, report
 `BLOCKED: review target required` and ask for one pointer. Never reconstruct a
 target from conversation memory.
 
@@ -29,7 +30,7 @@ current claim needs it. Stop gathering when every requirement and candidate
 risk has a source pointer. Do not survey unrelated architecture.
 
 After interruption, confirm the target and requirements have not changed before
-using the ledger.
+using the ledger. If either changed, discard the ledger and restart Step 1.
 
 Done when each review claim can cite a requirement, target section, source
 path, test, or history artifact.
@@ -39,14 +40,18 @@ path, test, or history artifact.
 Map each requirement to a proposed step and verification. Check boundaries,
 failure and rollback paths, ordering, compatibility, security, performance,
 and test coverage. Rank by probability times impact. Do not promote a
-theoretical concern over an evidenced failure.
+theoretical concern over an evidenced failure. Treat unsupported security,
+compatibility, or performance claims in the target as gaps.
 
 Select at most one critical risk:
 
 - no critical risk: `Ship it.`
-- one repairable blocker: `Fix the critical risk first, then ship.`
+- one repairable blocker: `Fix the critical risk first, then ship.` Repairable
+  means at most three steps without changing the approach or requirements.
 - wrong approach, missing core requirements, or several coupled blockers:
   `Needs rework.`
+
+If another must-fix blocker remains after the critical fix, use `Needs rework.`
 
 Done when the verdict follows this mapping and every material requirement has
 been checked.
@@ -56,7 +61,8 @@ been checked.
 Write exactly four sections:
 
 1. `## Critical risk`: one evidence-backed paragraph, or `None found.`
-2. `## Other gaps`: `- <gap> → <impact>` bullets, or `None.`
+2. `## Other gaps`: at most five material `- <gap> → <impact>` bullets, or
+   `None.` Omit style and preference nits.
 3. `## Fix`: numbered steps for the critical risk or first rework decision, or
    `None.`
 4. `## Verdict`: exactly one mapped sentence and no added explanation.
@@ -65,8 +71,10 @@ Done when the four-section contract holds and every finding has a citation.
 
 ## 5. Optional plan update
 
-Edit only when the user explicitly requested an update before the review or
+Edit only when the user explicitly requested an update in the review request or
 confirms after reading it. Apply only the reported Fix; broad rework requires a
 new approved design. Re-read the diff and report changed paths.
 
-Terminal values are `REVIEWED`, `BLOCKED`, and `AWAITING_CONFIRMATION`.
+Terminal values: missing target is `BLOCKED`; analysis-only is `REVIEWED`;
+requested confirmation is `AWAITING_CONFIRMATION`; a verified plan edit is
+`UPDATED`.

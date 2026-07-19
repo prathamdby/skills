@@ -62,4 +62,5 @@ Drop the instance when any answer is uncertain:
 
 Prefer explicit code over compact code. Do not combine unrelated concerns to
 save lines. Do not remove a safety check merely because it is verbose; remove
-it only when a proven contract makes it redundant.
+it only when types, verified callers, or an existing test prove the same
+contract. A comment or assumption is not proof.

@@ -18,29 +18,37 @@ description: >
 The scope flags are mutually exclusive. More than one, a missing base branch,
 or prose that conflicts with a flag is `BLOCKED`; ask which scope to use. Never
 switch away from the default because another diff happens to be non-empty.
+Prose conflicts only when it names a different scope than an explicit flag.
+Every scope-resolution failure ends the run as `BLOCKED`.
 
 ## 1. Lock scope
 
-Capture status, the selected diff, its file list, and a fingerprint. Record:
+Capture status, the selected diff, its lexicographically sorted file list, and
+the SHA-256 of the scope name plus complete diff as its fingerprint. Record:
 
 `scope/fingerprint | current file | checked | kept instances | verification | terminal`
 
 If the diff is empty, report `NO_CHANGES` and mention other non-empty scopes
-without touching them. Before editing staged scope, block if a target file also
-has unstaged changes. This prevents staging unrelated work.
+from `git diff` without touching them. Before editing staged scope, block the
+whole run if any target file also has unstaged changes. `--base` covers commits
+only; block if a scoped path has staged or unstaged work.
 
 Done when the exact editable scope and original index state are recorded.
 
 ## 2. Inspect and classify
 
 Read each changed file and at most two adjacent files per module that establish
-local norms. Classify every changed hunk against the six categories in
-`./REFERENCE.md`. Record path, lines, category, evidence from local norms, and
-the smallest behavior-preserving edit. Do not stop after the first category.
+local norms; module means the changed file's directory and adjacent means files
+in that directory. Classify every changed hunk against the six categories in
+`./REFERENCE.md`. An instance is contiguous lines handled by one atomic edit.
+Record path, lines, primary category, local evidence, and smallest safe edit.
+For overlap, choose the category requiring the smallest edit; use a secondary
+only for another edit. Do not stop after the first category.
 
-For large diffs, process stable path order and update the ledger after each
-file. After interruption, recompute the fingerprint; restart a changed current
-file and preserve completed entries only when their hunks are unchanged.
+For large diffs, process the sorted order and update the ledger after each file.
+After any turn interruption before terminal state, recompute the fingerprint;
+restart a changed current file and preserve completed entries only when their
+hunks are unchanged.
 
 Done when every scoped hunk has six-category coverage. Zero instances is
 `CLEAN`.
@@ -55,15 +63,16 @@ abstractions.
 `--unstaged` and `--base` never stage. For `--staged`, stage only edited target
 files after confirming they had no pre-existing unstaged hunks.
 
-Done when each kept instance is changed and the original index state outside
-staged target files is unchanged.
+Done when each kept instance is changed; for unstaged/base the index matches
+the Step 1 snapshot, and for staged only clean target-file updates entered it.
 
 ## 4. Verify and report
 
 Re-run the selected diff and status. Confirm each kept instance is gone, no
-out-of-scope hunk moved layers, and no new complexity appeared. Run targeted
-tests for control-flow, error, type, or API edits. Text-only cleanup needs only
-the diff audit. If required tests cannot run, report `BLOCKED`, not success.
+out-of-scope hunk moved layers, and the post-edit diff has no new slop. Run the
+narrowest existing test covering the edited file, symbol, or package for
+control-flow, error, type, or API edits. Text-only cleanup needs only the diff
+audit. If no covering test exists or it cannot run, report `BLOCKED`.
 
 Report scope, files, category counts, preserved staging state, diff audit, and
 tests. Terminal values are `SUCCESS`, `CLEAN`, `NO_CHANGES`, and `BLOCKED`.
