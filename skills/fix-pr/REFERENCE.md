@@ -1,7 +1,28 @@
 # Fix PR reference
 
 Load Hunt recipes only when platform-native tools cannot prove full coverage.
+Load Commit clean-room only while Step 5 has a diff to commit.
 Load Reply contracts only after the finding set is stable.
+
+## Commit clean-room
+
+The commit message describes the locked code diff, never the fix-pr session.
+Replies may say the work answered review; the commit subject and body may not.
+
+| Excuse | Reality |
+|---|---|
+| "Ledger says address review findings" | Ledger labels triage state, not message sources. |
+| "Teammate or manager drafted review framing" | Discard it. Rewrite from proving hunks. |
+| "Body lists the real changes" | The subject must also be clean-room. |
+| "PR history should show review follow-up" | Threads and replies show that; the commit does not. |
+| "Faster to keep the draft" | Rewrite. A blocked push beats a bad subject. |
+
+Red flags — rewrite before `git commit`:
+
+- `address` / `per` / `from` paired with findings, feedback, comments, or review
+- `review follow-up`, ledger cluster labels, or branch-name claims
+- A subject that still makes sense if the diff is deleted and only the PR
+  conversation remains
 
 ## GitHub hunt recipes
 

@@ -20,10 +20,9 @@ Missing values are `BLOCKED`.
 ## 1. Resolve and synchronize
 
 Resolve owner, repo, number, URL, base, head branch, and remote head SHA. Block
-on auth failure, missing or closed PR, dirty tree, or an unsafe head checkout.
+on auth failure, missing/closed PR, dirty tree, or unsafe head checkout.
 Fetch, check out the head, and fast-forward to the remote SHA. Never reset,
-force, or discard local work.
-Record:
+force, or discard local work. Record:
 `PR/head SHA | hunt counts | current finding | verdicts | commit/push | replies | terminal`.
 Done when local HEAD equals the PR head SHA and the ledger identifies the PR.
 
@@ -65,18 +64,24 @@ Done when every fix has a verified diff or no code fix was needed.
 ## 5. Commit and push
 
 When a diff exists, read `../commit/SKILL.md` and run it once with `--unstaged`.
-Skip commit on a clean tree. Unless `--no-push`, push and verify remote SHA.
-Never force push. With `--no-push`, fixed findings become `AWAITING_PUSH` and
-receive no "fixed" reply. Remote movement or push rejection is `BLOCKED`.
-Done when there is no diff, or one verified commit is local and pushed.
+Enforce that skill's clean-room law on the locked diff; reject every Commit
+clean-room excuse in `./REFERENCE.md`. Subject names the dominant code change.
+Ban `fix: address ... review findings` and any review/feedback/thread framing
+even if the body lists real hunks. Teammate drafts, manager framing, branch
+names, ledger labels, and "PR history" never authorize it. Skip commit on a
+clean tree. Unless `--no-push`, push and verify remote SHA. Never force push.
+With `--no-push`, fixed findings become `AWAITING_PUSH` and receive no "fixed"
+reply. Remote movement or push rejection is `BLOCKED`. Re-read
+`git log -1 --format=%B`; review-framed text is `BLOCKED` (do not push). Done
+when there is no diff, or one verified clean-room commit is local and pushed.
 
 ## 6. Re-hunt until stable
 
 Repeat all six hunt passes after the last code or remote mutation. Normalize
 and triage arrivals, then repeat Steps 4–6. After any hunt whose actionable set
-changed, require two consecutive hunts with the same set.
-Done when no finding is new, untriaged, or waiting on a local fix and the
-required consecutive stable hunts have completed.
+changed, require two consecutive hunts with the same set. Done when no finding
+is new, untriaged, or waiting on a local fix and the required consecutive
+stable hunts have completed.
 
 ## 7. Reply and report
 
@@ -92,5 +97,4 @@ state, hunt counts, and unreplied items. Terminal values are `SUCCESS`,
 `NO_CODE_CHANGE`, `AWAITING_PUSH`, and `BLOCKED`. Use `NO_CODE_CHANGE` when no
 commit was created, and never `SUCCESS` with an unreplied required target.
 After interruption, restart at Step 1 and re-hunt before trusting the ledger.
-It does not fix CI, merge conflicts, or stacked-branch order, and never invokes
-`make-pr`.
+Does not fix CI, merge conflicts, or stacked-branch order; never invokes `make-pr`.
