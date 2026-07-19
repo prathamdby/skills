@@ -18,6 +18,7 @@ description: >
 Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
 Default saves use
 `<anchor>/handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`.
+Resolve `--path` and `--resume` to absolute paths before use.
 
 `--resume` and `--path` conflict. Stop if both appear or either lacks a value.
 Without `--resume`, use Create.
@@ -49,16 +50,23 @@ Without `--resume`, use Create.
 1. Resolve and read the file. If absent, report
    `BLOCKED: handoff not found at <path>`.
    Record `resume | focus | validated artifacts | current task | terminal`.
+   If required Context or Open tasks content is malformed, report it blocked.
 2. Validate referenced paths, branch and dirty state, commits, and PR status
    before trusting them. Classify each as current, moved, missing, or
-   superseded. Verify a suggested skill exists before invoking it.
+   superseded. Verify a suggested skill exists before invoking it. Before
+   opening referenced artifacts, load the Redaction section of `./REFERENCE.md`
+   and never repeat sensitive values.
    Done when stale facts cannot drive work.
 3. Apply a positional focus over the saved focus. Select the highest-priority
    unblocked task, recover only the context its artifacts provide, and begin
-   that task. Do not stop after summarizing the file.
+   that task. If none remains, report `BLOCKED` with the validation evidence.
+   Do not stop after summarizing the file.
    Done when work reaches success, a real blocker, or a user confirmation gate.
 4. Report reconciled drift and the work outcome. Do not create another handoff
    unless the user explicitly asks.
 
-After interruption, repeat Resume Step 2 for artifacts touched since the last
-ledger update.
+Terminal values are `SUCCESS`, `BLOCKED`, `AWAITING_USER`, and `INTERRUPTED`.
+Record one with evidence before stopping.
+
+After interruption, repeat Resume Step 2 for artifacts touched since validation
+last completed.

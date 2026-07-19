@@ -1,6 +1,7 @@
 # Handoff reference
 
-Load this file only while creating a handoff.
+Load this file while creating a handoff. On resume, load only Redaction before
+opening referenced artifacts.
 
 ## Document contract
 
@@ -50,9 +51,9 @@ Load this file only while creating a handoff.
 - Open tasks exclude completed and stale todos. Name dependencies.
 - Artifacts include the active plan, PR or issue, branch, useful commits,
   changed files, and required config. Do not list every file.
-- Suggested skills must exist in the installed sibling directories. Common
-  choices are `peer-review`, `deslop`, `commit`, `make-pr`, `fix-pr`, `recon`,
-  `box`, `assign`, `orchestrate`, and `explain-diff`.
+- Suggested skills must exist under the installed `skills/` root containing
+  this skill. Common choices are `peer-review`, `deslop`, `commit`, `make-pr`,
+  `fix-pr`, `recon`, `box`, `assign`, `orchestrate`, and `explain-diff`.
 - A live positional focus overrides a focus saved in the document.
 
 ## Redaction
