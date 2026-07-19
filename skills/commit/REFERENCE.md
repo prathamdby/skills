@@ -1,6 +1,7 @@
 # Commit Skill Reference
 
-Per-style message format. Reached from Step 3 for the chosen style.
+Per-style message format and anti-patterns. Reached from Step 3 for the chosen
+style, and again when checking the draft against anti-patterns.
 
 ## `--conventional` formatting rules
 
@@ -41,3 +42,17 @@ Each message names the change its hunk proves, nothing more.
 | Null check added in `userService.ts` | fix: guard null user in getProfile    |
 | README install steps rewritten       | docs: add pnpm install steps          |
 | Extract helper from handler          | refactor: extract parsePayload helper |
+
+## Anti-patterns (reject and rewrite)
+
+| Bad draft / command | Why it fails | Rewrite toward |
+| --- | --- | --- |
+| `fix: address Sarah's review feedback` | Session / reviewer, not in diff | Name the concrete code change |
+| `fix: implement ABC-99 auth plan` | Ticket / plan, not in diff | Name the hunk (e.g. null guard) |
+| `feat(api): add rate limiting middleware` | Scope notation forbidden | `feat: add rate limiting middleware` |
+| `refactor: extract helper.` | Trailing period; vague | `refactor: extract parsePayload helper` |
+| Subject > 50 chars (conventional) | Over limit | Shorten; move detail to body |
+| Three or more `-m` flags | Blank line between every bullet | One subject `-m` + one body `-m` |
+| Single `-m` with embedded `\n\n` body | Body often dropped | Two `-m` flags |
+| `git commit -F - <<EOF ...` / HEREDOC | Not this skill's recipe | Two `-m` + `$'...'` |
+| `git commit -m "..."` without `-n` when no `--verify` | Hooks must be skipped | Add `-n` |
