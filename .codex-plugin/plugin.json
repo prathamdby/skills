@@ -1,0 +1,22 @@
+{
+  "name": "skills",
+  "version": "1.0.0",
+  "description": "Planning, git, review, delegation, and session-continuity skills",
+  "author": {
+    "name": "Pratham Dubey",
+    "url": "https://github.com/prathamdby"
+  },
+  "homepage": "https://github.com/prathamdby/skills",
+  "repository": "https://github.com/prathamdby/skills",
+  "license": "MIT",
+  "keywords": ["skills", "git", "review", "workflows"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Pratham Dubey's skills",
+    "shortDescription": "Workflows for planning, git, review, and handoffs",
+    "longDescription": "A small set of coding-agent skills with narrow jobs, explicit stop conditions, and defaults in each skill file.",
+    "developerName": "Pratham Dubey",
+    "category": "Productivity",
+    "websiteURL": "https://github.com/prathamdby/skills"
+  }
+}

@@ -8,11 +8,27 @@ conditions, and defaults listed in its own file.
 
 ## Install
 
+### skills.sh
+
 ```bash
 npx skills@latest add prathamdby/skills
 ```
 
-Choose the skills and coding agents you want during the installer flow.
+Pick the skills and agents you want in the installer.
+
+### Claude Code
+
+```text
+/plugin marketplace add prathamdby/skills
+/plugin install skills@pratham-skills
+```
+
+### Codex
+
+```bash
+codex plugin marketplace add prathamdby/skills
+codex plugin add skills@pratham-skills
+```
 
 ## Quickstart
 
