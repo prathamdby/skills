@@ -9,7 +9,7 @@ description: >
 
 ## Flags
 
-| Flag | Default | Diff |
+| Flag | Default | Effect |
 |---|---|---|
 | `--staged` | yes | `git diff --cached` |
 | `--unstaged` | no | `git diff` |
