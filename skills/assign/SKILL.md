@@ -1,61 +1,64 @@
 ---
 name: assign
 description: >
-  assign a task to an external coding agent and monitor it. Pipes the prompt via
-  stdin to dodge quoting failures and auto-approves permissions to avoid silent
-  hangs. Triggers: run a task with an external agent, hand off to OpenCode,
-  Claude Code, or similar, execute a plan non-interactively. Flags: --agent
-  <name> (default opencode), --model <model>, and --dir <path>.
+  assign when running one exact task through a supported external coding-agent
+  CLI without interactive prompts.
 ---
 
 # Assign
 
-```
-/assign "Fix the null check in auth.ts" --agent opencode --model opencode-go/kimi-k2.6
-/assign "Fix the null check in auth.ts" --agent claude
-```
-
 ## Flags
 
-| Flag              | Effect                                                                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `--agent <name>`  | Agent to delegate to. **Default: `opencode`**.                                                                                        |
-| `--model <model>` | Model to use. Agent default applies if omitted.                                                                                       |
-| `--dir <path>`    | Agent working directory. **Default: current directory.** `assign-prompt.tmp` is always written to the current directory, not `--dir`. |
+| Flag | Default | Effect |
+|---|---|---|
+| `--agent <name>` | `opencode` | `opencode`, `codex`, or `claude` |
+| `--model <model>` | registry default | Override the selected agent's model |
+| `--dir <path>` | current directory | External agent working directory |
 
 If `--agent` names an unsupported agent, stop: "Unknown agent `<name>`.
 Supported agents: opencode, codex, claude. See `./REFERENCE.md`."
 
-## Step 1: Write the prompt file
+## 1. Preflight
 
-Write the full task prompt to `./assign-prompt.tmp` in the **current working
-directory** (not `--dir`). Never pass the prompt as a shell argument, quoting
-breaks on multi-line or special-character prompts. Overwrite silently.
+Require a non-empty positional task, an existing working directory, the agent
+executable, and the registry entry in `./REFERENCE.md`. For Codex outside a git
+repo, use the registry's non-git branch.
 
-## Step 2: Invoke the agent
+Record:
+`agent/model | dir | prompt path | process | last progress | exit | terminal`.
 
-Look up the agent's invocation template and required non-interactive flags in
-`./REFERENCE.md`. Those flags are not optional: without them the agent blocks on
-an invisible permission prompt and hangs silently. Substitute `<model>` and
-`<dir>`, then pipe the prompt:
+Done when inputs and the exact non-interactive command are resolved, or a
+specific missing executable, directory, or auth blocker is reported.
 
-```bash
-cat ./assign-prompt.tmp | <agent-command>
-```
+## 2. Create transport
 
-## Step 3: Monitor output
+Create a collision-safe prompt file with restrictive permissions using the
+system temp directory. Write the task bytes unchanged. Never pass task text as
+a shell argument. Register cleanup before launching so success, error, signal,
+or interruption removes the prompt.
 
-Watch for progress (tool calls, file writes, step completions). If there is no
-output for >60s after startup, the agent is hung on a permission prompt. Kill
-it and check the agent's troubleshooting notes in `./REFERENCE.md`.
+Done when the prompt can be read back byte-for-byte and parallel assignments
+cannot share its path.
 
-## Step 4: Verify and clean up
+## 3. Execute and monitor
 
-1. Report the exit code and a brief summary of what the agent did.
-2. Delete `./assign-prompt.tmp`.
-3. If the task was a code change, prompt the user to verify results.
+Run the selected registry command through a tracked process and pipe the prompt
+on stdin. Capture stdout, stderr, process ID, and exit code. Monitor output,
+process state, and target-directory changes. Silence alone is not proof of a
+hang. Inspect the process after a silent interval; terminate only when it is
+waiting for input despite non-interactive flags, the user cancels, or the
+execution deadline is reached. Use the reference's termination sequence.
 
-## Constraints
+Done when the process exits or is terminated, with no orphaned child process.
 
-- Never infer or expand the task. Delegate exactly the prompt provided.
-- Never commit, push, or build unless the prompt explicitly asked for it.
+## 4. Verify and report
+
+Always run cleanup, then confirm the prompt file is absent. Non-zero exit,
+spawn failure, timeout, or empty output is not success. For code work, inspect
+the resulting diff and requested test evidence; do not trust the CLI summary.
+
+Report the agent, model, directory, exit code, observed result, verification,
+and one terminal value: `SUCCESS`, `FAILED`, `TIMED_OUT`, or `INTERRUPTED`.
+
+Delegate exactly the supplied task. Do not add commit, push, build, or scope
+unless the task itself asks for it.

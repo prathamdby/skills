@@ -1,11 +1,10 @@
-## External References
+## External references
 
-> These are repos cloned into the local sandbox by the `box` skill. If the user
-> mentions any of them by name, search the local copy for context instead of
-> guessing or making assumptions.
+Search these local clones when the user names them. Do not infer their contents
+from the remote URL.
 
 <!-- box:begin {slug} -->
 
-- **Repo:** `{slug}` → `{url}` (local: `{local_path}`)
+- `{slug}`: `{url}`. Local clone: `{local_path}`
 
 <!-- box:end {slug} -->
