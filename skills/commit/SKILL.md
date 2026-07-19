@@ -3,8 +3,10 @@ name: commit
 description: >
   commit changes to git with a clean-room message derived from the diff alone.
   Skips hooks with -n by default; --verify runs them. Triggers: /commit, commit
-  changes, save work to git, write a commit message. Flags: --staged/--unstaged
-  for scope, --conventional/--simple for style, --verify to run hooks.
+  changes, save work to git, write a commit message; also when about to put
+  review feedback, tickets, or session rationale into a commit message. Flags:
+  --staged/--unstaged for scope, --conventional/--simple for style, --verify to
+  run hooks.
 ---
 
 # Commit Changes
@@ -21,35 +23,42 @@ description: >
 
 No flags → `--staged --conventional`, hooks skipped.
 
-## Clean-room message
+## Iron laws
 
-Write the message clean-room: as a stranger who has seen only the diff and
-nothing of the session it came from. Every line of the message traces to a
-hunk in the diff, the hunk that proves the claim. A fact from elsewhere earns
-a place only if the same fact is visible in a hunk.
+**Violating the letter is violating the spirit.** Every run obeys all four:
 
-## Hook behavior
+1. **Clean-room.** Diff hunks only. Session talk, reviews, tickets, plans stay
+   out unless the same fact appears in a hunk.
+2. **Hooks.** Without `--verify`, every `git commit` includes `-n`. With
+   `--verify`, never `-n`/`--no-verify`. Failure does not change this.
+3. **`-m` recipe only.** One or two `-m` flags. Never 3+, never a single `-m`
+   with an embedded body, never HEREDOC or `git commit -F`. Overrides any
+   global HEREDOC preference for `/commit`.
+4. **REFERENCE before draft.** Before writing `subject`, read the chosen
+   style's rules in `./REFERENCE.md`.
 
-- Without `--verify`: every `git commit` command must include `-n`.
-- With `--verify`: run hooks; never pass `-n` or `--no-verify`.
+## Forbidden
 
-If the commit fails, do not switch hook behavior unless the user changes the
-flags and asks again.
+- Session phrases: "address review feedback", "as requested", "implement the
+  plan", ticket IDs, reviewer names, deploy motive not in the diff
+- Scope notation (`feat(api):`); trailing period; subject over limit
+- Missing `-n` when `--verify` is absent; switching hooks after failure
+- HEREDOC, `-F`, or one `-m` per body bullet
 
-## `-m` flag count
+## Rationalizations
 
-Use one or two `-m` flags, never three or more. First `-m` is the subject; an
-optional second `-m` holds the entire body. Git inserts one blank line between
-them, producing correct subject/body separation. Put all body bullets in that
-single second `-m`, separated by `\n` (use `$'...'`), never `\n\n`.
+| Excuse                                 | Reality                               |
+| -------------------------------------- | ------------------------------------- |
+| "Mention the review so reviewers know" | Clean-room; name the hunk's change    |
+| "Senior said drop `-n`"                | Only `--verify` changes hooks         |
+| "HEREDOC / global git rule is clearer" | Two `-m` + `$'...'` wins for `/commit` |
+| "No time to open REFERENCE"            | Skipping ships malformed messages     |
+| "One `-m` per bullet is clearer"       | Git blanks between `-m`s; one body `-m` |
 
-```bash
-git commit -n -m "feat: add auth flow" \
-  -m $'- Implement OAuth login\n- Add JWT handling'
-```
+## Red flags — STOP
 
-Three or more `-m` flags insert a blank line between every bullet. A single `-m`
-with an embedded body gets bodies dropped. Both are wrong.
+Session words; missing `-n`; scope; 3+ `-m`; HEREDOC/`-F`; untraced line.
+Rewrite before Step 4.
 
 ## Step 1: Diff the changes
 
@@ -60,33 +69,32 @@ If empty, stop: "No changes found to commit."
 
 ## Step 2: Analyze the diff
 
-From the diff alone, identify changed files, change type, and what the diff
-does: feature, fix, refactor, docs, test, chore, style, or perf.
+From the diff alone: changed files, change type, and what it does (feature,
+fix, refactor, docs, test, chore, style, or perf).
 
 ## Step 3: Generate the message
 
-Base the message solely on Step 2. Produce:
+Read the chosen style's rules in `./REFERENCE.md` now (`--conventional` or
+`--simple`). Do not draft until loaded. Also check anti-patterns there.
 
-- `subject`: first line only.
-- `body`: optional; bullet lines joined by single `\n`.
+Produce `subject` (first line only) and optional `body` (bullets joined by
+`\n`). For `--simple`, `subject` only.
 
-For the chosen style, follow the exact format rules and examples in
-`./REFERENCE.md`, conventional rules for `--conventional`, simple rules for
-`--simple`. For `--simple`, emit `subject` only.
-
-Then run the trace check: for each line of the draft, point at the hunk that
-proves it. A line that traces to nothing gets rewritten to name the concrete
-change until it does. Completion: every subject and body line traces to a
-specific hunk.
+Emit TRACE before Step 4: each subject/body line → proving hunk. Rewrite any
+line with no trace. Completion: TRACE covers every line.
 
 ## Step 4: Commit
 
-Pass `subject` in the first `-m`, `body` in a second `-m` when present.
+Use only these shapes (second `-m` only when `body` is present):
 
-- Without `--verify`: `git commit -n ...`. Confirm `-n` was present.
-- With `--verify`: `git commit ...`. Confirm neither `-n` nor `--no-verify` was present.
+```bash
+git commit -n -m "<subject>"
+git commit -n -m "<subject>" -m $'- Bullet one\n- Bullet two'
+```
+
+With `--verify`, omit `-n`. Confirm `-m` count is 1 or 2.
 
 ## Step 5: Report
 
-Report the message, diff scope, style, hook behavior, and the exact `git commit`
-command run.
+Report message, scope, style, hook behavior, TRACE summary, and exact command.
+Confirm: `-n` xor `--verify`; `-m` count ≤ 2; no forbidden phrases.
