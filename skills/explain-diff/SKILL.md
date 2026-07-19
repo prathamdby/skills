@@ -1,75 +1,77 @@
 ---
 name: explain-diff
 description: >
-  explain-diff: explain a code change, diff, branch, or PR as a rich
-  self-contained HTML page. Flags: --target <branch>, --pr <n>, --staged,
-  --unstaged, --output <path>.
+  explain-diff when turning a git diff, branch, or pull request into a
+  self-contained HTML teaching page.
 ---
 
-# Explain Diff
-
-Produce one **teaching artifact**: a long-page HTML file with Background,
-Intuition, Code, and Quiz. Not a PR description (`make-pr`) and not inline chat
-prose—the reader opens the file in a browser.
+# Explain diff
 
 ## Flags
 
-| Flag                | Effect                                                         |
-| ------------------- | -------------------------------------------------------------- |
-| `--target <branch>` | Branch diff: `git diff <branch>...HEAD`. **Default: `main`.**  |
-| `--pr <n\|url>`     | PR diff via `gh pr diff` (and PR title/body for context).      |
-| `--staged`          | `git diff --cached` only.                                      |
-| `--unstaged`        | `git diff` only.                                               |
-| `--output <path>`   | Write path. **Default:** `/tmp/YYYY-MM-DD-explain-<slug>.html` |
+| Flag | Default | Effect |
+|---|---|---|
+| `--target <branch>` | `main` | Explain `<branch>...HEAD` |
+| `--pr <n\|url>` | off | Explain one PR diff and metadata |
+| `--staged` | off | Explain the index |
+| `--unstaged` | off | Explain worktree changes |
+| `--output <path>` | dated `/tmp` file | Set the HTML path |
 
-Diff source is mutually exclusive. Use the first detected among `--pr`, `--staged`,
-`--unstaged`; otherwise `--target`. `--pr` without a number when not on a PR
-branch: try `gh pr view` to resolve; if it returns no PR, stop and ask.
+The four source choices are mutually exclusive; conflicting or valueless flags
+are `BLOCKED`. With no source flag, use `--target main`. A bare `--pr` may
+resolve the current branch's PR; block if absent or ambiguous.
 
-Slug: short kebab from the change topic (e.g. `rate-limit-api`).
+## 1. Lock source and output
 
-## Step 1: Gather the change set
+Capture source identity, head SHA, exact diff, sorted paths, and SHA-256 diff
+hash. Empty diff is `NO_CHANGES`. Derive slug from sanitized branch name, PR
+number, or `change-<head8>`, capped at 40 characters.
 
-Collect diff text and identifiers (files, commits, PR number). If the diff is
-empty, stop: "No changes found to explain."
+Resolve output to an absolute path outside the repo. Create a missing parent.
+Block before overwriting a user-supplied existing file. A default output may
+replace only a prior artifact containing this skill's generator marker.
 
-For `--target`, also run `git log <target>..HEAD --oneline` for narrative context.
+Record:
+`source/hash | themes | evidence | output | current gate | verification | terminal`.
+Persist it beside the output as `<output>.ledger` and remove it on success.
 
-## Step 2: Legwork
+Done when source and safe output are immutable.
 
-Read surrounding code beyond the diff hunk lines—callers, types, tests, config—so
-Background can stand alone for a beginner and still narrow to what this change
-touches. Done when you can name the system before/after without guessing.
+## 2. Group and research
 
-## Step 3: Draft the four sections
+Assign every changed path to a functional theme before reading surrounding
+code. For more than 50 paths, explain themes through representative hunks and
+include a complete changed-file inventory. Use at most 12 themes, three
+surrounding files per theme, and 30 surrounding files total. Read direct
+definitions, callers, contracts, tests, and config only when a planned claim
+needs them.
 
-Follow section rubrics, prose tone, diagram families, and quiz rules in
-`./REFERENCE.md`. Order on the page: Background → Intuition → Code → Quiz.
+Done when every path has a theme and each planned claim has a hunk or read-file
+pointer.
 
-Trace rule: claims about the change trace to diff hunks; claims about the
-surrounding system trace to code read in Step 2. A sentence that traces to
-neither gets cut or rewritten. Completion: every Background, Intuition, and
-Code claim traces to a hunk or a read file.
+## 3. Build the teaching page
 
-## Step 4: Write HTML
+Load `./REFERENCE.md`. Write one HTML file in this order: Background, Intuition,
+Code, Quiz. Include a table of contents, inline CSS and JavaScript, responsive
+layout, and only HTML or inline-SVG diagrams. Code sections group by theme,
+with the complete inventory for large diffs.
 
-Emit a **single self-contained** file: embedded CSS and JavaScript, table of
-contents, section headers, one scroll (no top-level tabs). Basic responsive
-layout. Apply the pre-save checklist in `./REFERENCE.md` (especially `pre` /
-`white-space` on code blocks).
+Every factual sentence about the change traces to a hunk. Every system claim
+traces to a surrounding file. Remove unsupported intent, motive, or PR claims.
 
-Write only to `--output` or the default under `/tmp/` (or another path **outside
-the repo**). Never commit the HTML file.
+Done when the file exists with all four non-empty sections and five grounded
+quiz questions.
 
-## Step 5: Report
+## 4. Verify and report
 
-Give the absolute path and a one-line open hint (`open` on macOS, `xdg-open` on
-Linux, `start` on Windows). Do not paste the full HTML into chat.
+Apply the reference checklist. Verify no external asset URL, all anchors,
+generator marker, code whitespace, evidence pointers, and quiz answer feedback.
+When a browser tool exists, load the file and test one correct and one incorrect
+answer; otherwise disclose static-only verification.
 
-## Constraints
+After interruption, compare source hash and ledger. Restart changed themes;
+otherwise continue at the first incomplete gate.
 
-- **Never** use ASCII art diagrams; use simple HTML diagram patterns from
-  `./REFERENCE.md`.
-- **Never** commit, push, or open a PR as part of this skill.
-- Quiz: five medium-difficulty multiple-choice questions with click feedback in
-  the page—spec in `./REFERENCE.md`.
+Report absolute path, source, theme and file counts, quiz count, and verification
+level. Do not paste the HTML. Terminal values are `SUCCESS`, `NO_CHANGES`, and
+`BLOCKED`. Never commit, push, or mutate a PR.

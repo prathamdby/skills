@@ -1,62 +1,62 @@
-# Explain Diff — reference
+# Explain diff reference
 
-## Prose
+Load this file only after source, themes, evidence, and output are locked.
 
-Write with clarity and flow: engaging, classic style, smooth transitions between
-sections. Concrete examples beat abstract claims.
+## Page contract
 
-## Background
+- Start with `<!-- generated-by: explain-diff -->`.
+- One HTML5 document with embedded CSS and JavaScript. No network assets.
+- One scrolling page with a table of contents and these IDs in order:
+  `background`, `intuition`, `code`, `quiz`.
+- Use sentence-case headings and concrete prose.
+- Put evidence on factual elements with
+  `data-source="path:line"` or `data-hunk="path:hunk"`.
 
-Two layers on one page (not tabs):
+## Sections
 
-1. **Broad** — system the reader might not know; skippable callout if they are
-   already familiar.
-2. **Narrow** — only what this change sits on top of.
+### Background
 
-Explore adjacent files, not just diff lines.
+Explain the smallest system boundary needed to understand the change. Separate
+broad context from the directly affected modules. Do not claim motivation from
+commit messages or PR text unless the locked PR metadata proves it.
 
-## Intuition
+### Intuition
 
-Core idea of the change—essence before details. Toy data and small examples.
-Figures and diagrams liberally; reuse a small set of diagram families (below).
+State the core before details. Use one small example with real data shapes from
+the evidence. A diagram may use CSS boxes, grid, flex, or inline SVG. No ASCII
+art.
 
-## Code
+### Code
 
-High-level walkthrough of the diff. Group hunks by theme (e.g. API surface,
-persistence, tests), not by commit order.
+Walk themes in dependency order, not commit or file order. Each theme includes
+the before/after behavior, representative hunks, affected contracts, and
+relevant checks. For a large diff, add a complete inventory table mapping every
+changed path to one theme.
 
-## Quiz
+### Quiz
 
-Five multiple-choice questions, medium difficulty: need to understand the change
-to answer, not trick questions. In-page JS: on click, show correct/incorrect and
-short feedback per option.
+Write exactly five medium-difficulty questions. Each has four options, one
+correct answer, feedback for every option, and an evidence pointer. Use
+`fieldset`, `legend`, labels, and keyboard-accessible controls. Inline JavaScript
+must show the score and per-option feedback without reloading.
 
-## Page chrome
+## Code and diagrams
 
-- Table of contents linking to section ids.
-- Section headers: Background, Intuition, Code, Quiz.
-- Callouts for definitions, key concepts, important edge cases.
-- Lists: HTML `<ul>`/`<ol>`, not markdown in the file.
+- Use `<pre><code>` and CSS `white-space: pre-wrap`.
+- Escape source text before inserting it into HTML.
+- Use callouts only for definitions, contracts, and important edge cases.
+- No top-level tabs, markdown syntax, decorative animation, or generated filler.
 
-## Diagram families (HTML only)
+## Verification checklist
 
-Pick a few and reuse:
-
-- **UI sketch** — simplified boxes/labels for what the user sees.
-- **Flow** — components and arrows; include **example payloads** on edges or in
-  nodes.
-
-No ASCII diagrams. Simple borders, flex/grid, or inline SVG—keep CSS in the same
-file.
-
-## Code blocks
-
-Always use `<pre>` (optionally `<code>` inside). If using a styled div instead,
-its CSS **must** include `white-space: pre-wrap` or `pre`, or newlines collapse.
-
-## Pre-save checklist
-
-1. Every code block: `white-space: pre` or `pre-wrap` in CSS.
-2. TOC anchors match section ids.
-3. Quiz JS runs without external CDN if possible (inline script).
-4. Filename starts with `YYYY-MM-DD-` when using the default path pattern.
+1. Generator marker appears once.
+2. All four sections and TOC anchors appear once and in order.
+3. Every factual paragraph, bullet, table row, question, and answer has evidence.
+4. Every changed path appears in a theme or inventory.
+5. No `src`, `href`, CSS import, or script points to a network URL.
+6. HTML source is escaped and code whitespace is preserved.
+7. Five questions each have four options, one keyed answer, and four feedback
+   strings.
+8. Browser check passes when available; otherwise JavaScript parses and static
+   structure passes.
+9. Default filename starts with `YYYY-MM-DD-explain-`.
