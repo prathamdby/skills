@@ -27,7 +27,6 @@ Record:
 Done when local HEAD equals the PR head SHA and the ledger identifies the PR.
 
 ## 2. Hunt before editing
-
 Collect every page from all applicable surfaces:
 
 1. unresolved review threads, including outdated ones
@@ -44,8 +43,8 @@ before all six passes finish.
 
 Normalize one atomic finding per claim. Keep source, URL or ID, reply target,
 author, path/line, rule ID, body, and existing replies. Drop acknowledgments
-and status noise. Deduplicate by meaning, path, and rule; preserve every native
-reply target.
+and status noise. Deduplicate only identical stable keys from `./REFERENCE.md`;
+preserve every native reply target.
 
 Done when pagination is exhausted and every normalized finding is in the
 ledger.
@@ -69,10 +68,10 @@ Do not change code for rejected or clarification findings.
 Done when every fix has a verified diff or no code fix was needed.
 
 ## 5. Commit and push
-When a diff exists, read `../commit/SKILL.md` and run it once. Skip commit on a
-clean tree. Unless `--no-push`, push normally and verify remote SHA. Never force
-push. With `--no-push`, fixed findings become `AWAITING_PUSH` and receive no
-"fixed" reply. If remote head moved or push is rejected, return to Step 1.
+When a diff exists, read `../commit/SKILL.md` and run it once with `--unstaged`.
+Skip commit on a clean tree. Unless `--no-push`, push and verify remote SHA.
+Never force push. With `--no-push`, fixed findings become `AWAITING_PUSH` and
+receive no "fixed" reply. Remote movement or push rejection is `BLOCKED`.
 
 Done when there is no diff, or one verified commit is local and pushed as
 requested.
@@ -85,11 +84,12 @@ changed, require two consecutive hunts with the same set.
 Done when no finding is new, untriaged, or waiting on a local fix.
 
 ## 7. Reply and report
-Unless `--no-reply`, draft each native-surface reply using `./REFERENCE.md`,
-then apply `./references/unslop-reply-drafts.md`. Preserve required bot command
-prefixes exactly. Consolidate findings sharing one conversation target. Re-hunt
-once after replies; new findings return to Step 3. Retry a failed reply once,
-then record its target and return `BLOCKED`. Do not resolve threads unless asked.
+Unless `--no-reply`, skip targets whose existing replies already satisfy the
+verdict, draft remaining native-surface replies using `./REFERENCE.md`, then
+apply `./references/unslop-reply-drafts.md`. Preserve bot command prefixes.
+Consolidate shared targets. Re-hunt after replies; new findings return to Step 3.
+Retry a failed reply once, then record its target and return `BLOCKED`. Do not
+resolve threads unless asked.
 
 Report `source | finding | verdict | action | evidence`, PR URL, commit and push
 state, hunt counts, and unreplied items. Terminal values are `SUCCESS`,

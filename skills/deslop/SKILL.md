@@ -16,10 +16,10 @@ description: >
 | `--base <branch>` | no | `git diff <branch>...HEAD` |
 
 The scope flags are mutually exclusive. More than one, a missing base branch,
-or prose that conflicts with a flag is `BLOCKED`; ask which scope to use. Never
-switch away from the default because another diff happens to be non-empty.
-Prose conflicts only when it names a different scope than an explicit flag.
-Every scope-resolution failure ends the run as `BLOCKED`.
+or prose that conflicts with a flag is `BLOCKED`; ask which scope to use. Prose
+that names staged, unstaged, or a base branch selects that scope exactly as its
+flag; naming several is `BLOCKED`. Otherwise default to staged and never switch
+because another diff is non-empty.
 
 ## 1. Lock scope
 
@@ -69,10 +69,11 @@ the Step 1 snapshot, and for staged only clean target-file updates entered it.
 ## 4. Verify and report
 
 Re-run the selected diff and status. Confirm each kept instance is gone, no
-out-of-scope hunk moved layers, and the post-edit diff has no new slop. Run the
-narrowest existing test covering the edited file, symbol, or package for
-control-flow, error, type, or API edits. Text-only cleanup needs only the diff
-audit. If no covering test exists or it cannot run, report `BLOCKED`.
+out-of-scope hunk moved layers, and the post-edit diff has no new slop. Any edit
+to executable code, types, control flow, error handling, validation, or an API
+runs the narrowest covering test for its file, symbol, or package. Only
+comments, docs, and whitespace may use the diff audit alone. Missing or failed
+required tests are `BLOCKED`.
 
 Report scope, files, category counts, preserved staging state, diff audit, and
 tests. Terminal values are `SUCCESS`, `CLEAN`, `NO_CHANGES`, and `BLOCKED`.

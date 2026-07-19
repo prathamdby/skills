@@ -71,7 +71,9 @@ chunk failure: first re-brief its owner with evidence, then replace its
 delegate, then mark it blocked on the third failure. Record each failed check
 as that chunk's next strike. For an integration failure, open a coordination
 brief naming each implicated chunk and the failing evidence; count each
-chunk's strikes separately. Never fix it yourself.
+chunk's strikes separately. Dispatch it to those owners and apply the same
+re-brief, replace, then block ladder using each running strike total. Never fix
+it yourself.
 
 Done when each criterion is `VERIFIED`, `BLOCKED` with evidence, or waived by
 the user by name and recorded in the ledger, and integration has passed or is

@@ -32,15 +32,14 @@ Without `--resume`, use Create.
    twelve artifacts. Prefer the active plan, branch, PR, commits, dirty paths,
    blockers, and durable decisions. Mark superseded material.
    Done when each retained fact helps the next agent act.
-3. Read the create format and redaction rules in `./REFERENCE.md`, then write a
-   file no larger than 12 KB. Point to artifacts; never paste full diffs, plans,
-   logs, or terminal output. A positional focus goes first and controls task
-   order.
-   Done when all required sections exist and bounds hold.
-4. Scan the finished text for credentials, tokens, passwords, private keys,
-   authenticated URLs, email addresses, and copied environment values. Replace
-   values with the reference's redaction markers.
-   Done when a second scan finds no sensitive value.
+3. Read `./REFERENCE.md`. Draft in memory, point to absolute artifact paths,
+   and never paste full diffs, plans, logs, or terminal output. Put a positional
+   focus first. Include any active mode or workflow ledger.
+4. Redact credentials, tokens, passwords, private keys, authenticated URLs,
+   email addresses, and environment values. Scan twice, enforce the 12 KB bound,
+   write to a sibling temporary file, then rename atomically. Scan the final
+   file once more.
+   Done when required sections, bounds, and all three scans pass.
 5. Report the path, what was captured, and
    `/handoff --resume <absolute-path>`.
    Success is the existing file plus the reported resume command.
@@ -59,8 +58,9 @@ Without `--resume`, use Create.
    Done when stale facts cannot drive work.
 3. Apply a positional focus over the saved focus. Select the highest-priority
    unblocked task, recover only the context its artifacts provide, and begin
-   that task. If none remains, report `BLOCKED` with the validation evidence.
-   Do not stop after summarizing the file.
+   that task. For a saved `prath-mode` chain, verify every remaining leaf before
+   its first step; for `orchestrate`, restore its ledger and roster. If no task
+   remains, report `BLOCKED` with validation evidence. Do not stop after summary.
    Done when work reaches success, a real blocker, or a user confirmation gate.
 4. Report reconciled drift and the work outcome. Do not create another handoff
    unless the user explicitly asks.

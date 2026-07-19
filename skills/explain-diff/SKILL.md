@@ -35,9 +35,10 @@ user-supplied existing file. A default output may replace only a prior artifact
 containing this skill's generator marker.
 
 Record:
-`source/hash | themes | evidence | output | gate | verification | terminal`.
+`source/hash | theme(name/paths/path-hash/gate) | evidence | output | gate | verification | terminal`.
 Gate is `lock`, `research`, `build`, or `verify`. Persist beside the output as
-`<output>.ledger`; an active conflicting ledger is `BLOCKED`. Remove on success.
+`<output>.ledger` after every gate and completed theme. Resume an active ledger
+only when output and source hash match; otherwise `BLOCKED`. Remove on success.
 
 Done when source and safe output are immutable.
 
@@ -47,7 +48,8 @@ Assign every changed path to a functional theme before reading surrounding
 code. For more than 50 paths, explain themes through representative hunks and
 include every sorted path without truncation. Represent a rename as
 `old → new`; list generated or binary paths under those themes and make no
-behavioral claim without text hunks. Use at most 12 themes, three
+behavioral claim without text hunks. Give path-only inventory rows
+`data-hunk="<path>:inventory"`. Use at most 12 themes, three
 surrounding files per theme, and 30 surrounding files total. Read direct
 definitions, callers, contracts, tests, and config only when a planned claim
 needs them.
@@ -75,6 +77,8 @@ generator marker, code whitespace, evidence pointers, and quiz answer feedback.
 When a browser tool exists, load the file and test one correct and one incorrect
 answer for every question; otherwise parse JavaScript and HTML and disclose
 `verification: static-only`. A browser run reports `verification: browser`.
+Recompute the live source fingerprint before `SUCCESS`; drift is `BLOCKED` so
+the page never mixes snapshots.
 
 After interruption, compare source hash and ledger. Restart changed themes;
 otherwise continue at the first incomplete gate.

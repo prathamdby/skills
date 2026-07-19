@@ -41,9 +41,9 @@ who has only this diff and the explicit ticket ID.
 
 - Default title: imperative sentence case, no type prefix, no trailing period,
   summary at most 60 characters.
-- Conventional title: load only that section of
-  `../commit/REFERENCE.md`, not its shared rejection section; keep its
-  50-character subject limit.
+- Conventional title: load its section and shared rejection check from
+  `../commit/REFERENCE.md`; keep the 50-character subject limit. Only an
+  explicit ticket prefix is exempt from the ticket-ID rejection.
 - Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
   ticket claims in the body and does not count toward the subject limit.
 - Body: `## Summary` with one to five thematic bullets. Group related hunks,

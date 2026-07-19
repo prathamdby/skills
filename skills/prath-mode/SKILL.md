@@ -45,14 +45,15 @@ such as "commit and open a PR", select the matching chain.
 
 Implementation is normal agent work, not a leaf. `fix-pr` already owns its
 fix, commit, push, re-hunt, and reply loop; never append those actions.
-Include optional `deslop` only when the user requests cleanup. Implementation
-is done when the approved plan's diff and relevant tests are recorded.
+`deslop` is required in Ship planned work and optional in custom or Save chains.
+Resolve mixed staged/unstaged paths before it. Implementation is done when the
+approved plan's diff and relevant tests are recorded.
 
 ## 1. Match
 
 Record a run ledger:
 
-`route | current owner | completed owners | terminal condition`
+`route | plan path/hash/verdict | current owner | completed owners | diff/tests | terminal`
 
 If no route matches, ask one question about the intended outcome. Done when one
 leaf or chain and its terminal condition are recorded.
@@ -70,8 +71,12 @@ Done when all required paths exist or the missing-skill report is sent.
 
 Read the current leaf in full and run it to one of its terminal states. Advance
 only after success or no-op; pause the chain on blocked or waiting. After an
-interruption, verify the last owner's artifacts before continuing. For
-implementation, verify the plan diff and test evidence in the ledger.
+interruption, verify the last owner's artifacts before continuing.
+
+In Ship planned work, continue past `peer-review` only on `Ship it.` An
+`UPDATED` plan is reviewed again. Lock its content hash before implementation;
+if it changes, return to `peer-review`. Before `make-pr`, require a clean tree.
+For implementation, verify the locked plan diff and test evidence in the ledger.
 
 Done when the recorded chain terminal condition is observed or the current
 leaf has reported why progress paused.

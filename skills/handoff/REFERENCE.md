@@ -10,6 +10,7 @@ opening referenced artifacts.
 - Keep no more than eight open tasks and twelve artifacts.
 - Omit empty optional sections.
 - Point to source material instead of copying it.
+- Store the repo root and every file artifact as an absolute path.
 
 ```markdown
 # Handoff: <short title>
@@ -18,7 +19,7 @@ opening referenced artifacts.
 <Only when the user supplied a focus. One concrete outcome.>
 
 ## Context
-- <repo root, branch, task, and current scope>
+- <absolute repo root, branch, task, current scope, and active mode or chain>
 
 ## Progress
 - <verified result with commit, PR, or file pointer>
@@ -49,6 +50,8 @@ opening referenced artifacts.
 - Progress contains verified outcomes, not activity.
 - Decisions exclude obvious, reversible, or speculative choices.
 - Open tasks exclude completed and stale todos. Name dependencies.
+- If `prath-mode` or `orchestrate` is active, preserve its complete run ledger,
+  remaining owners or chunks, and terminal condition.
 - Artifacts include the active plan, PR or issue, branch, useful commits,
   changed files, and required config. Do not list every file.
 - Suggested skills must exist under the installed `skills/` root containing
