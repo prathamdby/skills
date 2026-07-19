@@ -33,12 +33,12 @@ Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`.
 ## 1. Lock the commit snapshot
 
 Read status. Staged scope uses `git diff --cached`. Unstaged scope requires an
-empty index, uses `git diff`, stages only its tracked paths, then re-reads
-`git diff --cached`; untracked files remain excluded and must be reported.
-If the selected diff is empty, report `NO_CHANGES` and mention other dirty
-layers without switching scope.
+empty index or terminates `BLOCKED`, and uses `git diff`; untracked files remain
+excluded. Hash the selected diff with `git hash-object --stdin`. If empty,
+report `NO_CHANGES`, naming unstaged tracked and untracked layers without
+switching scope.
 
-Record `scope | staged diff hash | paths | message | command | commit | terminal`.
+Record `scope | selected diff hash | paths | message | command | commit | terminal`.
 Done when the exact bytes intended for the commit are fixed.
 
 ## 2. Draft and trace
@@ -55,16 +55,26 @@ Done when the message passes the style rules and every line has a trace.
 
 ## 3. Commit
 
-Use `git commit -n -m "<subject>"` or one additional body `-m`; omit `-n` only
-with `--verify`. Confirm the staged diff hash still matches the ledger
-immediately before running it. On mismatch, return to Step 1.
+Re-hash the selected scope immediately before mutation. On mismatch, return to
+Step 1. For unstaged scope, stage only the locked tracked paths now and verify
+the cached diff matches the locked snapshot.
 
-Done when git creates one commit, or returns a captured hook or git error.
+Use `git commit -n -m "<subject>"`; conventional style may add one body `-m`.
+Omit `-n` only with `--verify`. Pass subject and body as separate argv values
+through the tool API; when using a shell, assign and quote variables so `"`,
+backticks, `$`, backslashes, and newlines remain literal.
+
+Done when git creates one commit. Hook, git, or interruption errors are
+`BLOCKED`; report stderr and any index mutation without changing hook policy.
 
 ## 4. Verify and report
 
-Compare the new commit diff and paths with the locked snapshot. Verify the
-stored message, hook policy, one-or-two `-m` shape, and preservation of
-out-of-scope work. Report commit SHA, subject, scope, hooks, and trace summary.
+Compare the new commit diff and paths with the locked snapshot and
+`git log -1 --format=%B` with the ledger message. Verify hook policy,
+one-or-two `-m` shape, and preservation of out-of-scope work. A mismatch is
+`BLOCKED`; report the created SHA and exact difference.
+
+Report commit SHA, subject, scope, hooks, trace summary, and remaining unstaged
+tracked and untracked work.
 
 Terminal values are `SUCCESS`, `NO_CHANGES`, and `BLOCKED`. Never push.
