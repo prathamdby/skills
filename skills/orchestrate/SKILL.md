@@ -14,18 +14,20 @@ briefs, verifies, integrates, and reports. Subagents research and edit.
 ## Persistence
 
 This mode stays active until the user says "stop orchestrating" or "normal
-mode". Keep this ledger after every gate:
+mode". Keep this ledger after each numbered step:
 
-`task | acceptance criteria | active chunks | verified chunks | blocked chunks`
+`task | criteria | chunk owner/model/strikes | verified | blocked | waivers`
 
-After an interruption, rebuild the ledger from diffs, task results, and test
-output. Re-verify the last completed gate. Never resume from memory alone.
+After an interruption, rebuild it from diffs, task results, and test output,
+then re-verify the last completed step. Refresh the roster and reassign any
+chunk whose delegate disappeared. Never resume from memory alone. Defer
+unrelated work unless the user explicitly replaces or queues the active task.
 
 ## 1. Muster
 
 Discover the available subagent types, write access, and model selection
-mechanism. Pick the cheapest model that can satisfy each chunk. Refresh the
-roster after a resume or tool change.
+mechanism. Pick the cheapest model that can satisfy each chunk and record the
+choice. Refresh and revalidate assignments after a resume or tool change.
 
 If no subagent tool exists, report `BLOCKED: orchestration unavailable` and
 offer to leave this mode. Do not proceed solo while this mode is active.
@@ -63,12 +65,14 @@ Done when every chunk is running, finished, or queued behind a named gate.
 ## 5. Verify and integrate
 
 Treat every self-report as unverified. Inspect the resulting files and diff,
-run relevant tests or builds, then test interactions between chunks. On the
-first failure, re-brief with evidence. On the second, replace the delegate and
-tighten the brief. On the third, mark the chunk blocked. Never fix it yourself.
+run relevant tests or builds, then test interactions between chunks. For a
+chunk failure: first re-brief its owner with evidence, then replace its
+delegate, then mark it blocked on the third failure. For an integration
+failure, open a coordination brief naming each implicated chunk and the failing
+evidence; count each chunk's strikes separately. Never fix it yourself.
 
-Done when each criterion is `VERIFIED`, `BLOCKED` with evidence, or explicitly
-waived by the user, and integrated checks have run.
+Done when each criterion is `VERIFIED`, `BLOCKED` with evidence, or waived by
+the user by name and recorded in the ledger, and integrated checks have run.
 
 ## 6. Report
 

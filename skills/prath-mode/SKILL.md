@@ -29,21 +29,24 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 
 For one action, route to its leaf. Use `orchestrate` for several in-harness
 delegates and `assign` for one external CLI process. Use a chain only when the
-request asks for its complete terminal outcome.
+request asks for its complete terminal outcome. Several explicit outcomes,
+such as "commit and open a PR", select the matching chain.
 
 ## Workflow chains
 
 | Requested outcome | Ordered owners | Complete when |
 |---|---|---|
-| Ship planned work | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | PR URL verified |
-| Save current work | `deslop` when requested → `commit` | new commit verified |
-| Finish PR feedback | `fix-pr` | its stable terminal state |
+| Ship planned work | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | approved plan diff tested and PR URL verified |
+| Save current work | optional `deslop` → `commit` | new commit verified |
+| Finish PR feedback | `fix-pr` | `fix-pr` report complete |
 | Understand current repo | `recon` | memory and report verified |
 | Research external code | `box` | cited answer returned |
 | End or resume work | `handoff` | create or resume terminal state |
 
 Implementation is normal agent work, not a leaf. `fix-pr` already owns its
 fix, commit, push, re-hunt, and reply loop; never append those actions.
+Include optional `deslop` only when the user requests cleanup. Implementation
+is done when the approved plan's diff and relevant tests are recorded.
 
 ## 1. Match
 
@@ -67,7 +70,8 @@ Done when all required paths exist or the missing-skill report is sent.
 
 Read the current leaf in full and run it to one of its terminal states. Advance
 only after success or no-op; pause the chain on blocked or waiting. After an
-interruption, verify the last owner's artifacts before continuing.
+interruption, verify the last owner's artifacts before continuing. For
+implementation, verify the plan diff and test evidence in the ledger.
 
 Done when the recorded chain terminal condition is observed or the current
 leaf has reported why progress paused.
