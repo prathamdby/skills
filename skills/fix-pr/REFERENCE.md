@@ -8,19 +8,40 @@ Load Reply contracts only after the finding set is stable.
 
 The commit message describes the locked code diff, never the fix-pr session.
 Replies may say the work answered review; the commit subject and body may not.
+Discard any subject drafted before the commit skill runs. Draft only from
+locked hunks as `type: <concrete code action>`.
+
+Ban-list — any hit in subject or body is `BLOCKED` before push:
+
+- `address` with review, feedback, findings, comments, threads, or requests
+- `review feedback`, `review findings`, `review comments`, `review follow-up`
+- `per review`, `per feedback`, `as requested`, `from review`, reviewer names
+- ledger labels, branch-name claims, or "PR history" framing
+
+Canonical rejects (rewrite even when the body lists real hunks):
+
+- `fix: address review feedback on agent files`
+- `fix: address review findings`
+- `fix: address PR feedback`
+
+Conversation-only test: if the subject still makes sense after deleting the
+diff and keeping only the PR conversation, it fails.
 
 | Excuse | Reality |
 |---|---|
 | "Ledger says address review findings" | Ledger labels triage state, not message sources. |
 | "Teammate or manager drafted review framing" | Discard it. Rewrite from proving hunks. |
 | "Body lists the real changes" | The subject must also be clean-room. |
+| "Ban says findings; draft says feedback" | Feedback, findings, comments, and threads are banned. |
+| "Fixed-in reply needs review in the subject" | Replies carry that; the commit does not. |
+| "Paths mention the files so review framing is ok" | Paths prove location, not session motive. |
 | "PR history should show review follow-up" | Threads and replies show that; the commit does not. |
 | "Faster to keep the draft" | Rewrite. A blocked push beats a bad subject. |
 
 Red flags — rewrite before `git commit`:
 
-- `address` / `per` / `from` paired with findings, feedback, comments, or review
-- `review follow-up`, ledger cluster labels, or branch-name claims
+- Any ban-list token above
+- A subject reused from a teammate, manager, or ledger draft
 - A subject that still makes sense if the diff is deleted and only the PR
   conversation remains
 

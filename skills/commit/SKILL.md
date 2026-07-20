@@ -23,7 +23,8 @@ Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`.
 ## Iron laws
 
 1. Clean-room: every message line is proved by a selected diff hunk. Session,
-   ticket, plan, branch, and reviewer facts stay out.
+   ticket, plan, branch, and reviewer facts stay out. Never start from a
+   review-follow-up draft; draft only from the locked diff.
 2. Hooks: without `--verify`, use `-n`; with it, never bypass hooks. A failed
    hook does not change the selected policy.
 3. Command: use one subject `-m` and at most one body `-m`. Never use HEREDOC,

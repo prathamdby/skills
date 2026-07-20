@@ -38,12 +38,11 @@ Collect every page from all applicable surfaces:
 Every hunt reconciles review-comment chains unless thread discovery proves every
 root is present. When using GitHub CLI, load hunt recipes in `./REFERENCE.md`.
 Record counts and final page markers. Do not triage or edit before all six
-passes finish.
-Normalize one atomic finding per claim. Keep source, URL or ID, reply target,
-author, path/line, rule ID, body, and existing replies. Drop acknowledgments
-and status noise. Deduplicate only identical stable keys from `./REFERENCE.md`;
-preserve every native reply target.
-Done when pagination is exhausted and every normalized finding is in the ledger.
+passes finish. Normalize one atomic finding per claim. Keep source, URL or ID,
+reply target, author, path/line, rule ID, body, and existing replies. Drop
+acknowledgments and status noise. Deduplicate only identical stable keys from
+`./REFERENCE.md`; preserve every native reply target. Done when pagination is
+exhausted and every normalized finding is in the ledger.
 
 ## 3. Triage every finding
 
@@ -62,39 +61,40 @@ record that evidence. Do not change code for rejected or clarification findings.
 Done when every fix has a verified diff or no code fix was needed.
 
 ## 5. Commit and push
-
-When a diff exists, read `../commit/SKILL.md` and run it once with `--unstaged`.
-Enforce that skill's clean-room law on the locked diff; reject every Commit
-clean-room excuse in `./REFERENCE.md`. Subject names the dominant code change.
-Ban `fix: address ... review findings` and any review/feedback/thread framing
-even if the body lists real hunks. Teammate drafts, manager framing, branch
-names, ledger labels, and "PR history" never authorize it. Skip commit on a
-clean tree. Unless `--no-push`, push and verify remote SHA. Never force push.
-With `--no-push`, fixed findings become `AWAITING_PUSH` and receive no "fixed"
-reply. Remote movement or push rejection is `BLOCKED`. Re-read
-`git log -1 --format=%B`; review-framed text is `BLOCKED` (do not push). Done
-when there is no diff, or one verified clean-room commit is local and pushed.
+When a diff exists, discard every pre-drafted subject (ledger, teammate,
+manager, branch, "review follow-up"). Read `../commit/SKILL.md` and run it
+once with `--unstaged` so that skill alone drafts from the locked diff as
+`type: <concrete code action proved by dominant hunks>`. Before `git commit`,
+load Commit clean-room in `./REFERENCE.md`; require no ban-list token, a
+passing conversation-only test, and rejection of every excuse there
+(including "feedback ≠ findings", "body lists hunks", "Fixed-in reply needs
+review framing"). Canonical rejects: `fix: address review feedback on agent
+files` and `fix: address ... review findings`. Skip commit on a clean tree.
+Unless `--no-push`, push and verify remote SHA; never force push. With
+`--no-push`, fixed findings become `AWAITING_PUSH` with no "fixed" reply.
+Remote movement or push rejection is `BLOCKED`. Re-read
+`git log -1 --format=%B`; ban-list or conversation-only text is `BLOCKED`
+(do not push). Done when there is no diff, or one verified clean-room commit
+is local and pushed.
 
 ## 6. Re-hunt until stable
-
 Repeat all six hunt passes after the last code or remote mutation. Normalize
-and triage arrivals, then repeat Steps 4–6. After any hunt whose actionable set
-changed, require two consecutive hunts with the same set. Done when no finding
-is new, untriaged, or waiting on a local fix and the required consecutive
-stable hunts have completed.
+and triage arrivals, then repeat Steps 4–6. After any hunt whose actionable
+set changed, require two consecutive hunts with the same set. Done when no
+finding is new, untriaged, or waiting on a local fix and the required
+consecutive stable hunts have completed.
 
 ## 7. Reply and report
-
 Unless `--no-reply`, skip targets whose existing replies already satisfy the
 verdict, draft remaining replies using `./REFERENCE.md`, then apply
 `./references/unslop-reply-drafts.md`. Preserve bot command prefixes.
 Consolidate shared targets. Re-hunt after replies; new findings return to
 Step 3. Before retrying a failed reply, refetch its target; if the intended
 reply is present, mark it posted, otherwise retry once. A second failure is
-`BLOCKED`. Do not resolve threads unless asked.
-Report `source | finding | verdict | action | evidence`, PR URL, commit and push
-state, hunt counts, and unreplied items. Terminal values are `SUCCESS`,
-`NO_CODE_CHANGE`, `AWAITING_PUSH`, and `BLOCKED`. Use `NO_CODE_CHANGE` when no
-commit was created, and never `SUCCESS` with an unreplied required target.
-After interruption, restart at Step 1 and re-hunt before trusting the ledger.
-Does not fix CI, merge conflicts, or stacked-branch order; never invokes `make-pr`.
+`BLOCKED`. Do not resolve threads unless asked. Report
+`source | finding | verdict | action | evidence`, PR URL, commit and push
+state, hunt counts, and unreplied items. Terminals: `SUCCESS`,
+`NO_CODE_CHANGE`, `AWAITING_PUSH`, `BLOCKED`. Use `NO_CODE_CHANGE` when no
+commit was created; never `SUCCESS` with an unreplied required target. After
+interruption, restart at Step 1 and re-hunt before trusting the ledger. Does
+not fix CI, merge conflicts, or stacked-branch order; never invokes `make-pr`.
