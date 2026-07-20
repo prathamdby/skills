@@ -42,7 +42,8 @@ Red flags — rewrite before `git commit`:
 
 - Any ban-list token above
 - A subject reused from a teammate, manager, or ledger draft
-- A subject that passes the conversation-only test
+- A subject that still makes sense if the diff is deleted and only the PR
+  conversation remains
 
 ## GitHub hunt recipes
 

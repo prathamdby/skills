@@ -66,7 +66,7 @@ manager, branch, "review follow-up"). Read `../commit/SKILL.md` and run it
 once with `--unstaged` so that skill alone drafts from the locked diff as
 `type: <concrete code action proved by dominant hunks>`. Before `git commit`,
 load Commit clean-room in `./REFERENCE.md`; require no ban-list token, a
-failing conversation-only test, and rejection of every excuse there
+passing conversation-only test, and rejection of every excuse there
 (including "feedback ≠ findings", "body lists hunks", "Fixed-in reply needs
 review framing"). Canonical rejects: `fix: address review feedback on agent
 files` and `fix: address ... review findings`. Skip commit on a clean tree.
