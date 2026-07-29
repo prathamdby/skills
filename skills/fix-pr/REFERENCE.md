@@ -9,7 +9,10 @@ Load Reply contracts only after the finding set is stable.
 The commit message describes the locked code diff, never the fix-pr session.
 Replies may say the work answered review; the commit subject and body may not.
 Discard any subject drafted before the commit skill runs. Draft only from
-locked hunks as `type: <concrete code action>`.
+locked hunks as `type: <concrete code action>`. Trailers default deny: never
+draft or pass `Co-authored-by` / `Signed-off-by` unless the user explicitly
+requests trailers for this run. After commit, scan `%B` and apply Trailer
+hygiene in `../commit/REFERENCE.md` when banned keys appear.
 
 Ban-list — any hit in subject or body is `BLOCKED` before push:
 
@@ -17,6 +20,7 @@ Ban-list — any hit in subject or body is `BLOCKED` before push:
 - `review feedback`, `review findings`, `review comments`, `review follow-up`
 - `per review`, `per feedback`, `as requested`, `from review`, reviewer names
 - ledger labels, branch-name claims, or "PR history" framing
+- identity trailer lines `Co-authored-by:` or `Signed-off-by:` unless allowed
 
 Canonical rejects (rewrite even when the body lists real hunks):
 
@@ -37,13 +41,15 @@ diff and keeping only the PR conversation, it fails.
 | "Paths mention the files so review framing is ok" | Paths prove location, not session motive. |
 | "PR history should show review follow-up" | Threads and replies show that; the commit does not. |
 | "Faster to keep the draft" | Rewrite. A blocked push beats a bad subject. |
+| "Hooks or the agent always add Co-authored-by" | Strip via Trailer hygiene before push. |
 
-Red flags — rewrite before `git commit`:
+Red flags — rewrite before `git commit` or block before push:
 
 - Any ban-list token above
 - A subject reused from a teammate, manager, or ledger draft
 - A subject that still makes sense if the diff is deleted and only the PR
   conversation remains
+- Banned identity trailers in `%B` when trailers are denied
 
 ## GitHub hunt recipes
 
@@ -62,8 +68,15 @@ Set `NO_COLOR=1`. Substitute owner, repo, number, and head SHA from the ledger.
    `gh api "repos/<owner>/<repo>/pulls/<number>/reviews" --paginate`.
 5. Fetch non-empty conversation comments:
    `gh api "repos/<owner>/<repo>/issues/<number>/comments" --paginate`.
-6. Fetch check runs for the head SHA, then paginate annotations for each run.
-   Add only actionable annotations tied to the PR head.
+6. PR CI for the head SHA:
+   - List check runs (and status contexts when required for merge) for the
+     head SHA. Page until complete.
+   - Normalize each terminal non-success required or blocking check as a
+     finding (name, conclusion, URL, head SHA). Skip pure pending or
+     in-progress runs; re-hunt after they finish if they remain blocking.
+   - Paginate annotations for each run. Add only actionable annotations tied
+     to the PR head. Prefer one finding per distinct failure claim; keep
+     both the check-run finding and its annotations when they differ.
 
 For every page loop, store item count, end cursor or page number, and completion
 boolean. A failed page makes the hunt `BLOCKED`; never treat partial data as
@@ -85,8 +98,8 @@ complete. Clean up temporary files on every exit.
 
 Reply to inline findings through their root review-comment reply endpoint.
 Review-body and conversation findings receive one PR conversation comment per
-shared parent. Check annotations use their linked conversation surface when
-one exists; otherwise report them without inventing a reply target.
+shared parent. Check-run and annotation findings use their linked conversation
+surface when one exists; otherwise report them without inventing a reply target.
 
 Reply forms:
 

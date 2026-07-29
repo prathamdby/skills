@@ -37,7 +37,7 @@ codex plugin add skills@pratham-skills
 - `/deslop` removes needless complexity from a selected diff.
 - `/commit` creates a clean-room commit from staged or tracked unstaged work.
 - `/make-pr` pushes committed work and creates or updates its pull request.
-- `/fix-pr` hunts, triages, fixes, and replies to pull-request feedback.
+- `/fix-pr` hunts, triages, fixes, and replies to pull-request feedback and CI.
 - `/explain-diff` writes a self-contained HTML walkthrough of a change.
 - `/recon` maps the current repository and refreshes only changed areas later.
 - `/box` clones and searches an external git repository locally.
@@ -55,7 +55,9 @@ codex plugin add skills@pratham-skills
 | Commit messages leak ticket or review context and do not match the committed hunks. | [`commit`](./skills/commit/SKILL.md) | Locks the snapshot, traces every message line to a hunk, applies the selected hook policy, and verifies the commit. |
 | PR creation misses local commits, duplicates an existing PR, or describes work absent from the diff. | [`make-pr`](./skills/make-pr/SKILL.md) | Blocks on a dirty or diverged branch, publishes committed work, reuses the open PR, and verifies its fields. |
 | Review work starts from the first visible comment and misses later pages, nested replies, or invalid suggestions. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Exhausts every feedback surface before editing, requires evidence for each verdict, and re-hunts until stable. |
+| Required CI or check runs on the PR head are left red while only human comments are fixed. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Hunts terminal non-success required or blocking checks and annotations with the other surfaces, then triages and fixes them. |
 | A fix-pr commit subject narrates review follow-up instead of the locked hunks. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Discards pre-drafted subjects, requires a hunk-proved subject recipe, and blocks ban-list or conversation-only messages before push. |
+| A fix-pr commit picks up identity trailers from hooks or agent defaults. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Denies `Co-authored-by` / `Signed-off-by` by default and runs commit Trailer hygiene before push. |
 | A large diff gets a shallow chat summary with no surrounding system context. | [`explain-diff`](./skills/explain-diff/SKILL.md) | Groups the change by theme and writes an evidence-linked HTML page with a working quiz. |
 | Every session re-reads the same repository from scratch. | [`recon`](./skills/recon/SKILL.md) | Stores a bounded evidence map and patches it from committed git drift. |
 | The agent guesses what an external repository contains. | [`box`](./skills/box/SKILL.md) | Clones into a skill-owned sandbox, searches local source, and returns cited findings. |
@@ -72,7 +74,7 @@ codex plugin add skills@pratham-skills
 | [`deslop`](./skills/deslop/SKILL.md) | Remove code slop from one git diff without changing behavior. | `--staged` default, `--unstaged`, `--base <branch>` |
 | [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify`, `--allow-trailers` |
 | [`make-pr`](./skills/make-pr/SKILL.md) | Publish a branch and create or update its PR. | `--target <branch>` default `main`, `--ticket <id>`, `--conventional` |
-| [`fix-pr`](./skills/fix-pr/SKILL.md) | Resolve all open PR feedback and reply with evidence. | `--pr <n\|url>`, `--no-push`, `--no-reply` |
+| [`fix-pr`](./skills/fix-pr/SKILL.md) | Resolve open PR feedback and CI, then reply with evidence. | `--pr <n\|url>`, `--no-push`, `--no-reply` |
 | [`explain-diff`](./skills/explain-diff/SKILL.md) | Write an HTML teaching page for a diff, branch, or PR. | `--target <branch>` default `main`, `--pr <n\|url>`, `--staged`, `--unstaged`, `--output <path>` |
 | [`recon`](./skills/recon/SKILL.md) | Build or refresh a persistent map of the current repo. | `--refresh`, positional focus |
 | [`box`](./skills/box/SKILL.md) | Clone, update, list, search, or persist an external repo. | `--persist`, `--update`, `--list`, `--no-subagents` |
