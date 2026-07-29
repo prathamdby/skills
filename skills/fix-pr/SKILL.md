@@ -1,12 +1,11 @@
 ---
 name: fix-pr
 description: >
-  fix-pr when exhaustively handling open pull-request feedback, including
-  nested discussions, invalid suggestions, new arrivals, fixes, and replies.
+  fix-pr when exhaustively handling open pull-request feedback, including nested
+  discussions, CI failures, invalid suggestions, new arrivals, fixes, and replies.
 ---
 
 # Fix PR feedback
-
 ## Flags
 
 | Flag | Default | Effect |
@@ -34,7 +33,7 @@ Collect every page from all applicable surfaces:
 3. review-comment API chains reconciled to thread roots
 4. actionable top-level review bodies
 5. actionable PR conversation comments
-6. actionable check annotations attached to the PR head
+6. PR CI on the head SHA: terminal non-success required/blocking checks and annotations
 Every hunt reconciles review-comment chains unless thread discovery proves every
 root is present. When using GitHub CLI, load hunt recipes in `./REFERENCE.md`.
 Record counts and final page markers. Do not triage or edit before all six
@@ -64,18 +63,19 @@ Done when every fix has a verified diff or no code fix was needed.
 When a diff exists, discard every pre-drafted subject (ledger, teammate,
 manager, branch, "review follow-up"). Read `../commit/SKILL.md` and run it
 once with `--unstaged` so that skill alone drafts from the locked diff as
-`type: <concrete code action proved by dominant hunks>`. Before `git commit`,
-load Commit clean-room in `./REFERENCE.md`; require no ban-list token, a
-passing conversation-only test, and rejection of every excuse there
-(including "feedback ≠ findings", "body lists hunks", "Fixed-in reply needs
-review framing"). Canonical rejects: `fix: address review feedback on agent
-files` and `fix: address ... review findings`. Skip commit on a clean tree.
-Unless `--no-push`, push and verify remote SHA; never force push. With
-`--no-push`, fixed findings become `AWAITING_PUSH` with no "fixed" reply.
-Remote movement or push rejection is `BLOCKED`. Re-read
-`git log -1 --format=%B`; ban-list or conversation-only text is `BLOCKED`
-(do not push). Done when there is no diff, or one verified clean-room commit
-is local and pushed.
+`type: <concrete code action proved by dominant hunks>`. Trailers default deny:
+no `Co-authored-by` / `Signed-off-by` unless the user requests trailers for this
+run. Before `git commit`, load Commit clean-room in `./REFERENCE.md`; require no
+ban-list token, a passing conversation-only test, and rejection of every excuse
+there. Canonical rejects: `fix: address review feedback on agent files` and
+`fix: address ... review findings`. Skip commit on a clean tree. Unless
+`--no-push`, push and verify remote SHA; never force push. With `--no-push`,
+fixed findings become `AWAITING_PUSH` with no "fixed" reply. Remote movement or
+push rejection is `BLOCKED`. Re-read `git log -1 --format=%B`; ban-list,
+conversation-only text, or banned identity trailers is `BLOCKED` (do not push).
+Apply Trailer hygiene in `../commit/REFERENCE.md` when banned trailers appear,
+then re-check the push gate. Done when there is no diff, or one verified
+clean-room commit is local and pushed.
 
 ## 6. Re-hunt until stable
 Repeat all six hunt passes after the last code or remote mutation. Normalize
@@ -97,4 +97,4 @@ state, hunt counts, and unreplied items. Terminals: `SUCCESS`,
 `NO_CODE_CHANGE`, `AWAITING_PUSH`, `BLOCKED`. Use `NO_CODE_CHANGE` when no
 commit was created; never `SUCCESS` with an unreplied required target. After
 interruption, restart at Step 1 and re-hunt before trusting the ledger. Does
-not fix CI, merge conflicts, or stacked-branch order; never invokes `make-pr`.
+not fix merge conflicts or stacked-branch order; never invokes `make-pr`.
