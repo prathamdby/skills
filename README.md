@@ -70,7 +70,7 @@ codex plugin add skills@pratham-skills
 | [`prath-mode`](./skills/prath-mode/SKILL.md) | Route one action or a complete workflow chain. | None |
 | [`peer-review`](./skills/peer-review/SKILL.md) | Review a plan or proposed change and issue a fixed verdict. | None |
 | [`deslop`](./skills/deslop/SKILL.md) | Remove code slop from one git diff without changing behavior. | `--staged` default, `--unstaged`, `--base <branch>` |
-| [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify` |
+| [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify`, `--allow-trailers` |
 | [`make-pr`](./skills/make-pr/SKILL.md) | Publish a branch and create or update its PR. | `--target <branch>` default `main`, `--ticket <id>`, `--conventional` |
 | [`fix-pr`](./skills/fix-pr/SKILL.md) | Resolve all open PR feedback and reply with evidence. | `--pr <n\|url>`, `--no-push`, `--no-reply` |
 | [`explain-diff`](./skills/explain-diff/SKILL.md) | Write an HTML teaching page for a diff, branch, or PR. | `--target <branch>` default `main`, `--pr <n\|url>`, `--staged`, `--unstaged`, `--output <path>` |

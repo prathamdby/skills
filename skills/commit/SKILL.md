@@ -16,9 +16,11 @@ description: >
 | `--conventional` | yes | `type: description` |
 | `--simple` | no | Plain one-line subject |
 | `--verify` | off | Run hooks; otherwise every commit uses `-n` |
+| `--allow-trailers` | off | Keep user-requested identity trailers; skip strip |
 
 Scope flags conflict with each other; style flags conflict with each other.
-Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`.
+Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`,
+trailers denied. A natural-language trailer request is the same opt-in; record it.
 
 ## Iron laws
 
@@ -30,6 +32,9 @@ Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`.
 3. Command: use one subject `-m` and at most one body `-m`. Never use HEREDOC,
    `-F`, `-a`, an editor, or one `-m` per bullet.
 4. Style: load the chosen section of `./REFERENCE.md` before drafting.
+5. Trailers: do not draft or pass `Co-authored-by` / `Signed-off-by` unless
+   `--allow-trailers` or an explicit user trailer request is recorded. Default
+   deny means `-m` args are subject/body only.
 
 ## 1. Lock the commit snapshot
 
@@ -39,7 +44,8 @@ excluded. Hash the selected diff with `git hash-object --stdin`. If empty,
 report `NO_CHANGES`, naming unstaged tracked and untracked layers without
 switching scope.
 
-Record `scope | selected diff hash | paths | message | command | commit | terminal`.
+Record
+`scope | selected diff hash | paths | message | trailers=deny|allow | command | commit | terminal`.
 Done when the exact bytes intended for the commit are fixed.
 
 ## 2. Draft and trace
@@ -50,8 +56,9 @@ optional bullet body.
 
 Before mutation, map every subject and body line to proving paths and hunks.
 Delete or rewrite unproved text. Reject ticket IDs, reviewer references,
-session rationale, scope notation, trailing periods, over-limit subjects, and
-lowercase-leading conventional body bullets.
+session rationale, scope notation, trailing periods, over-limit subjects,
+lowercase-leading conventional body bullets, and banned identity trailers per
+the shared rejection check in `./REFERENCE.md` unless trailers are allowed.
 
 Done when the message passes the style rules and every line has a trace.
 
@@ -76,7 +83,12 @@ Compare the new commit diff and paths with the locked snapshot and
 one-or-two `-m` shape, and preservation of out-of-scope work. A mismatch is
 `BLOCKED`; report the created SHA and exact difference.
 
-Report commit SHA, subject, scope, hooks, trace summary, and remaining unstaged
-tracked and untracked work.
+Then apply Trailer hygiene in `./REFERENCE.md`: scan `%B` for banned keys; if
+dirty and trailers are denied (or unexpected under allow), amend once to the
+ledger message when this run owns unpushed `HEAD`, then re-read `%B`. Still
+dirty or amend unsafe is `BLOCKED`. Report whether a trailer amend ran.
+
+Report commit SHA, subject, scope, hooks, trailers policy, trace summary, and
+remaining unstaged tracked and untracked work.
 
 Terminal values are `SUCCESS`, `NO_CHANGES`, and `BLOCKED`. Never push.
