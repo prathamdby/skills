@@ -32,7 +32,8 @@ trailers denied. A natural-language trailer request is the same opt-in; record i
 3. Command: use one subject `-m` and at most one body `-m`. Never use HEREDOC,
    `-F`, `-a`, an editor, or one `-m` per bullet.
 4. Style: load the chosen section of `./REFERENCE.md` before drafting.
-5. Trailers: do not draft or pass `Co-authored-by` / `Signed-off-by` unless
+5. Trailers: do not draft or pass `Co-authored-by` / `Signed-off-by` /
+   `Made-with`, or freeform harness footers such as `Made with Cursor`, unless
    `--allow-trailers` or an explicit user trailer request is recorded. Default
    deny means `-m` args are subject/body only.
 

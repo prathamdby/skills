@@ -63,18 +63,18 @@ Done when every fix has a verified diff or no code fix was needed.
 When a diff exists, discard every pre-drafted subject (ledger, teammate,
 manager, branch, "review follow-up"). Read `../commit/SKILL.md` and run it
 once with `--unstaged` so that skill alone drafts from the locked diff as
-`type: <concrete code action proved by dominant hunks>`. Trailers default deny:
-no `Co-authored-by` / `Signed-off-by` unless the user requests trailers for this
-run. Before `git commit`, load Commit clean-room in `./REFERENCE.md`; require no
-ban-list token, a passing conversation-only test, and rejection of every excuse
-there. Canonical rejects: `fix: address review feedback on agent files` and
-`fix: address ... review findings`. Skip commit on a clean tree. Unless
-`--no-push`, push and verify remote SHA; never force push. With `--no-push`,
-fixed findings become `AWAITING_PUSH` with no "fixed" reply. Remote movement or
-push rejection is `BLOCKED`. Re-read `git log -1 --format=%B`; ban-list,
-conversation-only text, or banned identity trailers is `BLOCKED` (do not push).
-Apply Trailer hygiene in `../commit/REFERENCE.md` when banned trailers appear,
-then re-check the push gate. Done when there is no diff, or one verified
+`type: <concrete code action proved by dominant hunks>`. Trailers default deny
+per Commit clean-room in `./REFERENCE.md` (identity trailers and harness
+footers such as `Made with Cursor`). Require no ban-list token, a passing
+conversation-only test, and rejection of every excuse there. Canonical rejects:
+`fix: address review feedback on agent files` and `fix: address ... review
+findings`. Skip commit on a clean tree. Unless `--no-push`, push and verify
+remote SHA; never force push. With `--no-push`, fixed findings become
+`AWAITING_PUSH` with no "fixed" reply. Remote movement or push rejection is
+`BLOCKED`. Re-read `git log -1 --format=%B`; ban-list, conversation-only text,
+or banned identity or harness trailers is `BLOCKED` (do not push). Apply Trailer
+hygiene in `../commit/REFERENCE.md` when banned trailers or harness footers
+appear, then re-check the push gate. Done when there is no diff, or one verified
 clean-room commit is local and pushed.
 
 ## 6. Re-hunt until stable
