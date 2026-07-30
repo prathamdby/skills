@@ -38,18 +38,24 @@ Reject and rewrite a draft containing:
 - a conventional body bullet whose first letter is lowercase
 - too many message arguments, embedded blank-line bodies, HEREDOC, or `-F`
 - hook behavior that disagrees with `--verify`
-- banned identity trailer lines (`Co-authored-by:`, `Signed-off-by:`) unless
-  allow-trailers is on
+- banned identity or harness trailer lines (`Co-authored-by:`, `Signed-off-by:`,
+  `Made-with:`) or freeform harness footers (`Made with Cursor`, Claude
+  marketing lines) unless allow-trailers is on
 
 ## Trailer hygiene
 
-Banned trailer keys (case-insensitive): `Co-authored-by`, `Signed-off-by`.
+Banned trailer keys (case-insensitive): `Co-authored-by`, `Signed-off-by`,
+`Made-with`.
 
-Detect: scan `git log -1 --format=%B` for lines matching those keys in git
-trailer form `Key: value`.
+Banned freeform harness lines (case-insensitive substring match on a whole
+line): `Made with Cursor`, `Generated with Claude`, `Generated with Claude
+Code`.
+
+Detect: scan `git log -1 --format=%B` for lines matching banned keys in git
+trailer form `Key: value`, or a banned freeform harness line.
 
 When trailers are denied, or when allow-trailers is on but `%B` contains a
-banned key the user did not request:
+banned key or freeform harness line the user did not request:
 
 1. Confirm this run created `HEAD`, it is not on the remote, and no later
    commit landed. Otherwise `BLOCKED`.
@@ -57,8 +63,8 @@ banned key the user did not request:
    `-n` / `--verify` policy as the original commit, and no trailer `-m` args.
    Replace the full message from the ledger; do not use `git interpret-trailers`
    to add or edit trailers.
-3. Re-read `%B`. Any remaining banned (or unexpected) trailer line is
-   `BLOCKED`; report the SHA and the leftover lines.
+3. Re-read `%B`. Any remaining banned (or unexpected) trailer or harness line
+   is `BLOCKED`; report the SHA and the leftover lines.
 
 Under allow-trailers, keep only trailers the user requested for this run.
 Report whether a trailer amend ran.

@@ -47,8 +47,8 @@ who has only this diff and the explicit ticket ID.
 - Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
   ticket claims in the body and does not count toward the subject limit.
 - Body: `## Summary` with one to five thematic bullets. Group related hunks,
-  never commits. Include no test, rollout, motive, or ticket claim the diff
-  cannot prove.
+  never commits. Include no test, rollout, motive, ticket claim the diff cannot
+  prove, or harness footer (`Made with Cursor`, identity trailers, and peers).
 
 Map every title phrase and bullet to proving paths and hunks. Rewrite untraced
 copy. Done when all copy passes its format and clean-room trace.
@@ -71,12 +71,18 @@ Done when the platform returns a PR URL or a captured mutation error.
 ## 4. Verify and report
 
 Read the PR back. Verify URL, base, head, title, body, and preserved draft state
-against the ledger. On a partial API result or mismatch, retry the PR mutation
-once after read-back; then report `BLOCKED` with a field-level difference.
-Auth, rate-limit, fetch, push, and platform errors are also `BLOCKED`.
+against the ledger. On a partial API result or non-body field mismatch, retry
+the PR mutation once after read-back; then report `BLOCKED` with a field-level
+difference. Auth, rate-limit, fetch, push, and platform errors are also
+`BLOCKED`.
 
-Report create or update, push status, URL, and trace summary only after
-read-back matches.
+Then apply Body hygiene in `./REFERENCE.md`: the body must equal the ledger
+body (single trailing newline only). If harness footers or other text were
+appended, update the body once to the exact ledger body, re-read, and report
+whether a strip ran. Still dirty is `BLOCKED`.
+
+Report create or update, push status, URL, body strip status, and trace
+summary only after read-back matches.
 
 After interruption, re-run Preflight and verify remote and PR state before any
 retry. Do not duplicate a PR or repeat a successful push.

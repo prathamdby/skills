@@ -10,9 +10,10 @@ The commit message describes the locked code diff, never the fix-pr session.
 Replies may say the work answered review; the commit subject and body may not.
 Discard any subject drafted before the commit skill runs. Draft only from
 locked hunks as `type: <concrete code action>`. Trailers default deny: never
-draft or pass `Co-authored-by` / `Signed-off-by` unless the user explicitly
-requests trailers for this run. After commit, scan `%B` and apply Trailer
-hygiene in `../commit/REFERENCE.md` when banned keys appear.
+draft or pass `Co-authored-by` / `Signed-off-by` / `Made-with` or freeform
+harness footers such as `Made with Cursor` unless the user explicitly requests
+trailers for this run. After commit, scan `%B` and apply Trailer hygiene in
+`../commit/REFERENCE.md` when banned keys or harness lines appear.
 
 Ban-list — any hit in subject or body is `BLOCKED` before push:
 
@@ -20,7 +21,9 @@ Ban-list — any hit in subject or body is `BLOCKED` before push:
 - `review feedback`, `review findings`, `review comments`, `review follow-up`
 - `per review`, `per feedback`, `as requested`, `from review`, reviewer names
 - ledger labels, branch-name claims, or "PR history" framing
-- identity trailer lines `Co-authored-by:` or `Signed-off-by:` unless allowed
+- identity or harness trailer lines `Co-authored-by:`, `Signed-off-by:`,
+  `Made-with:`, or freeform `Made with Cursor` / Claude marketing lines unless
+  allowed
 
 Canonical rejects (rewrite even when the body lists real hunks):
 
@@ -42,6 +45,7 @@ diff and keeping only the PR conversation, it fails.
 | "PR history should show review follow-up" | Threads and replies show that; the commit does not. |
 | "Faster to keep the draft" | Rewrite. A blocked push beats a bad subject. |
 | "Hooks or the agent always add Co-authored-by" | Strip via Trailer hygiene before push. |
+| "Harness appends Made with Cursor" | Strip via Trailer hygiene before push. |
 
 Red flags — rewrite before `git commit` or block before push:
 
@@ -49,7 +53,7 @@ Red flags — rewrite before `git commit` or block before push:
 - A subject reused from a teammate, manager, or ledger draft
 - A subject that still makes sense if the diff is deleted and only the PR
   conversation remains
-- Banned identity trailers in `%B` when trailers are denied
+- Banned identity or harness trailers in `%B` when trailers are denied
 
 ## GitHub hunt recipes
 
