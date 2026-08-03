@@ -28,7 +28,7 @@ missing target, fetch failure, behind or diverged upstream, any uncommitted or
 untracked file, or an open PR whose base differs from target.
 
 Record:
-`branch/target | diff hash | remote state | open PR | title/body | mutation | terminal`.
+`branch/target | diff hash | remote state | open PR | title/body/tier | mutation | terminal`.
 
 Done when the branch is clean, the base is fixed, and create versus update is
 known.
@@ -46,12 +46,13 @@ who has only this diff and the explicit ticket ID.
   explicit ticket prefix is exempt from the ticket-ID rejection.
 - Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
   ticket claims in the body and does not count toward the subject limit.
-- Body: `## Summary` with one to five thematic bullets. Group related hunks,
-  never commits. Include no test, rollout, motive, ticket claim the diff cannot
-  prove, or harness footer (`Made with Cursor`, identity trailers, and peers).
+- Body: measure the locked diff, pick the tier, and draft per Body scale and
+  STE100 in `./REFERENCE.md`. Group related hunks, never commits. Include no
+  test, rollout, motive, ticket claim the diff cannot prove, or harness footer.
 
-Map every title phrase and bullet to proving paths and hunks. Rewrite untraced
-copy. Done when all copy passes its format and clean-room trace.
+Map every title phrase and body line to proving paths and hunks. Rewrite
+untraced copy. Done when format, chosen tier, STE100, and clean-room trace
+pass.
 
 ## 3. Publish
 
@@ -81,8 +82,8 @@ body (single trailing newline only). If harness footers or other text were
 appended, update the body once to the exact ledger body, re-read, and report
 whether a strip ran. Still dirty is `BLOCKED`.
 
-Report create or update, push status, URL, body strip status, and trace
-summary only after read-back matches.
+Report create or update, push status, URL, body strip status, chosen tier, and
+trace summary only after read-back matches.
 
 After interruption, re-run Preflight and verify remote and PR state before any
 retry. Do not duplicate a PR or repeat a successful push.
