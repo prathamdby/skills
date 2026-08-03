@@ -50,9 +50,8 @@ codex plugin add skills@pratham-skills
 | Common failure | Skill | Contract |
 |---|---|---|
 | The agent picks the wrong workflow or repeats work owned by another skill. | [`prath-mode`](./skills/prath-mode/SKILL.md) | Routes each immediate action to one owner and tracks chain completion. |
-| A plan misses a requirement or carries a risky assumption into implementation. | [`peer-review`](./skills/peer-review/SKILL.md) | Exhausts every material finding (including zero-tech-debt end-state gaps), ranks them, and issues a fixed verdict. It edits only with explicit authority. |
+| A plan misses a requirement or carries a risky assumption into implementation. | [`peer-review`](./skills/peer-review/SKILL.md) | Exhausts every material finding, ranks them, and issues a fixed verdict. It edits only with explicit authority. |
 | A plan review stops after the first risk and leaves other blockers unlisted. | [`peer-review`](./skills/peer-review/SKILL.md) | Surfaces every material finding with no count cap, then maps the full ranked list to the verdict. |
-| A plan preserves dead compatibility or reshapes from the old path instead of the intended end state. | [`peer-review`](./skills/peer-review/SKILL.md) | Runs the zero-tech-debt checks: real callers, one product surface, shared rules, and verification of deleted assumptions. |
 | Generated code adds guards, wrappers, comments, or indirection that the codebase does not need. | [`deslop`](./skills/deslop/SKILL.md) | Classifies the selected diff against six categories, preserves staging intent, and verifies behavior-sensitive edits. |
 | Commit messages leak ticket or review context and do not match the committed hunks. | [`commit`](./skills/commit/SKILL.md) | Locks the snapshot, traces every message line to a hunk, applies the selected hook policy, and verifies the commit. |
 | PR creation misses local commits, duplicates an existing PR, or describes work absent from the diff. | [`make-pr`](./skills/make-pr/SKILL.md) | Blocks on a dirty or diverged branch, publishes committed work, reuses the open PR, and verifies its fields. |
@@ -74,7 +73,7 @@ codex plugin add skills@pratham-skills
 | Skill | Description | Flags and arguments |
 |---|---|---|
 | [`prath-mode`](./skills/prath-mode/SKILL.md) | Route one action or a complete workflow chain. | None |
-| [`peer-review`](./skills/peer-review/SKILL.md) | Exhaustively review a plan or proposed change, including zero-tech-debt end-state checks, and issue a fixed verdict. | None |
+| [`peer-review`](./skills/peer-review/SKILL.md) | Exhaustively review a plan or proposed change and issue a fixed verdict. | None |
 | [`deslop`](./skills/deslop/SKILL.md) | Remove code slop from one git diff without changing behavior. | `--staged` default, `--unstaged`, `--base <branch>` |
 | [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify`, `--allow-trailers` |
 | [`make-pr`](./skills/make-pr/SKILL.md) | Publish a branch and create or update its PR with a diff-scaled body. | `--target <branch>` default `main`, `--ticket <id>`, `--conventional` |

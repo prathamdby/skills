@@ -25,10 +25,8 @@ Done when the target and requirements are fixed, or the blocked report is sent.
 
 Read the target, requirements, directly affected contracts, relevant source,
 and current tests. Read history only when the target cites a past failure or a
-current claim needs it. Search real callers of every mode, prop, wrapper, route
-alias, and fallback the plan preserves. Stop gathering when every requirement,
-compatibility claim, and candidate risk has a source pointer. Do not survey
-unrelated architecture.
+current claim needs it. Stop gathering when every requirement and candidate
+risk has a source pointer. Do not survey unrelated architecture.
 
 After interruption, confirm target and requirements are unchanged before using
 the ledger; if either changed, discard the ledger and restart Step 1.
@@ -44,23 +42,6 @@ and test coverage. Rank every finding by probability times impact. Do not
 promote a theoretical concern over an evidenced failure. Treat unsupported
 security, compatibility, or performance claims in the target as findings.
 
-**Zero tech debt.** Rework the proposal from the intended end state, not the
-historical path that produced the patch:
-
-1. State the intended end state in one or two sentences.
-2. Drop any mode, prop, wrapper, route alias, or fallback with no current
-   caller. Do not keep dead compatibility.
-3. Prefer one clear product surface over mode flags. Split only on obvious
-   boundaries: state, layout, controls, or domain commands.
-4. Move shared rules (feature flags, permissions, route gating, URL state,
-   command naming) to one place. Flag duplication across pages or views.
-5. Require verification of the new flow and of deleted assumptions that affect
-   navigation, permissions, or persisted state.
-
-Also flag a generic framework for one feature, names from implementation
-history not product intent, a refactor that leaves the final shape incoherent,
-and optimizing for the smallest diff over the code that should exist.
-
 Surface **every** material finding. Do not stop at the first blocker. Do not
 cap the list. Omit style and preference nits only.
 
@@ -73,22 +54,21 @@ Verdict mapping (after ranking the full list):
 - wrong approach, missing core requirements, or several coupled blockers:
   `Needs rework.`
 
-Done when every material requirement and zero-tech-debt check has a finding or
-an explicit pass, and the verdict follows this mapping.
+Done when every material requirement has a finding or an explicit pass, and
+the verdict follows this mapping.
 
 ## 4. Report
 
-Write exactly four sections:
+Write exactly three sections:
 
-1. `## End state`: the intended end state in one or two sentences.
-2. `## Findings`: ranked worst-first list of every material
+1. `## Findings`: ranked worst-first list of every material
    `- <finding> → <impact>` bullet with a citation, or `None found.` No
    count cap.
-3. `## Fix`: numbered steps covering each repairable blocker in rank order,
+2. `## Fix`: numbered steps covering each repairable blocker in rank order,
    or the first rework decision, or `None.`
-4. `## Verdict`: exactly one mapped sentence and no added explanation.
+3. `## Verdict`: exactly one mapped sentence and no added explanation.
 
-Done when the four-section contract holds and every finding has a citation.
+Done when the three-section contract holds and every finding has a citation.
 
 ## 5. Optional plan update
 
