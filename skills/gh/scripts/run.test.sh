@@ -4,6 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 RUN="$ROOT/run"
+TEST_PATH=$PATH
 PASS=0
 FAIL=0
 WORKDIR="$(mktemp -d)"
@@ -169,14 +170,132 @@ assert_contains "no runtime mentions tsx" "$err" "tsx"
 assert_contains "no runtime mentions node" "$err" "node"
 
 # ---------------------------------------------------------------------------
-# 8. Real Node 22 in this environment can run --help through the runner
+# 8. Ambient PATH can run --help through the runner
 # ---------------------------------------------------------------------------
 set +e
-help_out="$(PATH="/usr/bin:/bin:/exec-daemon:${HOME}/.nvm/versions/node/v22.22.2/bin" "$RUN" "$ROOT/pr-snapshot.ts" --help 2>&1)"
+help_out="$(PATH="$TEST_PATH" "$RUN" "$ROOT/pr-snapshot.ts" --help 2>&1)"
 help_st=$?
 set -e
-assert "real node --help exit" "$help_st" "0"
-assert_contains "real node --help text" "$help_out" "usage: pr-snapshot.ts"
+assert "ambient runtime --help exit" "$help_st" "0"
+assert_contains "ambient runtime --help text" "$help_out" "usage: pr-snapshot.ts"
+
+# ---------------------------------------------------------------------------
+# 9. Zero args and missing script are exit 2
+# ---------------------------------------------------------------------------
+set +e
+err="$(PATH="/usr/bin:/bin" "$RUN" 2>&1 >/dev/null)"
+st=$?
+set -e
+assert "no-args exit 2" "$st" "2"
+assert_contains "no-args usage" "$err" "usage: run <script.ts>"
+
+set +e
+err="$(PATH="/usr/bin:/bin" "$RUN" "$WORKDIR/missing.ts" 2>&1 >/dev/null)"
+st=$?
+set -e
+assert "missing-script exit 2" "$st" "2"
+assert_contains "missing-script message" "$err" "script not found:"
+
+# ---------------------------------------------------------------------------
+# 10. Non-TS node failure does not strip-retry or fall through to nvm
+# ---------------------------------------------------------------------------
+BIN="$WORKDIR/bin-syntax"
+ARGS="$WORKDIR/node-syntax-args"
+: >"$ARGS"
+write_exec "$BIN/node" <<EOF
+#!/bin/sh
+echo "\$*" >> "$ARGS"
+echo "SyntaxError: unexpected token" >&2
+exit 1
+EOF
+NVM_FAKE="$WORKDIR/nvm-syntax"
+write_exec "$NVM_FAKE/versions/node/v22.22.2/bin/node" <<'EOF'
+#!/bin/sh
+echo "runtime=nvm-node"
+exit 0
+EOF
+set +e
+out="$(PATH="$BIN:/usr/bin:/bin" NVM_DIR="$NVM_FAKE" HOME="$WORKDIR/no-home" "$RUN" "$SCRIPT" 2>/dev/null)"
+st=$?
+set -e
+assert "syntax failure exit" "$st" "1"
+assert "syntax failure does not use nvm" "$out" ""
+if grep -q 'experimental-strip-types' "$ARGS"; then
+  FAIL=$((FAIL + 1))
+  echo "not ok syntax failure skips strip-types"
+else
+  PASS=$((PASS + 1))
+  echo "ok syntax failure skips strip-types"
+fi
+
+# ---------------------------------------------------------------------------
+# 11. nub / tsx script failure does not fall through to node
+# ---------------------------------------------------------------------------
+BIN="$WORKDIR/bin-nub-fail"
+write_exec "$BIN/nub" <<'EOF'
+#!/bin/sh
+echo "nub-failed" >&2
+exit 1
+EOF
+write_exec "$BIN/node" <<'EOF'
+#!/bin/sh
+echo "runtime=node"
+exit 0
+EOF
+set +e
+out="$(PATH="$BIN:/usr/bin:/bin" "$RUN" "$SCRIPT" 2>/dev/null)"
+st=$?
+set -e
+assert "nub failure does not fall through" "$out" ""
+assert "nub failure exit" "$st" "1"
+
+BIN="$WORKDIR/bin-tsx-fail"
+write_exec "$BIN/tsx" <<'EOF'
+#!/bin/sh
+echo "tsx-failed" >&2
+exit 1
+EOF
+write_exec "$BIN/node" <<'EOF'
+#!/bin/sh
+echo "runtime=node"
+exit 0
+EOF
+set +e
+out="$(PATH="$BIN:/usr/bin:/bin" "$RUN" "$SCRIPT" 2>/dev/null)"
+st=$?
+set -e
+assert "tsx failure does not fall through" "$out" ""
+assert "tsx failure exit" "$st" "1"
+
+# ---------------------------------------------------------------------------
+# 12. PATH node that cannot load TS falls through to a later nvm node
+# ---------------------------------------------------------------------------
+NVM_FAKE="$WORKDIR/nvm-multi"
+write_exec "$NVM_FAKE/versions/node/v10.0.0/bin/node" <<'EOF'
+#!/bin/sh
+for a in "$@"; do
+  if [ "$a" = "--experimental-strip-types" ]; then
+    echo "node: bad option: --experimental-strip-types" >&2
+    exit 9
+  fi
+done
+echo 'TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts"' >&2
+exit 1
+EOF
+write_exec "$NVM_FAKE/versions/node/v22.22.2/bin/node" <<'EOF'
+#!/bin/sh
+echo "runtime=nvm-second"
+exit 0
+EOF
+BIN="$WORKDIR/bin-path-old"
+mkdir -p "$BIN"
+ln -s "$NVM_FAKE/versions/node/v10.0.0/bin/node" "$BIN/node"
+set +e
+out="$(PATH="$BIN:/usr/bin:/bin" NVM_DIR="$NVM_FAKE" HOME="$WORKDIR/no-home" "$RUN" "$SCRIPT" 2>/dev/null)"
+st=$?
+set -e
+assert "old node falls through to nvm" "$out" "runtime=nvm-second"
+assert "old node nvm exit" "$st" "0"
 
 echo
 echo "passed=$PASS failed=$FAIL"

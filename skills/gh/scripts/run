@@ -38,42 +38,14 @@ note() {
 EX_NO_TS=75
 
 is_ts_unsupported() {
-  /usr/bin/grep -q 'ERR_UNKNOWN_FILE_EXTENSION' "$1" 2>/dev/null
-}
-
-node_ts_mode() {
-  bin=$1
-  ver=$("$bin" -p 'process.versions.node' 2>/dev/null) || { echo unknown; return 0; }
-  case "$ver" in
-    [0-9]*.[0-9]*) ;;
-    *) echo unknown; return 0 ;;
-  esac
-  major=${ver%%.*}
-  rest=${ver#*.}
-  minor=${rest%%.*}
-  if [ "$major" -ge 24 ]; then echo native; return 0; fi
-  if [ "$major" -eq 23 ] && [ "$minor" -ge 6 ]; then echo native; return 0; fi
-  if [ "$major" -eq 22 ] && [ "$minor" -ge 18 ]; then echo native; return 0; fi
-  if [ "$major" -eq 23 ]; then echo strip; return 0; fi
-  if [ "$major" -eq 22 ] && [ "$minor" -ge 6 ]; then echo strip; return 0; fi
-  echo unknown
+  PATH="${ORIG_PATH}:/usr/bin:/bin" grep -q 'ERR_UNKNOWN_FILE_EXTENSION' "$1" 2>/dev/null
 }
 
 run_node() {
   bin=$1
   shift
   note "node($bin)"
-  mode=$(node_ts_mode "$bin")
-  if [ "$mode" = native ]; then
-    "$bin" "$SCRIPT" "$@"
-    return $?
-  fi
-  if [ "$mode" = strip ]; then
-    note "node --experimental-strip-types"
-    "$bin" --experimental-strip-types --no-warnings "$SCRIPT" "$@"
-    return $?
-  fi
-  err="${TMPDIR:-/tmp}/gh-run-$$.err"
+  err=$(PATH="${ORIG_PATH}:/usr/bin:/bin" mktemp "${TMPDIR:-/tmp}/gh-run.XXXXXX")
   set +e
   "$bin" "$SCRIPT" "$@" 2>"$err"
   st=$?
@@ -89,13 +61,13 @@ run_node() {
     "$bin" --experimental-strip-types --no-warnings "$SCRIPT" "$@" 2>"$err"
     st=$?
     set -e
-    if [ "$st" -ne 0 ] && is_ts_unsupported "$err"; then
+    if [ "$st" -ne 0 ]; then
       rm -f "$err"
       return "$EX_NO_TS"
     fi
     cat "$err" >&2
     rm -f "$err"
-    return "$st"
+    return 0
   fi
   cat "$err" >&2
   rm -f "$err"
