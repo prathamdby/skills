@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 import { execFile } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { chmodSync, closeSync, constants, fchmodSync, mkdtempSync, openSync, unlinkSync, writeSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseArgs, promisify } from "node:util";
 import {
+  assertSha,
   gh,
   ghJson,
   ghJobLogs,
   resolveRepo,
   restJson,
   run,
+  sanitizeForTerminal,
   truncate,
 } from "./lib.ts";
 
@@ -180,9 +182,23 @@ async function zipToText(zipPath: string): Promise<string> {
 }
 
 function leadSnippet(annotations: Ann[], log: string): string {
-  const ann = annotations.map((a) => `${a.path}:${a.start_line} [${a.annotation_level}] ${a.message}`);
+  const cap = 10;
+  const rows = annotations.map((a) => `${a.path}:${a.start_line} [${a.annotation_level}] ${a.message}`);
+  const extra = rows.length > cap ? [`… ${rows.length - cap} more annotations`] : [];
+  const prefix = [...rows.slice(0, cap), ...extra];
   const body = snippet(log);
-  return ann.length ? `${ann.join("\n")}\n${body}` : body;
+  return prefix.length ? `${prefix.join("\n")}\n${body}` : body;
+}
+
+function writePrivate(path: string, data: string | Buffer): void {
+  const flags = constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | (constants.O_NOFOLLOW || 0);
+  const fd = openSync(path, flags, 0o600);
+  try {
+    fchmodSync(fd, 0o600);
+    writeSync(fd, data);
+  } finally {
+    closeSync(fd);
+  }
 }
 
 async function annotationsFor(repo: string, checkRunId: number | undefined): Promise<Ann[]> {
@@ -200,13 +216,21 @@ async function downloadLog(repo: string, job: { databaseId: number; name: string
     let text: string;
     if (isZip(buf)) {
       const zipPath = join(logDir, `${job.databaseId}-${slug(job.name)}.zip`);
-      writeFileSync(zipPath, buf);
-      text = await zipToText(zipPath);
+      writePrivate(zipPath, buf);
+      try {
+        text = await zipToText(zipPath);
+      } finally {
+        try {
+          unlinkSync(zipPath);
+        } catch {
+          /* keep going; log file still written below */
+        }
+      }
     } else {
       text = buf.toString("utf8");
     }
     const file = join(logDir, `${job.databaseId}-${slug(job.name)}.log`);
-    writeFileSync(file, text);
+    writePrivate(file, text);
     return { file, lines: [...iterLines(text)].length, text };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
@@ -304,6 +328,7 @@ run(async () => {
   });
   if (v.help) return void console.log(USAGE);
   const repo = await resolveRepo(v.repo);
+  const log = (line = "") => console.log(sanitizeForTerminal(line));
 
   if (v.list) {
     const limit = v.limit ? Number(v.limit) : 10;
@@ -321,22 +346,19 @@ run(async () => {
     if (v.workflow) args.push("--workflow", v.workflow);
     const rows = await ghJson<RunRow[]>(args);
     if (v.json) return void console.log(JSON.stringify({ repo, runs: rows }, null, 2));
-    console.log(`${repo}: last ${rows.length} runs${v.workflow ? ` · workflow ${v.workflow}` : ""}`);
+    log(`${repo}: last ${rows.length} runs${v.workflow ? ` · workflow ${v.workflow}` : ""}`);
     for (const r of rows) {
       const mark = r.conclusion === "success" ? "✓" : FAILING.has(r.conclusion) ? "✗" : "○";
       const concl = r.conclusion || r.status;
       const when = r.createdAt.slice(0, 16).replace("T", " ");
       const title = r.displayTitle && r.displayTitle !== r.workflowName ? ` · ${truncate(r.displayTitle, 48)}` : "";
-      console.log(`${mark} ${r.databaseId}  ${when}  ${concl.padEnd(11)} ${r.event.padEnd(17)} ${r.workflowName}${title}`);
+      log(`${mark} ${r.databaseId}  ${when}  ${concl.padEnd(11)} ${r.event.padEnd(17)} ${r.workflowName}${title}`);
     }
-    if (rows.length > 0) console.log(`\ndrill into a failure: ci-failures.ts <run-id>${v.repo ? ` -R ${repo}` : ""}`);
+    if (rows.length > 0) log(`\ndrill into a failure: ci-failures.ts <run-id>${v.repo ? ` -R ${repo}` : ""}`);
     return;
   }
 
   const runId = positionals[0];
-  const logDir = join(process.env.TMPDIR || tmpdir(), "gh-ci");
-  mkdirSync(logDir, { recursive: true });
-
   const runs = new Map<string, string[]>();
   const external: Check[] = [];
   let prNum: number | undefined;
@@ -348,7 +370,7 @@ run(async () => {
     if (!v.pr && v.repo) throw new Error("with -R, also pass --pr N or a run id");
     prNum = v.pr ? Number(v.pr) : (await ghJson<{ number: number }>(["pr", "view", "--json", "number"])).number;
     if (v.sha) {
-      const pinned = await failingFromSha(repo, v.sha);
+      const pinned = await failingFromSha(repo, assertSha(v.sha));
       for (const [id, names] of pinned.runs) runs.set(id, names);
       external.push(...pinned.external);
     } else {
@@ -367,9 +389,12 @@ run(async () => {
     }
     if (runs.size === 0 && external.length === 0) {
       if (v.json) return void console.log(JSON.stringify({ repo, pr: prNum, runs: [], external: [] }, null, 2));
-      return void console.log(`${repo} PR #${prNum}: no failing checks`);
+      return void log(`${repo} PR #${prNum}: no failing checks`);
     }
   }
+
+  const logDir = runs.size > 0 ? mkdtempSync(join(process.env.TMPDIR || tmpdir(), "gh-ci-")) : "";
+  if (logDir) chmodSync(logDir, 0o700);
 
   const results: RunEntry[] = await Promise.all(
     [...runs].map(async ([id, names]) => {
@@ -387,32 +412,32 @@ run(async () => {
   }
 
   const prLabel = prNum ? ` PR #${prNum}` : "";
-  console.log(`${repo}${prLabel}: ${results.length} run${results.length === 1 ? "" : "s"} analyzed\n`);
+  log(`${repo}${prLabel}: ${results.length} run${results.length === 1 ? "" : "s"} analyzed\n`);
   for (const r of results) {
     if ("error" in r) {
-      console.log(`✗ could not analyze run ${r.runId}: ${r.error}\n`);
+      log(`✗ could not analyze run ${r.runId}: ${r.error}\n`);
       continue;
     }
     if (r.jobs.length === 0 && !FAILING.has(r.conclusion)) {
-      console.log(`○ ${r.workflow} · run ${r.runId} concluded ${r.conclusion || "in progress"}, nothing to report\n`);
+      log(`○ ${r.workflow} · run ${r.runId} concluded ${r.conclusion || "in progress"}, nothing to report\n`);
       continue;
     }
     const via = r.checks.length ? ` (checks: ${r.checks.join(", ")})` : "";
-    console.log(`✗ ${r.workflow} · run ${r.runId} · ${r.conclusion}${via}`);
-    console.log(`  ${r.url}`);
-    if (r.jobs.length === 0) console.log("  no failing jobs; failure is at the workflow level (startup/config?)");
+    log(`✗ ${r.workflow} · run ${r.runId} · ${r.conclusion}${via}`);
+    log(`  ${r.url}`);
+    if (r.jobs.length === 0) log("  no failing jobs; failure is at the workflow level (startup/config?)");
     for (const j of r.jobs) {
       const steps = j.failedSteps.length ? `, failed step: ${j.failedSteps.join(", ")}` : "";
-      console.log(`  job: ${j.name} (${j.conclusion})${steps}`);
+      log(`  job: ${j.name} (${j.conclusion})${steps}`);
       if (j.log.error) {
-        console.log(`    log: ${j.log.error}`);
+        log(`    log: ${j.log.error}`);
       } else {
-        console.log(`    log: ${j.log.file} (${j.log.lines} lines)`);
-        console.log(`    ┄ snippet ┄`);
-        console.log((j.log.snippet ?? "").replace(/^/gm, "    "));
+        log(`    log: ${j.log.file} (${j.log.lines} lines)`);
+        log(`    ┄ snippet ┄`);
+        log((j.log.snippet ?? "").replace(/^/gm, "    "));
       }
     }
-    console.log();
+    log();
   }
-  for (const c of external) console.log(`✗ ${c.name} is an external check (not GitHub Actions): ${c.link || "(no link)"}`);
+  for (const c of external) log(`✗ ${c.name} is an external check (not GitHub Actions): ${c.link || "(no link)"}`);
 });

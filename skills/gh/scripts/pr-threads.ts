@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
-import { graphql, ghost, resolvePr, resolveRepo, run, splitOwnerRepo, truncate } from "./lib.ts";
+import { graphql, ghost, prArg, resolvePr, resolveRepo, run, sanitizeForTerminal, splitOwnerRepo, truncate } from "./lib.ts";
 
-const USAGE = `usage: pr-threads.ts [pr] [-R owner/repo] [--all|--open] [--author login] [--since ISO] [--full] [--json] [--complete] [--help]
+const USAGE = `usage: pr-threads.ts [pr] [--pr n] [-R owner/repo] [--all|--open] [--author login] [--since ISO] [--full] [--json] [--complete] [--help]
 
 Review conversation for a PR: review bodies, issue comments, and inline
 threads. Default hides resolved and outdated threads (header counts them).
 --open keeps unresolved including outdated. --all keeps everything.
-Omit [pr] to use the current branch's PR. With -R, also pass the PR number.
+Omit [pr] to use the current branch's PR. With -R, also pass [pr] or --pr.
   --all          include resolved and outdated threads
   --open         unresolved only (includes outdated)
   --author X     only items by X (threads: any comment by X)
@@ -269,6 +269,7 @@ async function fetchConversation(repo: string, pr: number, complete: boolean) {
     for (const n of conn.nodes) {
       const comments = n.comments.nodes.map((c) => mapComment(c, c.createdAt ?? ""));
       if (n.comments.pageInfo.hasNextPage) moreThreadComments = true;
+      const root = comments[0];
       threads.push({
         isResolved: n.isResolved,
         isOutdated: n.isOutdated,
@@ -278,6 +279,8 @@ async function fetchConversation(repo: string, pr: number, complete: boolean) {
         moreComments: n.comments.pageInfo.hasNextPage,
         comments,
         id: n.id,
+        databaseId: root?.databaseId ?? null,
+        url: root?.url ?? null,
       });
       if (n.comments.pageInfo.hasNextPage) {
         pendingComments.push({
@@ -337,6 +340,7 @@ run(async () => {
   const { values: v, positionals } = parseArgs({
     options: {
       repo: { type: "string", short: "R" },
+      pr: { type: "string" },
       all: { type: "boolean" },
       open: { type: "boolean" },
       author: { type: "string" },
@@ -350,7 +354,7 @@ run(async () => {
   });
   if (v.help) return void console.log(USAGE);
   if (v.all && v.open) throw new Error("--all and --open cannot be used together");
-  const pr = await resolvePr(positionals[0], v.repo);
+  const pr = await resolvePr(prArg(v.pr, positionals[0]), v.repo);
   const repo = await resolveRepo(v.repo);
 
   let { convo, threads, moreReviews, moreComments, moreConvo, moreThreadComments } = await fetchConversation(
@@ -398,33 +402,34 @@ run(async () => {
   } else {
     threadStat = `${threads.length}/${totalThreads} threads${hidden > 0 ? ` (${hidden} resolved/outdated hidden; --all shows)` : ""}`;
   }
-  console.log(
+  const log = (line = "") => console.log(sanitizeForTerminal(line));
+  log(
     `${repo}#${pr}: ${reviews} review ${reviews === 1 ? "body" : "bodies"} · ${comments} comment${comments === 1 ? "" : "s"} · ${threadStat}\n`,
   );
   if (convo.length === 0 && threads.length === 0) {
-    return void console.log(totalThreads === 0 ? "no review activity" : "nothing matches the filters");
+    return void log(totalThreads === 0 ? "no review activity" : "nothing matches the filters");
   }
 
   for (const item of convo) {
     const tag = item.kind === "review" ? `[review · ${item.state}]` : "[comment]";
     const body = v.full ? item.body : truncate(item.body, 600);
-    console.log(`${tag} @${item.author} (${item.createdAt.slice(0, 10)})`);
-    console.log(`  ${body.replace(/\n/g, "\n  ")}\n`);
+    log(`${tag} @${item.author} (${item.createdAt.slice(0, 10)})`);
+    log(`  ${body.replace(/\n/g, "\n  ")}\n`);
   }
   if (moreConvo) {
-    console.log("… reviews/comments older than the last 50 omitted\n");
+    log("… reviews/comments older than the last 50 omitted\n");
   }
 
   threads.forEach((t, i) => {
     const state = t.isResolved ? "RESOLVED" : "OPEN";
     const outdatedTag = t.isOutdated ? " · outdated" : "";
     const loc = t.line ?? (t.originalLine != null ? `${t.originalLine} (original)` : "?");
-    console.log(`[${i + 1}] ${state}${outdatedTag} · ${t.path}:${loc}`);
+    log(`[${i + 1}] ${state}${outdatedTag} · ${t.path}:${loc}`);
     for (const c of t.comments) {
       const body = v.full ? c.body : truncate(c.body, 600);
-      console.log(`  @${c.author} (${c.createdAt.slice(0, 10)}): ${body.replace(/\n/g, "\n    ")}`);
+      log(`  @${c.author} (${c.createdAt.slice(0, 10)}): ${body.replace(/\n/g, "\n    ")}`);
     }
-    if (t.moreComments) console.log("  … thread has more comments omitted (--complete pages them)");
-    console.log();
+    if (t.moreComments) log("  … thread has more comments omitted (--complete pages them)");
+    log();
   });
 });

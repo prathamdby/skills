@@ -10,7 +10,9 @@ const TRACE = process.env.GH_TRACE === "1";
 
 let spawnCount = 0;
 let httpCount = 0;
-let tokenCache: string | undefined;
+const tokenCache = new Map<string, string>();
+const GH_HOST_RE =
+  /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*(?::(?:[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?$/i;
 
 export class HttpError extends Error {
   status: number;
@@ -119,22 +121,34 @@ export async function ghJobLogs(repo: string, jobId: number): Promise<Buffer> {
   ]);
 }
 
+function githubHost(): string | undefined {
+  const raw = process.env.GH_HOST?.trim();
+  if (!raw) return undefined;
+  if (/[/\\?#@]/.test(raw) || !GH_HOST_RE.test(raw)) {
+    throw new Error(`GH_HOST must be hostname[:port], got: ${raw}`);
+  }
+  return raw.toLowerCase();
+}
+
 export async function getToken(): Promise<string> {
-  if (tokenCache !== undefined) return tokenCache;
-  const host = process.env.GH_HOST;
+  const host = githubHost();
+  const key = host ?? "github.com";
+  const cached = tokenCache.get(key);
+  if (cached !== undefined) return cached;
   const args = host ? ["auth", "token", "-h", host] : ["auth", "token"];
-  tokenCache = (await gh(args)).trim();
-  if (!tokenCache) throw new Error("gh auth token returned empty; run gh auth login");
-  return tokenCache;
+  const token = (await gh(args)).trim();
+  if (!token) throw new Error("gh auth token returned empty; run gh auth login");
+  tokenCache.set(key, token);
+  return token;
 }
 
 function graphqlUrl(): string {
-  const host = process.env.GH_HOST;
+  const host = githubHost();
   return host ? `https://${host}/api/graphql` : "https://api.github.com/graphql";
 }
 
 function restBase(): string {
-  const host = process.env.GH_HOST;
+  const host = githubHost();
   return host ? `https://${host}/api/v3/` : "https://api.github.com/";
 }
 
@@ -173,7 +187,7 @@ export async function graphql<T>(query: string, variables: Record<string, unknow
     data?: T;
     errors?: { message: string }[];
   };
-  if (json.errors?.length && json.data == null) {
+  if (json.errors?.length) {
     throw new HttpError(json.errors.map((err) => err.message).join("; "), res.status);
   }
   if (json.data == null) throw new HttpError(`GraphQL ${res.status} empty data`, res.status);
@@ -214,6 +228,10 @@ export function splitOwnerRepo(repo: string): { owner: string; name: string } {
 export async function resolveRepo(flag?: string): Promise<string> {
   if (flag) {
     if (!/^[\w.-]+\/[\w.-]+$/.test(flag)) throw new Error(`--repo must be owner/repo, got: ${flag}`);
+    const { owner, name } = splitOwnerRepo(flag);
+    if (owner === "." || owner === ".." || name === "." || name === "..") {
+      throw new Error(`--repo must be owner/repo, got: ${flag}`);
+    }
     return flag;
   }
   try {
@@ -223,6 +241,34 @@ export async function resolveRepo(flag?: string): Promise<string> {
     if (/gh not found|auth login|authentication/i.test(msg)) throw e;
     throw new Error("not inside a repo with a GitHub remote; pass -R owner/repo");
   }
+}
+
+/** Prefer `--pr` or the positional; reject conflicting values. */
+export function prArg(flag?: string, positional?: string): string | undefined {
+  if (flag != null && positional != null && flag !== positional) {
+    throw new Error("pass the PR as [pr] or --pr, not both");
+  }
+  return flag ?? positional;
+}
+
+export function assertSha(sha: string): string {
+  if (!/^[0-9a-fA-F]{7,64}$/.test(sha)) throw new Error(`--sha must be a commit SHA, got: ${sha}`);
+  return sha;
+}
+
+/** Strip C0/C1 controls so untrusted GitHub text cannot drive the terminal. */
+export function sanitizeForTerminal(s: string): string {
+  let out = "";
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    if (c === 9 || c === 10) {
+      out += s[i];
+      continue;
+    }
+    if (c <= 31 || c === 127 || (c >= 0x80 && c <= 0x9f)) continue;
+    out += s[i];
+  }
+  return out;
 }
 
 /** PR number: explicit positional, or the current branch's PR when omitted. */

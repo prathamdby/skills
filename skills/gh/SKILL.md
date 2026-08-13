@@ -18,7 +18,7 @@ reimplemented). Requires authenticated `gh` and Node ≥ 23.6.
 | `[pr]` / `--pr <n>` | current branch PR | Target PR |
 | `-R owner/repo` | cwd repo | Target repo; with `-R` also pass `pr` / `--pr` |
 | `--json` | off | Structured output |
-| `--full` | off | Do not truncate bodies (snapshot, threads) |
+| `--full` | off | Snapshot/threads: do not truncate bodies. CI: accepted; snippets stay capped |
 | `--all` | off | Threads: include resolved and outdated |
 | `--open` | off | Threads: unresolved including outdated |
 | `--author <login>` | off | Threads: filter by author |
@@ -26,6 +26,8 @@ reimplemented). Requires authenticated `gh` and Node ≥ 23.6.
 | `--complete` | off | Threads: page leftover comments and reviews |
 | `--sha <SHA>` | off | CI: pin commit; not hunt surface 6 |
 | `--list` | off | CI: recent runs instead of drilldown |
+| `-L <n>` | 10 | CI `--list`: how many runs |
+| `--workflow <W>` | off | CI `--list`: filter by name or file |
 | `[run-id]` | PR failing checks | CI: analyze that Actions run |
 
 `--all` and `--open` conflict: `BLOCKED`. Missing values are `BLOCKED`. No flags
@@ -48,9 +50,9 @@ Load JSON shapes in `./REFERENCE.md` before parsing `--json`.
 
 | Script | Covers |
 |---|---|
-| `<anchor>/scripts/pr-snapshot.ts [pr] [-R owner/repo] [--full] [--json]` | Meta, mergeability, checks, files, reviews, comments, thread counts |
-| `<anchor>/scripts/pr-threads.ts [pr] [-R owner/repo] [--all\|--open] [--author] [--since] [--full] [--json] [--complete]` | Review bodies, issue comments, inline threads with resolution |
-| `<anchor>/scripts/ci-failures.ts [run-id] [--pr N] [--sha SHA] [--list] [-R owner/repo] [--json]` | Failing checks → jobs/steps → snippet; logs on disk |
+| `<anchor>/scripts/pr-snapshot.ts [pr] [--pr n] [-R owner/repo] [--full] [--json]` | Meta, mergeability, checks, files, reviews, comments, thread counts |
+| `<anchor>/scripts/pr-threads.ts [pr] [--pr n] [-R owner/repo] [--all\|--open] [--author] [--since] [--full] [--json] [--complete]` | Review bodies, issue comments, inline threads with resolution |
+| `<anchor>/scripts/ci-failures.ts [run-id] [--pr N] [--sha SHA] [--list [-L n] [--workflow W]] [--full] [-R owner/repo] [--json]` | Failing checks → jobs/steps → snippet; logs on disk |
 
 ## 1. Resolve the target
 

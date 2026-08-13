@@ -6,24 +6,26 @@ import {
   graphql,
   ghost,
   isGraphqlFallback,
+  prArg,
   resolvePr,
   resolveRepo,
   run,
+  sanitizeForTerminal,
   splitOwnerRepo,
   truncate,
 } from "./lib.ts";
 
-const USAGE = `usage: pr-snapshot.ts [pr] [-R owner/repo] [--full] [--json] [--help]
+const USAGE = `usage: pr-snapshot.ts [pr] [--pr n] [-R owner/repo] [--full] [--json] [--help]
 
 Everything about a PR in one GraphQL call. Omit [pr] to use the current
-branch's PR. With -R owner/repo, also pass the PR number.
+branch's PR. With -R owner/repo, also pass [pr] or --pr.
   --full   don't truncate body/comment text
   --json   structured output; if files.hasNextPage, extra GraphQL pages
            (not the 1-query path). keys: number, title, state, isDraft,
            author, url, createdAt, baseRefName, headRefName, headRefOid,
            mergeable, mergeStateStatus, reviewDecision, additions,
-           deletions, changedFiles, body, files, comments, checks,
-           threads, reviewsLatest`;
+           deletions, changedFiles, body, files, filesCapped, comments,
+           checks, threads, reviewsLatest`;
 
 const SNAPSHOT_QUERY = `
 query PrSnapshot($owner: String!, $name: String!, $number: Int!) {
@@ -125,6 +127,7 @@ interface Snapshot {
   changedFiles: number;
   body: string;
   files: FileRow[];
+  filesCapped: boolean;
   comments: CommentRow[];
   checks: Check[];
   threads: Threads;
@@ -256,6 +259,7 @@ async function fromGraphql(repo: string, number: number, paginateFiles: boolean)
   const pr = data.repository?.pullRequest;
   if (!pr) throw new Error(`PR ${repo}#${number} not found`);
   let files = pr.files.nodes;
+  const filesCapped = !paginateFiles && pr.files.pageInfo.hasNextPage;
   if (paginateFiles && pr.files.pageInfo.hasNextPage) {
     files = await extraFiles(owner, name, number, pr.files);
   }
@@ -279,6 +283,7 @@ async function fromGraphql(repo: string, number: number, paginateFiles: boolean)
     changedFiles: pr.changedFiles,
     body: pr.body ?? "",
     files,
+    filesCapped,
     comments: pr.comments.nodes,
     checks: mapRollup(rollup),
     threads: threadStats(pr.reviewThreads.nodes, pr.reviewThreads.pageInfo.hasNextPage),
@@ -308,7 +313,7 @@ async function threadStatsViaGh(repo: string, number: number): Promise<Threads> 
 }
 
 async function fromFallback(repo: string, number: number): Promise<Snapshot> {
-  type View = Omit<Snapshot, "checks" | "threads" | "reviewsLatest" | "author" | "reviewDecision" | "body"> & {
+  type View = Omit<Snapshot, "checks" | "threads" | "reviewsLatest" | "author" | "reviewDecision" | "body" | "filesCapped"> & {
     author: { login: string } | null;
     reviewDecision: string | null;
     body: string | null;
@@ -344,6 +349,7 @@ async function fromFallback(repo: string, number: number): Promise<Snapshot> {
     changedFiles: view.changedFiles,
     body: view.body ?? "",
     files: view.files ?? [],
+    filesCapped: false,
     comments: view.comments ?? [],
     checks,
     threads,
@@ -352,11 +358,12 @@ async function fromFallback(repo: string, number: number): Promise<Snapshot> {
 }
 
 function printText(repo: string, snap: Snapshot, full: boolean): void {
+  const log = (line = "") => console.log(sanitizeForTerminal(line));
   const draft = snap.isDraft ? " (draft)" : "";
-  console.log(`${repo}#${snap.number}: ${snap.title}`);
-  console.log(`${snap.state}${draft} · @${snap.author.login} · created ${snap.createdAt.slice(0, 10)} · ${snap.url}`);
-  console.log(`${snap.baseRefName} ← ${snap.headRefName} @ ${snap.headRefOid.slice(0, 12)}`);
-  console.log(
+  log(`${repo}#${snap.number}: ${snap.title}`);
+  log(`${snap.state}${draft} · @${snap.author.login} · created ${snap.createdAt.slice(0, 10)} · ${snap.url}`);
+  log(`${snap.baseRefName} ← ${snap.headRefName} @ ${snap.headRefOid.slice(0, 12)}`);
+  log(
     `mergeable ${snap.mergeable} · mergeState ${snap.mergeStateStatus} · review ${snap.reviewDecision || "NONE"}`,
   );
 
@@ -367,31 +374,32 @@ function printText(repo: string, snap: Snapshot, full: boolean): void {
     .filter(([, count]) => count > 0)
     .map(([b, count]) => `${count} ${b}`)
     .join(" · ");
-  console.log(`checks: ${counts || "none reported"}`);
-  for (const c of byBucket.get("fail") ?? []) console.log(`  ✗ ${c.name}`);
+  log(`checks: ${counts || "none reported"}`);
+  for (const c of byBucket.get("fail") ?? []) log(`  ✗ ${c.name}`);
 
-  console.log(`threads: ${snap.threads.open} open / ${snap.threads.total}${snap.threads.capped ? "+" : ""}`);
+  log(`threads: ${snap.threads.open} open / ${snap.threads.total}${snap.threads.capped ? "+" : ""}`);
 
-  console.log(`files: ${snap.changedFiles} (+${snap.additions} −${snap.deletions})`);
-  for (const f of snap.files.slice(0, 50)) console.log(`  +${f.additions} −${f.deletions}  ${f.path}`);
-  if (snap.files.length > 50) console.log(`  … ${snap.files.length - 50} more files`);
+  log(`files: ${snap.changedFiles} (+${snap.additions} −${snap.deletions})`);
+  for (const f of snap.files.slice(0, 50)) log(`  +${f.additions} −${f.deletions}  ${f.path}`);
+  if (snap.filesCapped) log(`  … file list capped at ${snap.files.length} (more exist; --json pages)`);
+  else if (snap.files.length > 50) log(`  … ${snap.files.length - 50} more files`);
 
   const latest = Object.entries(snap.reviewsLatest);
   if (latest.length > 0) {
-    console.log(`reviews: ${latest.map(([a, s]) => `${a} ${s}`).join(" · ")}`);
+    log(`reviews: ${latest.map(([a, s]) => `${a} ${s}`).join(" · ")}`);
   }
 
   if (snap.comments.length > 0) {
-    console.log(`comments: ${snap.comments.length}${snap.comments.length > 5 ? " (last 5)" : ""}`);
+    log(`comments: ${snap.comments.length}${snap.comments.length > 5 ? " (last 5)" : ""}`);
     for (const c of snap.comments.slice(-5)) {
       const body = full ? c.body : truncate(c.body, 400);
-      console.log(`  @${ghost(c.author?.login)} ${c.createdAt.slice(0, 10)}: ${body.replace(/\n/g, "\n    ")}`);
+      log(`  @${ghost(c.author?.login)} ${c.createdAt.slice(0, 10)}: ${body.replace(/\n/g, "\n    ")}`);
     }
   }
 
   if (snap.body) {
     const body = full ? snap.body : truncate(snap.body, 600);
-    console.log(`body:\n  ${body.replace(/\n/g, "\n  ")}`);
+    log(`body:\n  ${body.replace(/\n/g, "\n  ")}`);
   }
 }
 
@@ -399,6 +407,7 @@ run(async () => {
   const { values: v, positionals } = parseArgs({
     options: {
       repo: { type: "string", short: "R" },
+      pr: { type: "string" },
       full: { type: "boolean" },
       json: { type: "boolean" },
       help: { type: "boolean", short: "h" },
@@ -406,7 +415,7 @@ run(async () => {
     allowPositionals: true,
   });
   if (v.help) return void console.log(USAGE);
-  const n = await resolvePr(positionals[0], v.repo);
+  const n = await resolvePr(prArg(v.pr, positionals[0]), v.repo);
   const repo = await resolveRepo(v.repo);
 
   let snap: Snapshot;

@@ -52,6 +52,7 @@ Keep upstream keys. Truncation markers look like `[…+N chars]` unless `--full`
   baseRefName, headRefName, headRefOid, mergeable, mergeStateStatus,
   reviewDecision, additions, deletions, changedFiles, body,
   files: [{ path, additions, deletions }],
+  filesCapped,
   comments: [{ author { login }, createdAt, body }],
   checks: [{ name, state, bucket }],
   threads: { open, total, capped },
@@ -60,8 +61,10 @@ Keep upstream keys. Truncation markers look like `[…+N chars]` unless `--full`
 ```
 
 `bucket` is `pass` / `fail` / `pending` / `skipping` / `cancel`. `threads.capped`
-is true when `reviewThreads` has a next page. Text output still slices files at
-50.
+is true when `reviewThreads` has a next page. `filesCapped` is true in text mode
+when the first files page has a next page (no extra calls). `--json` pages files
+until complete and sets `filesCapped` false. Text output slices files at 50 and
+warns when `filesCapped` or the local list is longer.
 
 `--json` file completeness is extra calls: if `files.hasNextPage`, further
 GraphQL pages run. That is not the one-query fast path.
@@ -91,7 +94,9 @@ back to split `gh pr view --json` + `gh pr checks` + thread-count GraphQL.
 ```
 
 `id`, `databaseId`, and `url` are additive on each thread and each comment
-(conversation items included). Per-thread `moreComments` is the nested comments
+(conversation items included). GraphQL `PullRequestReviewThread` has no
+`databaseId` or `url`; those thread fields are copied from the first comment
+(the REST reply target). Per-thread `moreComments` is the nested comments
 connection cap (main query uses `comments(first: 100)`).
 
 Top-level `--complete` page markers (`moreReviews`, `moreComments`,
@@ -147,5 +152,6 @@ log tokens, `Authorization`, or signed URLs.
 Job logs go through `gh api repos/<owner>/<repo>/actions/jobs/<id>/logs`. Do
 not `fetch` the log URL with a GitHub `Authorization` header; the 302 to blob
 storage must not forward the bearer token. If the body starts with `PK`, unzip
-and snippet the failed step. Cite the printed file path; do not paste the full
-log.
+and snippet the failed step, then unlink the zip. Logs land in a 0700
+`mkdtemp` under `$TMPDIR` (`gh-ci-*`), files mode 0600. Cite the printed file
+path; do not paste the full log.
