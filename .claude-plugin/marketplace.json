@@ -27,6 +27,7 @@
         "./skills/deslop",
         "./skills/explain-diff",
         "./skills/fix-pr",
+        "./skills/gh",
         "./skills/handoff",
         "./skills/make-pr",
         "./skills/orchestrate",

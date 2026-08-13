@@ -38,6 +38,7 @@ codex plugin add skills@pratham-skills
 - `/commit` creates a clean-room commit from staged or tracked unstaged work.
 - `/make-pr` pushes committed work and creates or updates its pull request.
 - `/fix-pr` hunts, triages, fixes, and replies to pull-request feedback and CI.
+- `/gh` orients on a PR, review threads, or red CI in one script call.
 - `/explain-diff` writes a self-contained HTML walkthrough of a change.
 - `/recon` maps the current repository and refreshes only changed areas later.
 - `/box` clones and searches an external git repository locally.
@@ -61,6 +62,7 @@ codex plugin add skills@pratham-skills
 | Required CI or check runs on the PR head are left red while only human comments are fixed. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Hunts terminal non-success required or blocking checks and annotations with the other surfaces, then triages and fixes them. |
 | A fix-pr commit subject narrates review follow-up instead of the locked hunks. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Discards pre-drafted subjects, requires a hunk-proved subject recipe, and blocks ban-list or conversation-only messages before push. |
 | A fix-pr commit picks up identity or harness trailers from hooks or agent defaults. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Denies `Co-authored-by` / `Signed-off-by` / `Made-with` and freeform harness footers by default and runs commit Trailer hygiene before push. |
+| Agents burn 3–5 `gh` calls and dump CI logs into context when inspecting a PR. | [`gh`](./skills/gh/SKILL.md) | One script per inspect loop; bounded snippets; logs on disk; raw `gh` only after gotchas. |
 | A large diff gets a shallow chat summary with no surrounding system context. | [`explain-diff`](./skills/explain-diff/SKILL.md) | Groups the change by theme and writes an evidence-linked HTML page with a working quiz. |
 | Every session re-reads the same repository from scratch. | [`recon`](./skills/recon/SKILL.md) | Stores a bounded evidence map and patches it from committed git drift. |
 | The agent guesses what an external repository contains. | [`box`](./skills/box/SKILL.md) | Clones into a skill-owned sandbox, searches local source, and returns cited findings. |
@@ -78,6 +80,7 @@ codex plugin add skills@pratham-skills
 | [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify`, `--allow-trailers` |
 | [`make-pr`](./skills/make-pr/SKILL.md) | Publish a branch and create or update its PR with a diff-scaled body. | `--target <branch>` default `main`, `--ticket <id>`, `--conventional` |
 | [`fix-pr`](./skills/fix-pr/SKILL.md) | Resolve open PR feedback and CI, then reply with evidence. | `--pr <n\|url>`, `--no-push`, `--no-reply` |
+| [`gh`](./skills/gh/SKILL.md) | Orient on PR state, review threads, or CI failures. | `--json`, `--full`, `-R owner/repo`, threads `--open`/`--all`/`--complete`, CI `--pr`/`--sha`/`--list` |
 | [`explain-diff`](./skills/explain-diff/SKILL.md) | Write an HTML teaching page for a diff, branch, or PR. | `--target <branch>` default `main`, `--pr <n\|url>`, `--staged`, `--unstaged`, `--output <path>` |
 | [`recon`](./skills/recon/SKILL.md) | Build or refresh a persistent map of the current repo. | `--refresh`, positional focus |
 | [`box`](./skills/box/SKILL.md) | Clone, update, list, search, or persist an external repo. | `--persist`, `--update`, `--list`, `--no-subagents` |

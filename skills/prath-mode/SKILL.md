@@ -19,6 +19,7 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Remove code slop | `deslop` (`../deslop/SKILL.md`) |
 | Create or update a PR | `make-pr` (`../make-pr/SKILL.md`) |
 | Address PR feedback | `fix-pr` (`../fix-pr/SKILL.md`) |
+| Inspect a PR, read threads, or why CI is red | `gh` (`../gh/SKILL.md`) |
 | Review an implementation plan | `peer-review` (`../peer-review/SKILL.md`) |
 | Explain a diff as HTML | `explain-diff` (`../explain-diff/SKILL.md`) |
 | Map or refresh the current repo | `recon` (`../recon/SKILL.md`) |
@@ -28,9 +29,11 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Save or resume session state | `handoff` (`../handoff/SKILL.md`) |
 
 For one action, route to its leaf. Use `orchestrate` for several in-harness
-delegates and `assign` for one external CLI process. Use a chain only when the
-request asks for its complete terminal outcome. Several explicit outcomes,
-such as "commit and open a PR", select the matching chain.
+delegates and `assign` for one external CLI process. Chain only for a complete
+terminal outcome; several explicit outcomes select the matching chain.
+Orientation-only terminals go to `gh`; any fix, reply, push, or "handle review
+feedback" stays `fix-pr`. `fix-pr` may invoke `../gh/scripts/…`. `/gh` never
+continues into `fix-pr`.
 
 ## Workflow chains
 
@@ -39,6 +42,7 @@ such as "commit and open a PR", select the matching chain.
 | Ship planned work | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | approved plan diff tested and PR URL verified |
 | Save current work | optional `deslop` → `commit` | new commit verified |
 | Finish PR feedback | `fix-pr` | `fix-pr` report complete |
+| Inspect PR or CI | `gh` | script report verified |
 | Understand current repo | `recon` | memory and report verified |
 | Research external code | `box` | cited answer returned |
 | End or resume work | `handoff` | create or resume terminal state |
