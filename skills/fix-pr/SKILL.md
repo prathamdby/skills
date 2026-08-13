@@ -34,13 +34,13 @@ Collect every page from all applicable surfaces:
 6. PR CI on the head SHA: terminal non-success required/blocking checks and annotations
 Every hunt reconciles review-comment chains unless every root is proved present.
 When using GitHub CLI: surfaces 1–2 run
-`../gh/scripts/pr-threads.ts --json --open --complete` (relative to this SKILL.md);
-CI snippets: `../gh/scripts/ci-failures.ts --json --pr N --sha <head>`. Always load
+`../gh/scripts/run pr-threads.ts --json --open --complete` (relative to this SKILL.md);
+CI snippets: `../gh/scripts/run ci-failures.ts --json --pr N --sha <head>`.
+`ERR_UNKNOWN_FILE_EXTENSION` is not failure; `run` tries bun, nub, tsx, nvm, and strip-types first. Always load
 recipe 3 in `./REFERENCE.md` (REST reconcile); a successful script is not proof REST roots are
 present. Skip 4–5 only when JSON `moreReviews`/`moreComments`/`moreConvo` are false
 after `--complete`; else load them there. Recipe 6 always SHA-pins required/blocking
-checks and annotations here; `ci-failures` is drilldown only. Load remaining recipes on script
-failure or a cap marker. Record counts and page markers. No triage or edit before
+checks and annotations here; `ci-failures` is drilldown only. Load remaining recipes only after `run` exits following every runtime, or a cap marker. Record counts and page markers. No triage or edit before
 all six passes finish. Normalize one finding per claim (source, URL/ID, reply
 target, author, path/line, rule ID, body, replies). Drop acknowledgments and status
 noise. Deduplicate only identical stable keys from `./REFERENCE.md`; preserve every

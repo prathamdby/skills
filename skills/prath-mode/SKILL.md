@@ -32,7 +32,7 @@ For one action, route to its leaf. Use `orchestrate` for several in-harness
 delegates and `assign` for one external CLI process. Chain only for a complete
 terminal outcome; several explicit outcomes select the matching chain.
 Orientation-only terminals go to `gh`; any fix, reply, push, or "handle review
-feedback" stays `fix-pr`. `fix-pr` may invoke `../gh/scripts/…`. `/gh` never
+feedback" stays `fix-pr`. `fix-pr` may invoke `../gh/scripts/run`. `/gh` never
 continues into `fix-pr`.
 
 ## Workflow chains

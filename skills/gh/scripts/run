@@ -1,0 +1,127 @@
+#!/usr/bin/env sh
+# Run a gh TypeScript script with the first working runtime.
+# Usage: run <script.ts> [args...]
+# Exit 2 = no runtime. Any other status is from the script or its runtime.
+set -eu
+
+if [ "$#" -lt 1 ]; then
+  echo "usage: run <script.ts> [args...]" >&2
+  exit 2
+fi
+
+SCRIPT=$1
+shift
+
+DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
+case "$SCRIPT" in
+  /*) ;;
+  *) SCRIPT="$DIR/$SCRIPT" ;;
+esac
+
+if [ ! -f "$SCRIPT" ]; then
+  echo "run: script not found: $SCRIPT" >&2
+  exit 2
+fi
+
+ORIG_PATH=$PATH
+TRIED=
+
+which_rt() {
+  PATH="$ORIG_PATH:/usr/bin:/bin" command -v "$1" 2>/dev/null || true
+}
+
+note() {
+  TRIED="${TRIED:+$TRIED, }$1"
+}
+
+# 75 = this node cannot load TypeScript; try the next node.
+EX_NO_TS=75
+
+is_ts_unsupported() {
+  PATH="${ORIG_PATH}:/usr/bin:/bin" grep -q 'ERR_UNKNOWN_FILE_EXTENSION' "$1" 2>/dev/null
+}
+
+run_node() {
+  bin=$1
+  shift
+  note "node($bin)"
+  err=$(PATH="${ORIG_PATH}:/usr/bin:/bin" mktemp "${TMPDIR:-/tmp}/gh-run.XXXXXX")
+  set +e
+  "$bin" "$SCRIPT" "$@" 2>"$err"
+  st=$?
+  set -e
+  if [ "$st" -eq 0 ]; then
+    cat "$err" >&2
+    rm -f "$err"
+    return 0
+  fi
+  if is_ts_unsupported "$err"; then
+    note "node --experimental-strip-types"
+    set +e
+    "$bin" --experimental-strip-types --no-warnings "$SCRIPT" "$@" 2>"$err"
+    st=$?
+    set -e
+    if [ "$st" -ne 0 ]; then
+      rm -f "$err"
+      return "$EX_NO_TS"
+    fi
+    cat "$err" >&2
+    rm -f "$err"
+    return 0
+  fi
+  cat "$err" >&2
+  rm -f "$err"
+  return "$st"
+}
+
+BUN=$(which_rt bun)
+if [ -z "$BUN" ] && [ -x "${HOME}/.bun/bin/bun" ]; then
+  BUN="${HOME}/.bun/bin/bun"
+fi
+NUB=$(which_rt nub)
+TSX=$(which_rt tsx)
+
+if [ -n "$BUN" ]; then
+  note bun
+  exec "$BUN" "$SCRIPT" "$@"
+fi
+if [ -n "$NUB" ]; then
+  note nub
+  exec "$NUB" "$SCRIPT" "$@"
+fi
+if [ -n "$TSX" ]; then
+  note tsx
+  exec "$TSX" "$SCRIPT" "$@"
+fi
+
+PATH_NODE=$(which_rt node)
+NVM_DIR="${NVM_DIR:-${HOME}/.nvm}"
+
+try_one_node() {
+  bin=$1
+  shift
+  [ -x "$bin" ] || return 0
+  st=0
+  run_node "$bin" "$@" || st=$?
+  if [ "$st" -eq "$EX_NO_TS" ]; then
+    return 0
+  fi
+  exit "$st"
+}
+
+if [ -n "$PATH_NODE" ]; then
+  try_one_node "$PATH_NODE" "$@"
+fi
+
+if [ -d "$NVM_DIR/versions/node" ]; then
+  for n in "$NVM_DIR"/versions/node/*/bin/node; do
+    [ -x "$n" ] || continue
+    if [ -n "$PATH_NODE" ] && [ "$n" = "$PATH_NODE" ]; then
+      continue
+    fi
+    try_one_node "$n" "$@"
+  done
+fi
+
+echo "run: no TypeScript runtime. Tried bun, nub, tsx, node${TRIED:+ (ran: $TRIED)}. Install bun, nub, tsx, or Node ≥ 22.6." >&2
+exit 2

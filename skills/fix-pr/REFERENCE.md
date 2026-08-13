@@ -57,15 +57,17 @@ Red flags — rewrite before `git commit` or block before push:
 
 ## GitHub hunt recipes
 
-Scripts vs recipes: `../gh/scripts/pr-threads.ts` and
-`../gh/scripts/ci-failures.ts` feed hunt surfaces 1–2 and CI log/annotation
+Scripts vs recipes: `../gh/scripts/run pr-threads.ts` and
+`../gh/scripts/run ci-failures.ts` feed hunt surfaces 1–2 and CI log/annotation
 snippets. They do not replace recipes 1–6 wholesale. Recipe 3 always runs
 (REST review-comment reconcile); a successful script is not proof REST roots
 are present. Skip recipes 4–5 only when `--complete` JSON has complete page
 markers (`moreReviews`/`moreComments`/`moreConvo` false). Recipe 6 always
 runs for SHA-pinned required/blocking checks and annotations; `ci-failures`
-is drilldown only. Load remaining recipes when a script fails or a cap
-marker is set. Script JSON additive fields `id`, `databaseId`, `url` are the
+is drilldown only. Load remaining recipes when `run` exits after trying every
+runtime (bun, nub, tsx, nvm, Node strip-types) or a cap marker is set.
+`node -v` below 23 and `ERR_UNKNOWN_FILE_EXTENSION` are not script failure.
+Script JSON additive fields `id`, `databaseId`, `url` are the
 reply targets from threads; REST reconcile may add roots.
 
 Set `NO_COLOR=1`. Substitute owner, repo, number, and head SHA from the ledger.

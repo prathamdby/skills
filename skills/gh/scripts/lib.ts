@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Shared spawn/HTTP helpers. Node >= 23.6 native TS, stdlib only.
+// Shared spawn/HTTP helpers. Stdlib only; invoke via ./run.
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
