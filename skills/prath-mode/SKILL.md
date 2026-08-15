@@ -19,7 +19,7 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Remove code slop | `deslop` (`../deslop/SKILL.md`) |
 | Create or update a PR | `make-pr` (`../make-pr/SKILL.md`) |
 | Address PR feedback | `fix-pr` (`../fix-pr/SKILL.md`) |
-| Inspect a PR, read threads, or why CI is red | `gh` (`../gh/SKILL.md`) |
+| Inspect a PR, read threads, why CI is red, or post a reply | `gh` (`../gh/SKILL.md`) |
 | Review an implementation plan | `peer-review` (`../peer-review/SKILL.md`) |
 | Explain a diff as HTML | `explain-diff` (`../explain-diff/SKILL.md`) |
 | Map or refresh the current repo | `recon` (`../recon/SKILL.md`) |
@@ -31,9 +31,9 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 For one action, route to its leaf. Use `orchestrate` for several in-harness
 delegates and `assign` for one external CLI process. Chain only for a complete
 terminal outcome; several explicit outcomes select the matching chain.
-Orientation-only terminals go to `gh`; any fix, reply, push, or "handle review
-feedback" stays `fix-pr`. `fix-pr` may invoke `../gh/scripts/run`. `/gh` never
-continues into `fix-pr`.
+Orientation or reply-only terminals go to `gh`; any fix, push, or "handle
+review feedback" stays `fix-pr`. `fix-pr` loads `gh` for GitHub I/O. `/gh`
+never continues into `fix-pr`.
 
 ## Workflow chains
 
@@ -42,7 +42,7 @@ continues into `fix-pr`.
 | Ship planned work | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | approved plan diff tested and PR URL verified |
 | Save current work | optional `deslop` → `commit` | new commit verified |
 | Finish PR feedback | `fix-pr` | `fix-pr` report complete |
-| Inspect PR or CI | `gh` | script report verified |
+| Inspect PR or CI, or post a reply | `gh` | script report or reply URL verified |
 | Understand current repo | `recon` | memory and report verified |
 | Research external code | `box` | cited answer returned |
 | End or resume work | `handoff` | create or resume terminal state |
