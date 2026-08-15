@@ -57,18 +57,18 @@ Red flags — rewrite before `git commit` or block before push:
 
 ## GitHub hunt recipes
 
-Scripts vs recipes: `../gh/scripts/run pr-threads.ts` and
-`../gh/scripts/run ci-failures.ts` feed hunt surfaces 1–2 and CI log/annotation
-snippets. They do not replace recipes 1–6 wholesale. Recipe 3 always runs
-(REST review-comment reconcile); a successful script is not proof REST roots
-are present. Skip recipes 4–5 only when `--complete` JSON has complete page
-markers (`moreReviews`/`moreComments`/`moreConvo` false). Recipe 6 always
-runs for SHA-pinned required/blocking checks and annotations; `ci-failures`
-is drilldown only. Load remaining recipes when `run` exits after trying every
-runtime (bun, nub, tsx, nvm, Node strip-types) or a cap marker is set.
-`node -v` below 23 and `ERR_UNKNOWN_FILE_EXTENSION` are not script failure.
-Script JSON additive fields `id`, `databaseId`, `url` are the
-reply targets from threads; REST reconcile may add roots.
+Scripts vs recipes: after reading `../gh/SKILL.md`, that skill's
+`pr-threads.ts` and `ci-failures.ts` feed hunt surfaces 1–2 and CI
+log/annotation snippets. They do not replace recipes 1–6 wholesale. Recipe 3
+always runs (REST review-comment reconcile); a successful script is not proof
+REST roots are present. Skip recipes 4–5 only when `--complete` JSON has
+complete page markers (`moreReviews`/`moreComments`/`moreConvo` false). Recipe
+6 always runs for SHA-pinned required/blocking checks and annotations;
+`ci-failures` is drilldown only. Load remaining recipes when `run` exits after
+trying every runtime (bun, nub, tsx, nvm, Node strip-types) or a cap marker is
+set. `node -v` below 23 and `ERR_UNKNOWN_FILE_EXTENSION` are not script
+failure. Script JSON additive fields `id`, `databaseId`, `url` are the reply
+targets from threads; REST reconcile may add roots.
 
 Set `NO_COLOR=1`. Substitute owner, repo, number, and head SHA from the ledger.
 
@@ -113,10 +113,12 @@ complete. Clean up temporary files on every exit.
 
 ## Reply contracts
 
-Reply to inline findings through their root review-comment reply endpoint.
-Review-body and conversation findings receive one PR conversation comment per
-shared parent. Check-run and annotation findings use their linked conversation
-surface when one exists; otherwise report them without inventing a reply target.
+Post through the loaded gh skill `pr-reply.ts`. Inline findings use
+`--in-reply-to` with the root review-comment `databaseId` (nested ids resolve
+to that root). Review-body and conversation findings use `--conversation`, one
+PR conversation comment per shared parent. Check-run and annotation findings
+use their linked conversation surface when one exists; otherwise report them
+without inventing a reply target. Do not invent raw `gh` for a covered reply.
 
 Reply forms:
 

@@ -1,8 +1,33 @@
-# GitHub orientation reference
+# GitHub I/O reference
 
 Load Raw `gh` gotchas before any raw `gh` command. Load JSON shapes before
-parsing `--json`. Load Trace and logs when counting script HTTP or reading
-job logs.
+parsing `--json`. Load Reply when posting a thread or conversation comment.
+Load Trace and logs when counting script HTTP or reading job logs.
+
+## Reply
+
+`pr-reply.ts` posts one comment. Exactly one target and one body, or
+`BLOCKED`:
+
+| Flag | Effect |
+|---|---|
+| `--in-reply-to <id>` | Review-thread reply. `id` is a `databaseId`, `discussion_rN`, or comment URL |
+| `--conversation` | New PR conversation comment |
+| `--body-file <path>` | Reply markdown file |
+| `--body <text>` | Reply text via argv; prefer `--body-file` |
+
+`--in-reply-to` and `--conversation` conflict. `--body` and `--body-file`
+conflict. Empty body is `BLOCKED`. Nested review-comment ids resolve to the
+thread root before POST. The script never resolves, pushes, or merges.
+
+### `pr-reply.ts --json`
+
+```
+{ kind: "thread" | "conversation", id, url, inReplyTo, body }
+```
+
+`url` is the posted `html_url`. `inReplyTo` is the root review-comment id for
+thread replies, else null.
 
 ## Raw `gh` gotchas
 

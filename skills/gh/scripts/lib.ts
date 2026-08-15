@@ -201,14 +201,19 @@ export function isGraphqlFallback(e: unknown): boolean {
   return /timeout|timed out|complexity|something went wrong while executing your query/i.test(msg);
 }
 
-export async function restJson<T>(path: string, query?: Record<string, string>): Promise<T> {
+async function restRequest<T>(method: "GET" | "POST", path: string, init?: { query?: Record<string, string>; body?: unknown }): Promise<T> {
   const token = await getToken();
   const url = new URL(path.replace(/^\//, ""), restBase());
-  if (query) for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
-  traceHttp("GET", url.toString());
+  if (init?.query) for (const [k, v] of Object.entries(init.query)) url.searchParams.set(k, v);
+  traceHttp(method, url.toString());
+  const headers = method === "POST" ? { ...authHeaders(token), "Content-Type": "application/json" } : authHeaders(token);
   let res: Response;
   try {
-    res = await fetch(url, { headers: authHeaders(token) });
+    res = await fetch(url, {
+      method,
+      headers,
+      body: method === "POST" ? JSON.stringify(init?.body ?? {}) : undefined,
+    });
   } catch (e) {
     throw new HttpError(e instanceof Error ? e.message : String(e), 0);
   }
@@ -217,6 +222,14 @@ export async function restJson<T>(path: string, query?: Record<string, string>):
     throw new HttpError(`REST ${res.status} ${url.pathname} ${body}`, res.status);
   }
   return (await res.json()) as T;
+}
+
+export async function restJson<T>(path: string, query?: Record<string, string>): Promise<T> {
+  return restRequest<T>("GET", path, { query });
+}
+
+export async function restPost<T>(path: string, body: unknown): Promise<T> {
+  return restRequest<T>("POST", path, { body });
 }
 
 export function splitOwnerRepo(repo: string): { owner: string; name: string } {
