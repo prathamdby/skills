@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { prArg, resolvePr, resolveRepo, restJson, restPost, run, sanitizeForTerminal } from "./lib.ts";
 
@@ -16,29 +14,35 @@ conversation. Pass body via --body-file or --body, not both.
   --body         reply text (tool argv; prefer --body-file)
   --json         { kind, id, url, inReplyTo, body }`;
 
-export function parseReviewCommentId(input: string): number {
-  const trimmed = input.trim();
-  const discussion = trimmed.match(/discussion_r(\d+)/);
-  if (discussion?.[1]) return requirePositiveId(discussion[1]);
-  const api = trimmed.match(/\/pulls\/comments\/(\d+)/);
-  if (api?.[1]) return requirePositiveId(api[1]);
-  return requirePositiveId(trimmed);
-}
-
-export function replyPath(repo: string, pr: number, rootId?: number): string {
-  if (rootId != null) return `repos/${repo}/pulls/${pr}/comments/${rootId}/replies`;
-  return `repos/${repo}/issues/${pr}/comments`;
-}
-
-export function replyRootId(comment: { id: number; in_reply_to_id?: number | null }): number {
-  return comment.in_reply_to_id ?? comment.id;
-}
+type Posted = {
+  id: number;
+  html_url?: string;
+  url?: string;
+  in_reply_to_id?: number | null;
+  body?: string;
+};
 
 function requirePositiveId(raw: string): number {
   if (!/^[1-9]\d*$/.test(raw)) throw new Error(`review comment id must be a positive integer, got: ${raw}`);
   const n = Number(raw);
   if (!Number.isSafeInteger(n)) throw new Error(`review comment id must be a positive integer, got: ${raw}`);
   return n;
+}
+
+function parseReviewCommentId(input: string): number {
+  const trimmed = input.trim();
+  const discussion = trimmed.match(/^discussion_r(\d+)$/);
+  if (discussion?.[1]) return requirePositiveId(discussion[1]);
+  const urlHash = trimmed.match(/^https?:\/\/\S+#discussion_r(\d+)$/i);
+  if (urlHash?.[1]) return requirePositiveId(urlHash[1]);
+  const api = trimmed.match(/^https?:\/\/\S+\/pulls\/comments\/(\d+)$/i);
+  if (api?.[1]) return requirePositiveId(api[1]);
+  return requirePositiveId(trimmed);
+}
+
+function replyPath(repo: string, pr: number, rootId?: number): string {
+  if (rootId != null) return `repos/${repo}/pulls/${pr}/comments/${rootId}/replies`;
+  return `repos/${repo}/issues/${pr}/comments`;
 }
 
 function readReplyBody(body: string | undefined, bodyFile: string | undefined): string {
@@ -49,25 +53,7 @@ function readReplyBody(body: string | undefined, bodyFile: string | undefined): 
   return text;
 }
 
-type Posted = {
-  id: number;
-  html_url?: string;
-  url?: string;
-  in_reply_to_id?: number | null;
-  body?: string;
-};
-
-function invokedAsScript(): boolean {
-  const entry = process.argv[1];
-  if (!entry) return false;
-  try {
-    return import.meta.url === pathToFileURL(resolve(entry)).href;
-  } catch {
-    return false;
-  }
-}
-
-async function main(): Promise<void> {
+run(async () => {
   const { values: v, positionals } = parseArgs({
     options: {
       repo: { type: "string", short: "R" },
@@ -92,7 +78,7 @@ async function main(): Promise<void> {
   let rootId: number | undefined;
   if (threadId != null) {
     const existing = await restJson<Posted>(`repos/${repo}/pulls/comments/${threadId}`);
-    rootId = replyRootId({ id: existing.id, in_reply_to_id: existing.in_reply_to_id });
+    rootId = existing.in_reply_to_id ?? existing.id;
   }
   const posted = await restPost<Posted>(replyPath(repo, pr, rootId), { body });
   const url = posted.html_url ?? posted.url ?? "";
@@ -110,6 +96,4 @@ async function main(): Promise<void> {
   if (kind === "thread") log(`${repo}#${pr}: replied to discussion_r${rootId}`);
   else log(`${repo}#${pr}: posted conversation comment`);
   if (url) log(url);
-}
-
-if (invokedAsScript()) run(main);
+});

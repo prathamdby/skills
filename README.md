@@ -82,7 +82,7 @@ codex plugin add skills@pratham-skills
 | [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify`, `--allow-trailers` |
 | [`make-pr`](./skills/make-pr/SKILL.md) | Publish a branch and create or update its PR with a diff-scaled body. | `--target <branch>` default `main`, `--ticket <id>`, `--conventional` |
 | [`fix-pr`](./skills/fix-pr/SKILL.md) | Resolve open PR feedback and CI, then reply with evidence. | `--pr <n\|url>`, `--no-push`, `--no-reply` |
-| [`gh`](./skills/gh/SKILL.md) | Orient on PR state, review threads, or CI, or post one reply. | `--json`, `--full`, `-R owner/repo`, threads `--open`/`--all`/`--complete`, CI `--pr`/`--sha`/`--list`, reply `--in-reply-to`/`--conversation`/`--body-file`; invoke via `scripts/run` |
+| [`gh`](./skills/gh/SKILL.md) | Orient on PR state, review threads, or CI, or post one reply. | `--json`, `--full`, `-R owner/repo`, threads `--open`/`--all`/`--complete`, CI `--pr`/`--sha`/`--list`, reply `--in-reply-to`/`--conversation`/`--body-file`/`--body`; invoke via `scripts/run` |
 | [`explain-diff`](./skills/explain-diff/SKILL.md) | Write an HTML teaching page for a diff, branch, or PR. | `--target <branch>` default `main`, `--pr <n\|url>`, `--staged`, `--unstaged`, `--output <path>` |
 | [`recon`](./skills/recon/SKILL.md) | Build or refresh a persistent map of the current repo. | `--refresh`, positional focus |
 | [`box`](./skills/box/SKILL.md) | Clone, update, list, search, or persist an external repo. | `--persist`, `--update`, `--list`, `--no-subagents` |
