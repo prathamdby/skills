@@ -33,7 +33,8 @@
         "./skills/orchestrate",
         "./skills/peer-review",
         "./skills/prath-mode",
-        "./skills/recon"
+        "./skills/recon",
+        "./skills/verify"
       ]
     }
   ]
