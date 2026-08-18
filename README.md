@@ -34,6 +34,7 @@ codex plugin add skills@pratham-skills
 
 - `/prath-mode` routes work to one skill or a delivery chain.
 - `/peer-review` checks an implementation plan before work starts.
+- `/verify` fans out N isolated attempts, ranks them, and stops on a named gate.
 - `/deslop` removes needless complexity from a selected diff.
 - `/commit` creates a clean-room commit from staged or tracked unstaged work.
 - `/make-pr` pushes committed work and creates or updates its pull request.
@@ -53,6 +54,7 @@ codex plugin add skills@pratham-skills
 | The agent picks the wrong workflow or repeats work owned by another skill. | [`prath-mode`](./skills/prath-mode/SKILL.md) | Routes each immediate action to one owner and tracks chain completion. |
 | A plan misses a requirement or carries a risky assumption into implementation. | [`peer-review`](./skills/peer-review/SKILL.md) | Exhausts every material finding, ranks them, and issues a fixed verdict. It edits only with explicit authority. |
 | A plan review stops after the first risk and leaves other blockers unlisted. | [`peer-review`](./skills/peer-review/SKILL.md) | Surfaces every material finding with no count cap, then maps the full ranked list to the verdict. |
+| The agent ships the first attempt or picks a winner from narration instead of observed evidence. | [`verify`](./skills/verify/SKILL.md) | Fans out N isolated attempts, pairwise-verifies on decomposed criteria, ranks with PPT, and stops on a named gate. |
 | Generated code adds guards, wrappers, comments, or indirection that the codebase does not need. | [`deslop`](./skills/deslop/SKILL.md) | Classifies the selected diff against six categories, preserves staging intent, and verifies behavior-sensitive edits. |
 | Commit messages leak ticket or review context and do not match the committed hunks. | [`commit`](./skills/commit/SKILL.md) | Locks the snapshot, traces every message line to a hunk, applies the selected hook policy, and verifies the commit. |
 | PR creation misses local commits, duplicates an existing PR, or describes work absent from the diff. | [`make-pr`](./skills/make-pr/SKILL.md) | Blocks on a dirty or diverged branch, publishes committed work, reuses the open PR, and verifies its fields. |
@@ -71,6 +73,7 @@ codex plugin add skills@pratham-skills
 | External coding-agent commands break on quoting, permissions, silence, or parallel runs. | [`assign`](./skills/assign/SKILL.md) | Uses collision-safe stdin transport, non-interactive commands, tracked processes, cleanup, and result verification. |
 | A resumed session trusts stale paths, tasks, branches, or PR state. | [`handoff`](./skills/handoff/SKILL.md) | Saves a bounded, redacted handoff and validates every artifact before resuming work. |
 | The main model spends its context on mechanical work or trusts delegate summaries. | [`orchestrate`](./skills/orchestrate/SKILL.md) | Delegates disjoint chunks, verifies evidence and integration, and keeps the parent read-only. |
+| Best-of-N collapses to the first plausible attempt or one yes/no judge call. | [`verify`](./skills/verify/SKILL.md) | Fans out a fixed-N pool, scores pairs on a 20-letter scale, ranks with a pivot tournament, and stops on a named gate. |
 
 ## Reference
 
@@ -78,6 +81,7 @@ codex plugin add skills@pratham-skills
 |---|---|---|
 | [`prath-mode`](./skills/prath-mode/SKILL.md) | Route one action or a complete workflow chain. | None |
 | [`peer-review`](./skills/peer-review/SKILL.md) | Exhaustively review a plan or proposed change and issue a fixed verdict. | None |
+| [`verify`](./skills/verify/SKILL.md) | Fan out N isolated attempts, pairwise-verify, and select, or score current progress. | `--candidates` default `3`, `--evals` default `2`, `--pivots` default `2`, `--max-rounds` default `0`, `--criteria` default auto, `--track` |
 | [`deslop`](./skills/deslop/SKILL.md) | Remove code slop from one git diff without changing behavior. | `--staged` default, `--unstaged`, `--base <branch>` |
 | [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify`, `--allow-trailers` |
 | [`make-pr`](./skills/make-pr/SKILL.md) | Publish a branch and create or update its PR with a diff-scaled body. | `--target <branch>` default `main`, `--ticket <id>`, `--conventional` |
