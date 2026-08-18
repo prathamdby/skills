@@ -84,8 +84,6 @@ Done when a stop rule fires.
 `criteria | generate | path | classify | ranking w_i/c_i | winner | rounds |
 stop | terminal`. `SUCCESS`, `ALL_PASS`, `NO_IMPROVEMENT`, `BLOCKED`.
 
-Do not install `llm-verifier` unless the user asked for that stack.
-
 ## Rationalizations
 
 | Excuse | Reality |
