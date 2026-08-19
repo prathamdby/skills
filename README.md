@@ -2,9 +2,9 @@
 
 [![skills.sh](https://skills.sh/b/prathamdby/skills)](https://skills.sh/prathamdby/skills)
 
-A small set of coding-agent workflows for planning, git work, code review,
-delegation, and session continuity. Each skill has a narrow job, explicit stop
-conditions, and defaults listed in its own file.
+A small set of coding-agent skills for planning, git work, code review,
+delegation, and session continuity. Each skill is one short file of plain
+instructions. You can read any of them in a minute.
 
 ## Install
 
@@ -14,7 +14,7 @@ conditions, and defaults listed in its own file.
 npx skills@latest add prathamdby/skills
 ```
 
-Pick the skills and agents you want in the installer.
+Pick the skills you want in the installer.
 
 ### Claude Code
 
@@ -30,80 +30,30 @@ codex plugin marketplace add prathamdby/skills
 codex plugin add skills@pratham-skills
 ```
 
-## Quickstart
+## Skills
 
-- `/prath-mode` routes work to one skill or a delivery chain.
-- `/peer-review` checks an implementation plan before work starts.
-- `/verify` fans out N isolated attempts, ranks them, and stops on a named gate.
-- `/deslop` removes needless complexity from a selected diff.
-- `/commit` creates a clean-room commit from staged or tracked unstaged work.
-- `/make-pr` pushes committed work and creates or updates its pull request.
-- `/fix-pr` hunts, triages, fixes, and replies to pull-request feedback and CI.
-- `/gh` orients on a PR, review threads, or red CI, or posts one reply.
-- `/explain-diff` writes a self-contained HTML walkthrough of a change.
-- `/recon` maps the current repository and refreshes only changed areas later.
-- `/box` clones and searches an external git repository locally.
-- `/assign` runs one exact task through an external coding-agent CLI.
-- `/handoff` saves resumable session state or continues from it.
-- `/orchestrate` coordinates cheaper subagents while the main agent verifies.
-
-## Why these skills exist
-
-| Common failure | Skill | Contract |
-|---|---|---|
-| The agent picks the wrong workflow or repeats work owned by another skill. | [`prath-mode`](./skills/prath-mode/SKILL.md) | Routes each immediate action to one owner and tracks chain completion. |
-| A plan misses a requirement or carries a risky assumption into implementation. | [`peer-review`](./skills/peer-review/SKILL.md) | Exhausts every material finding, ranks them, and issues a fixed verdict. It edits only with explicit authority. |
-| A plan review stops after the first risk and leaves other blockers unlisted. | [`peer-review`](./skills/peer-review/SKILL.md) | Surfaces every material finding with no count cap, then maps the full ranked list to the verdict. |
-| The agent ships the first attempt or picks a winner from narration instead of observed evidence. | [`verify`](./skills/verify/SKILL.md) | Fans out N isolated attempts, pairwise-verifies on decomposed criteria, ranks with PPT, and stops on a named gate. |
-| Generated code adds guards, wrappers, comments, or indirection that the codebase does not need. | [`deslop`](./skills/deslop/SKILL.md) | Classifies the selected diff against six categories, preserves staging intent, and verifies behavior-sensitive edits. |
-| Commit messages leak ticket or review context and do not match the committed hunks. | [`commit`](./skills/commit/SKILL.md) | Locks the snapshot, traces every message line to a hunk, applies the selected hook policy, and verifies the commit. |
-| PR creation misses local commits, duplicates an existing PR, or describes work absent from the diff. | [`make-pr`](./skills/make-pr/SKILL.md) | Blocks on a dirty or diverged branch, publishes committed work, reuses the open PR, and verifies its fields. |
-| A PR body stays flat for large diffs or buries small changes in boilerplate. | [`make-pr`](./skills/make-pr/SKILL.md) | Measures the locked diff, picks a body tier for bullet count and depth, and writes STE100 prose. |
-| A harness appends marketing footers such as `Made with Cursor` to the PR body. | [`make-pr`](./skills/make-pr/SKILL.md) | Requires the published body to equal the ledger body and strips injected footers once before success. |
-| Review work starts from the first visible comment and misses later pages, nested replies, or invalid suggestions. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Exhausts every feedback surface before editing, requires evidence for each verdict, and re-hunts until stable. |
-| Required CI or check runs on the PR head are left red while only human comments are fixed. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Hunts terminal non-success required or blocking checks and annotations with the other surfaces, then triages and fixes them. |
-| A fix-pr commit subject narrates review follow-up instead of the locked hunks. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Discards pre-drafted subjects, requires a hunk-proved subject recipe, and blocks ban-list or conversation-only messages before push. |
-| A fix-pr commit picks up identity or harness trailers from hooks or agent defaults. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Denies `Co-authored-by` / `Signed-off-by` / `Made-with` and freeform harness footers by default and runs commit Trailer hygiene before push. |
-| Agents burn 3–5 `gh` calls and dump CI logs into context when inspecting a PR. | [`gh`](./skills/gh/SKILL.md) | One script per I/O loop; bounded snippets; logs on disk; raw `gh` only after gotchas. |
-| A fix-pr hunt runs `gh` scripts without loading the gh skill, then invents raw `gh` to reply. | [`fix-pr`](./skills/fix-pr/SKILL.md) | Requires the gh skill before any GitHub I/O and posts replies through `pr-reply.ts`. |
-| Agents skip the `.ts` inspect scripts on Node 22 and dump GraphQL instead of probing bun, nub, tsx, or type-stripping Node. | [`gh`](./skills/gh/SKILL.md) | `scripts/run` tries bun, nub, tsx, then Node (native TS or `--experimental-strip-types`, including nvm); GraphQL inspect is blocked until that list is exhausted. |
-| A large diff gets a shallow chat summary with no surrounding system context. | [`explain-diff`](./skills/explain-diff/SKILL.md) | Groups the change by theme and writes an evidence-linked HTML page with a working quiz. |
-| Every session re-reads the same repository from scratch. | [`recon`](./skills/recon/SKILL.md) | Stores a bounded evidence map and patches it from committed git drift. |
-| The agent guesses what an external repository contains. | [`box`](./skills/box/SKILL.md) | Clones into a skill-owned sandbox, searches local source, and returns cited findings. |
-| External coding-agent commands break on quoting, permissions, silence, or parallel runs. | [`assign`](./skills/assign/SKILL.md) | Uses collision-safe stdin transport, non-interactive commands, tracked processes, cleanup, and result verification. |
-| A resumed session trusts stale paths, tasks, branches, or PR state. | [`handoff`](./skills/handoff/SKILL.md) | Saves a bounded, redacted handoff and validates every artifact before resuming work. |
-| The main model spends its context on mechanical work or trusts delegate summaries. | [`orchestrate`](./skills/orchestrate/SKILL.md) | Delegates disjoint chunks, verifies evidence and integration, and keeps the parent read-only. |
-| Best-of-N collapses to the first plausible attempt or one yes/no judge call. | [`verify`](./skills/verify/SKILL.md) | Fans out a fixed-N pool, scores pairs on a 20-letter scale, ranks with a pivot tournament, and stops on a named gate. |
-
-## Reference
-
-| Skill | Description | Flags and arguments |
-|---|---|---|
-| [`prath-mode`](./skills/prath-mode/SKILL.md) | Route one action or a complete workflow chain. | None |
-| [`peer-review`](./skills/peer-review/SKILL.md) | Exhaustively review a plan or proposed change and issue a fixed verdict. | None |
-| [`verify`](./skills/verify/SKILL.md) | Fan out N isolated attempts, pairwise-verify, and select, or score current progress. | `--candidates` default `3`, `--evals` default `2`, `--pivots` default `2`, `--max-rounds` default `0`, `--criteria` default auto, `--track` |
-| [`deslop`](./skills/deslop/SKILL.md) | Remove code slop from one git diff without changing behavior. | `--staged` default, `--unstaged`, `--base <branch>` |
-| [`commit`](./skills/commit/SKILL.md) | Commit a locked snapshot with hunk-traced copy. | `--staged` default, `--unstaged`, `--conventional` default, `--simple`, `--verify`, `--allow-trailers` |
-| [`make-pr`](./skills/make-pr/SKILL.md) | Publish a branch and create or update its PR with a diff-scaled body. | `--target <branch>` default `main`, `--ticket <id>`, `--conventional` |
-| [`fix-pr`](./skills/fix-pr/SKILL.md) | Resolve open PR feedback and CI, then reply with evidence. | `--pr <n\|url>`, `--no-push`, `--no-reply` |
-| [`gh`](./skills/gh/SKILL.md) | Orient on PR state, review threads, or CI, or post one reply. | `--json`, `--full`, `-R owner/repo`, threads `--open`/`--all`/`--complete`, CI `--pr`/`--sha`/`--list`, reply `--in-reply-to`/`--conversation`/`--body-file`/`--body`; invoke via `scripts/run` |
-| [`explain-diff`](./skills/explain-diff/SKILL.md) | Write an HTML teaching page for a diff, branch, or PR. | `--target <branch>` default `main`, `--pr <n\|url>`, `--staged`, `--unstaged`, `--output <path>` |
-| [`recon`](./skills/recon/SKILL.md) | Build or refresh a persistent map of the current repo. | `--refresh`, positional focus |
-| [`box`](./skills/box/SKILL.md) | Clone, update, list, search, or persist an external repo. | `--persist`, `--update`, `--list`, `--no-subagents` |
-| [`assign`](./skills/assign/SKILL.md) | Run one task with OpenCode, Codex, or Claude Code. | `--agent <name>` default `opencode`, `--model <model>`, `--dir <path>` |
-| [`handoff`](./skills/handoff/SKILL.md) | Save or resume bounded session state. | `--resume <path>`, `--path <path>`, positional focus |
-| [`orchestrate`](./skills/orchestrate/SKILL.md) | Coordinate in-harness subagents as a read-only parent. | Positional task |
+| Skill | What it does |
+|---|---|
+| [`/prath-mode`](./skills/prath-mode/SKILL.md) | Route one request to the skill that owns it, or run a full ship chain. |
+| [`/peer-review`](./skills/peer-review/SKILL.md) | Decide if a plan is ready to build: ship, fix the blockers, or rework. |
+| [`/verify`](./skills/verify/SKILL.md) | Run N isolated attempts at a task and pick the best one. |
+| [`/deslop`](./skills/deslop/SKILL.md) | Cut bloat from a diff without changing what the code does. |
+| [`/commit`](./skills/commit/SKILL.md) | Commit staged work with a message proved by the diff. |
+| [`/make-pr`](./skills/make-pr/SKILL.md) | Push a branch and create or update its pull request. |
+| [`/fix-pr`](./skills/fix-pr/SKILL.md) | Work through pull-request feedback and red CI, then reply. |
+| [`/gh`](./skills/gh/SKILL.md) | Read PR state, review threads, and CI failures through local scripts. |
+| [`/explain-diff`](./skills/explain-diff/SKILL.md) | Turn a diff into a self-contained HTML teaching page. |
+| [`/recon`](./skills/recon/SKILL.md) | Map the current repository and patch the map on later runs. |
+| [`/box`](./skills/box/SKILL.md) | Clone an external repository and search the local copy with citations. |
+| [`/assign`](./skills/assign/SKILL.md) | Run one task through an external coding-agent CLI. |
+| [`/handoff`](./skills/handoff/SKILL.md) | Save session state and resume from it later. |
+| [`/orchestrate`](./skills/orchestrate/SKILL.md) | Split work across subagents and verify what they return. |
 
 ## Development
 
-Before committing a skill edit, run the manual checks in
-[`AGENTS.md`](./AGENTS.md):
-
-1. Frontmatter name matches the skill directory.
-2. Description is present and at most 1,024 characters.
-3. `SKILL.md` is at most 100 lines.
-4. Quickstart and Reference both include the skill.
-5. Every real Markdown path in the skill resolves.
+The authoring rules live in [`AGENTS.md`](./AGENTS.md). The short version: one
+plain file per skill, written in simplified technical English, with this table
+updated for every new skill.
 
 ## License
 

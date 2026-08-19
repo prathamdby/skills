@@ -1,88 +1,12 @@
 ---
 name: explain-diff
-description: >
-  explain-diff when turning a git diff, branch, or pull request into a
-  self-contained HTML teaching page.
+description: explain-diff when turning a git diff, branch, or pull request into a self-contained HTML teaching page.
 ---
 
 # Explain diff
 
-## Flags
+Turn a diff, branch, or pull request into one HTML page that teaches the change. By default, explain the diff against `main`. The user can pick a branch, a PR, or the staged or unstaged changes instead.
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--target <branch>` | `main` | Explain `<branch>...HEAD` |
-| `--pr <n\|url>` | off | Explain one PR diff and metadata |
-| `--staged` | off | Explain the index |
-| `--unstaged` | off | Explain worktree changes |
-| `--output <path>` | `/tmp/YYYY-MM-DD-explain-<slug>.html` | Set HTML path |
+Group the changed files into a few themes. For each theme, explain what changed and why in plain language, and quote the hunks that prove it. Read the surrounding code before you make a claim about how the system works. If you cannot prove a claim from the diff or the code, cut it.
 
-The four source choices are mutually exclusive; conflicting or valueless flags
-are `BLOCKED`; bare `--pr` is the only value-less exception and may resolve the
-current branch PR. With no source flag, use the equivalent of `--target main`.
-Block when PR diff cannot be fetched. Missing optional PR metadata permits a
-diff-only page with no motive claims.
-
-## 1. Lock source and output
-
-Capture source identity, head SHA, exact diff, sorted paths, and SHA-256 diff
-hash. Empty diff is `NO_CHANGES`. Derive slug from sanitized branch name, PR
-number, or `change-<head8>`, capped at 40 characters.
-
-Resolve output to an absolute path outside the repo; an explicit in-repo path is
-`BLOCKED`, never relocated. Create a missing parent. Block before overwriting a
-user-supplied existing file. A default output may replace only a prior artifact
-containing this skill's generator marker.
-
-Record:
-`source/hash | theme(name/paths/path-hash/gate) | evidence | output | gate | verification | terminal`.
-Gate is `lock`, `research`, `build`, or `verify`. Persist beside the output as
-`<output>.ledger` after every gate and completed theme. Resume an active ledger
-only when output and source hash match; otherwise `BLOCKED`. Remove on success.
-
-Done when source and safe output are immutable.
-
-## 2. Group and research
-
-Assign every changed path to a functional theme before reading surrounding
-code. For more than 50 paths, explain themes through representative hunks and
-include every sorted path without truncation. Represent a rename as
-`old → new`; list generated or binary paths under those themes and make no
-behavioral claim without text hunks. Give path-only inventory rows
-`data-hunk="<path>:inventory"`. Use at most 12 themes, three
-surrounding files per theme, and 30 surrounding files total. Read direct
-definitions, callers, contracts, tests, and config only when a planned claim
-needs them.
-
-Done when every path has a theme and each planned claim has a hunk or read-file
-pointer.
-
-## 3. Build the teaching page
-
-Load `./REFERENCE.md`. Write one HTML file in this order: Background, Intuition,
-Code, Quiz. Include a table of contents, inline CSS and JavaScript, responsive
-layout, and only HTML or inline-SVG diagrams. Code sections group by theme,
-with the complete inventory for large diffs.
-
-Every factual sentence about the change traces to a hunk. Every system claim
-traces to a surrounding file. Remove unsupported intent, motive, or PR claims.
-
-Done when the file exists with all four non-empty sections and five grounded
-quiz questions.
-
-## 4. Verify and report
-
-Apply the reference checklist. Verify no external asset URL, all anchors,
-generator marker, code whitespace, evidence pointers, and quiz answer feedback.
-When a browser tool exists, load the file and test one correct and one incorrect
-answer for every question; otherwise parse JavaScript and HTML and disclose
-`verification: static-only`. A browser run reports `verification: browser`.
-Recompute the live source fingerprint before `SUCCESS`; drift is `BLOCKED` so
-the page never mixes snapshots.
-
-After interruption, compare source hash and ledger. Restart changed themes;
-otherwise continue at the first incomplete gate.
-
-Report absolute path, source, theme and file counts, quiz count, and verification
-level. Do not paste the HTML. Terminal values are `SUCCESS`, `NO_CHANGES`, and
-`BLOCKED`. Never commit, push, or mutate a PR.
+Write one HTML file with all its CSS and JavaScript inline so it works offline. Use these sections: background, intuition, code walkthrough, and a short quiz with answer feedback. Save the page outside the repository and report the path. Never commit the page, push it, or edit the PR.

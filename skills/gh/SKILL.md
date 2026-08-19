@@ -1,99 +1,14 @@
 ---
 name: gh
-description: >
-  gh when inspecting a PR, reading review threads, diagnosing red CI, posting a
-  thread or conversation reply, or composing non-trivial gh commands. fix-pr
-  loads this skill for hunt and reply I/O. Node below 23 or
-  ERR_UNKNOWN_FILE_EXTENSION is not a skip to GraphQL.
+description: gh when inspecting a PR, reading review threads, diagnosing red CI, posting a thread or conversation reply, or composing non-trivial gh commands. fix-pr loads this skill for hunt and reply I/O. Node below 23 or ERR_UNKNOWN_FILE_EXTENSION is not a skip to GraphQL.
 ---
 
 # GitHub I/O
 
-CLI contracts follow AVGVSTVS96/better-github-skill (no upstream license;
-reimplemented). Requires authenticated `gh`. Scripts are TypeScript. `run`
-tries bun, nub, tsx, then Node (native TS or `--experimental-strip-types`),
-including nvm installs.
+Use the scripts in the `scripts` directory next to this file for GitHub work. Run them with `scripts/run <script>` and it finds a working TypeScript runtime for you. `pr-snapshot.ts` shows PR state and checks. `pr-threads.ts` shows review threads. `ci-failures.ts` collects CI failures and saves the logs to disk. `pr-reply.ts` posts one reply.
 
-## Flags
+A snapshot tells you the state of the PR. The threads tell you what reviewers wrote. You usually need both. Pass `--json` for structured output and `--full` when you need complete comment bodies.
 
-| Flag | Default | Effect |
-|---|---|---|
-| `[pr]` / `--pr <n>` | current branch PR | Target PR |
-| `-R owner/repo` | cwd repo | Target repo; with `-R` also pass `pr` / `--pr` |
-| `--json` | off | Structured output |
-| `--full` | off | Snapshot/threads: do not truncate bodies. CI: accepted; snippets stay capped |
-| `--all` | off | Threads: include resolved and outdated |
-| `--open` | off | Threads: unresolved including outdated |
-| `--author <login>` | off | Threads: filter by author |
-| `--since <ISO>` | off | Threads: activity at/after timestamp |
-| `--complete` | off | Threads: page leftover comments and reviews |
-| `--sha <SHA>` | off | CI: pin commit; not hunt surface 6 |
-| `--list` | off | CI: recent runs instead of drilldown |
-| `-L <n>` | 10 | CI `--list`: how many runs |
-| `--workflow <W>` | off | CI `--list`: filter by name or file |
-| `[run-id]` | PR failing checks | CI: analyze that Actions run |
+Do not pipe output through `head`. If the output is large, redirect it to a file. If `run` exits with code 2, stop and report it. That is not permission to hand-write GraphQL. A Node version error means the runtime cannot load TypeScript, not that the script failed. Let `run` try its runtimes.
 
-`--all` and `--open` conflict: `BLOCKED`. Missing values are `BLOCKED`. No flags
-mean current-branch PR, cwd repo, truncated text. When posting a reply, use
-exactly one target and one body from Reply in `./REFERENCE.md`.
-
-## Iron laws
-
-1. Scripts for the four I/O loops via `<anchor>/scripts/run`. Raw `gh`
-   only when no script covers the request. A missing Node 23 is not "no
-   script covers." Before any raw `gh` command, apply the gotchas in
-   `./REFERENCE.md`.
-2. Snapshot is PR state; threads is what reviewers wrote. Neither replaces the
-   other.
-3. Scripts exit 0 when the report or post succeeds. Red CI and open threads are
-   not script failures. Never `gh | head`. EPIPE is not failure.
-4. Never resolve, push, or merge. Reply only through `pr-reply.ts`.
-5. Never version-gate Node. Never treat `node -v` or
-   `ERR_UNKNOWN_FILE_EXTENSION` as script failure. That error means this
-   `node` cannot load `.ts`. Invoke `run`; it must try bun, nub, tsx, nvm
-   nodes, and `node --experimental-strip-types` before any GraphQL/`gh api`
-   inspect of snapshot, threads, or CI. `run` exit 2 is `BLOCKED`, not a
-   GraphQL license. User or senior saying "GraphQL is fine" does not skip
-   `run`.
-
-## Scripts
-
-Resolve `<anchor>` as the directory containing this `SKILL.md`. Invoke only
-through `<anchor>/scripts/run <script.ts> …`. Never `node <script.ts>`
-directly. Load JSON shapes in `./REFERENCE.md` before parsing `--json`.
-
-| Script | Covers |
-|---|---|
-| `<anchor>/scripts/run pr-snapshot.ts [pr] [--pr n] [-R owner/repo] [--full] [--json]` | Meta, mergeability, checks, files, reviews, comments, thread counts |
-| `<anchor>/scripts/run pr-threads.ts [pr] [--pr n] [-R owner/repo] [--all\|--open] [--author] [--since] [--full] [--json] [--complete]` | Review bodies, issue comments, inline threads with resolution |
-| `<anchor>/scripts/run ci-failures.ts [run-id] [--pr N] [--sha SHA] [--list [-L n] [--workflow W]] [--full] [-R owner/repo] [--json]` | Failing checks → jobs/steps → snippet; logs on disk |
-| `<anchor>/scripts/run pr-reply.ts [pr] [--pr n] [-R owner/repo] (--in-reply-to id \| --conversation) (--body-file path \| --body text) [--json]` | One thread or conversation reply; nested ids resolve to the root |
-
-## 1. Resolve the target
-
-Confirm `gh` is authenticated. Do not check Node ≥ 23. Record owner/repo, PR
-or run id, SHA if known, and which surface. Reply also records target kind and
-body source. No PR for a PR-bound request is `NO_CHANGES`. Auth failure or
-missing `gh` is `BLOCKED`. Missing Node 23 is not.
-
-Record: `target | surface | command | terminal`.
-
-Done when the target is identified or a terminal is set.
-
-## 2. Inspect or reply
-
-Pick one covering script. Invoke it with `run`. Pass `--sha` when the head SHA
-is known. Pass `--json --open --complete` when the consumer needs every
-unresolved thread. For a reply, pass one target and one body; do not resolve
-the thread. If no script covers the request, use raw `gh` after applying
-gotchas in `./REFERENCE.md`. If `run` exits 2, report `BLOCKED` with the
-tried-runtime list; do not hand-roll GraphQL for a covered surface.
-Redirect large output to a file; never pipe to `head`. Done when stdout is a
-complete report, a posted reply URL, or stderr names a real failure.
-
-## 3. Report
-
-Summarize from the script output. Cite printed log paths; do not paste full
-CI logs. A set cap marker in `--json` means that list is incomplete. Green CI,
-zero threads, or a printed reply URL is `SUCCESS`. Terminal values are
-`SUCCESS`, `NO_CHANGES` (empty or no PR), and `BLOCKED`.
+Never resolve threads, merge, or push from this skill. Post replies only through `pr-reply.ts`.

@@ -1,64 +1,12 @@
 ---
 name: assign
-description: >
-  assign when running one exact task through a supported external coding-agent
-  CLI without interactive prompts.
+description: assign when running one exact task through a supported external coding-agent CLI without interactive prompts.
 ---
 
 # Assign
 
-## Flags
+Give one task to an external coding agent and let it run to the end. The supported agents are opencode, codex, and claude. Write the full task before you start, because the agent cannot ask questions. Include the goal, the files that matter, and what a good result looks like. Do not add steps the task did not ask for, such as a commit or a push.
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--agent <name>` | `opencode` | `opencode`, `codex`, or `claude` |
-| `--model <model>` | registry default | Override the selected agent's model |
-| `--dir <path>` | current directory | External agent working directory |
+Write the task to a temp file and pipe it to the agent on stdin. Never put the task text in the command line, where other users and logs can read it. For codex, pass `-` so it reads from stdin. Run the agent without interactive prompts and watch its output. Silence is not a failure. Stop it only when it waits for input, the user cancels, or the time limit is reached.
 
-If `--agent` names an unsupported agent, stop: "Unknown agent `<name>`.
-Supported agents: opencode, codex, claude. See `./REFERENCE.md`."
-
-## 1. Preflight
-
-Require a non-empty positional task, an existing working directory, the agent
-executable, and the registry entry in `./REFERENCE.md`. For Codex outside a git
-repo, use the registry's non-git branch.
-
-Record:
-`agent/model | dir | prompt path | process | last progress | exit | terminal`.
-
-Done when inputs and the exact non-interactive command are resolved, or a
-specific missing executable, directory, or auth blocker is reported.
-
-## 2. Create transport
-
-Create a collision-safe prompt file with restrictive permissions using the
-system temp directory. Write the task bytes unchanged. Never pass task text as
-a shell argument. Register cleanup before launching so success, error, signal,
-or interruption removes the prompt.
-
-Done when the prompt can be read back byte-for-byte and parallel assignments
-cannot share its path.
-
-## 3. Execute and monitor
-
-Run the selected registry command through a tracked process and pipe the prompt
-on stdin. Capture stdout, stderr, process ID, and exit code. Monitor output,
-process state, and target-directory changes. Silence alone is not proof of a
-hang. Inspect the process after a silent interval; terminate only when it is
-waiting for input despite non-interactive flags, the user cancels, or the
-execution deadline is reached. Use the reference's termination sequence.
-
-Done when the process exits or is terminated, with no orphaned child process.
-
-## 4. Verify and report
-
-Always run cleanup, then confirm the prompt file is absent. Non-zero exit,
-spawn failure, timeout, or empty output is not success. For code work, inspect
-the resulting diff and requested test evidence; do not trust the CLI summary.
-
-Report the agent, model, directory, exit code, observed result, verification,
-and one terminal value: `SUCCESS`, `FAILED`, `TIMED_OUT`, or `INTERRUPTED`.
-
-Delegate exactly the supplied task. Do not add commit, push, build, or scope
-unless the task itself asks for it.
+When the agent exits, check the result yourself. Look at the diff and run the tests. Do not trust the summary the CLI prints. Report the agent, the exit code, and what the code actually does now.
