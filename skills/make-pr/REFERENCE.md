@@ -56,9 +56,14 @@ Apply ASD-STE100 and Google developer documentation style to body prose
 - Use one plain word for one act. Do not rotate synonyms (prefer start over
   begin, commence, or initiate).
 - Write active voice. Name the actor: "The skill measures the diff."
-- Use simple tenses only: infinitive, imperative, simple present, simple
-  past, or simple future. Use present tense for current behavior. Do not
-  use perfect or progressive forms.
+- Use simple tenses: infinitive, imperative, simple present, simple past,
+  or simple future. Prefer simple present or imperative. Avoid progressive
+  and perfect when simple present suffices. Use present tense for current
+  behavior. Keep -ing only for technical nouns, adjectives, or
+  prepositions (`opening`, `remaining`, `during`). Rewrite other -ing
+  verbs as imperative or simple present: "The handler starts the job."
+  not "The skill is handling the job." Prefer "The skill runs the
+  checks." over "The skill is running the checks."
 - Keep instructional lines at 20 words or fewer. Keep descriptive bullets
   at 25 words or fewer.
 - Keep one topic per sentence and one idea per bullet.
@@ -68,8 +73,6 @@ Apply ASD-STE100 and Google developer documentation style to body prose
 - Do not write we, let's, please, simply, easy, quickly, slang, or tl;dr.
   Do not use exclamation marks.
 - Put a condition before its instruction: "If X, do Y."
-- Avoid -ing verb forms. Rewrite as imperative or simple present. Keep
-  -ing only when the word is a technical noun, adjective, or preposition.
 - Use sentence-case headings (`## Summary`, `## Details`, `## Breaking`).
   Use serial commas.
 - Keep articles (a, the) when they make grammar clear. Use American
@@ -84,7 +87,8 @@ Apply ASD-STE100 and Google developer documentation style to body prose
 
 Title lines: Pope/Beams imperative, no trailing period. Default title uses
 sentence case and stays at most 60 characters. Conventional title follows
-commit conventional rules (lowercase description, 50 characters, no scope).
+commit conventional rules (lowercase except names and technical terms, 50
+characters, no scope, imperative, no period).
 
 Provenance (principles only; do not copy the STE dictionary):
 https://www.asd-ste100.org/STE_faq.html

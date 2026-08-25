@@ -24,8 +24,16 @@ Load Trailer hygiene only during Step 4 verify, or when drafting under
   onto body bullets.
 - Subject is the first `-m`. Optional body is the second `-m`. That pair is
   the required Pope/Beams blank line. Never join them into one `-m`.
-- Wrap every body line at 72 characters. Continue a wrapped `- ` bullet with
-  a hanging indent of two spaces.
+- Wrap every body line at 72 characters. 72 counts every character on the
+  line, including `- `, the hanging indent, and path or code literals.
+  Continue a wrapped `- ` bullet with a hanging indent of two spaces.
+  Before (77, reject):
+  `- Add webhook parser tests under skills/commit/REFERENCE.md for the wrap gate`
+  After (72, then a two-space hanging indent):
+```
+- Add webhook parser tests under skills/commit/REFERENCE.md for the wrap
+  gate
+```
 - Body states what changed and why the proving hunks exist, not how the code
   works. The diff shows how. Use only facts the locked diff proves. Do not
   add ticket, review, or session motives.
