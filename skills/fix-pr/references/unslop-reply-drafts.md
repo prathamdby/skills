@@ -30,3 +30,20 @@ meaning, IDs, paths, SHAs, or required bot commands.
 
 For a Semgrep dismissal, rewrite only the reason after the prefix. Final check:
 could a reviewer tell what happened and why from this reply alone?
+
+## Voice
+
+Apply ASD-STE100 and Google developer-docs voice after the contract is met.
+This pass changes voice only. Meaning, IDs, paths, SHAs, Semgrep prefixes,
+and reply forms stay exact.
+
+- Use short sentences. One idea per sentence or bullet.
+- Write active voice. Use present tense for current behavior.
+- Address the reviewer as you only when the sentence speaks to the reviewer.
+  Use imperative for instructions. Use third person for what the code does.
+- Do not write we, let's, please, simply, or easy.
+- Do not use -ing verb forms. Rewrite as imperative or simple present.
+
+Provenance (principles only; do not copy the STE dictionary):
+https://www.asd-ste100.org/STE_faq.html
+https://developers.google.com/style

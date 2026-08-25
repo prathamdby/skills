@@ -42,30 +42,55 @@ Rules for every tier:
 3. Cluster hunks into themes.
 4. Write `## Summary` bullets at that tier's depth and count range.
 5. Add allowed extra sections only when evidence exists.
-6. Apply STE100 below to every body sentence and bullet.
+6. Apply Body style below to every body sentence and bullet.
 7. Map every title phrase and body line to proving paths and hunks.
    Rewrite untraced copy.
 
-Done when format, tier, STE100, and clean-room trace all pass.
+Done when format, tier, Body style, and clean-room trace all pass.
 
-## STE100 for PR bodies
+## Body style
 
-Apply ASD-STE100 discipline to body prose (not to path or symbol literals):
+Apply ASD-STE100 and Google developer documentation style to body prose
+(not to path or symbol literals):
 
-- Use one plain word for one idea. Do not rotate synonyms for the same act.
+- Use one plain word for one act. Do not rotate synonyms (prefer start over
+  begin, commence, or initiate).
 - Write active voice. Name the actor: "The skill measures the diff."
-- Use simple tense. Prefer "The body uses tier M." over perfect forms.
+- Use simple tenses only: infinitive, imperative, simple present, simple
+  past, or simple future. Use present tense for current behavior. Do not
+  use perfect or progressive forms.
 - Keep instructional lines at 20 words or fewer. Keep descriptive bullets
   at 25 words or fewer.
-- Keep one topic per paragraph and one idea per bullet.
+- Keep one topic per sentence and one idea per bullet.
 - Use a list when three or more parallel points appear.
-- Keep necessary technical nouns (API names, flags, path segments). Define a
-  rare term once in the same bullet if a stranger would misread it.
+- Address the reviewer or a future reader as you. Use imperative for any
+  instruction (you is implied). Use third person for what the code does.
+- Do not write we, let's, please, simply, easy, quickly, slang, or tl;dr.
+  Do not use exclamation marks.
+- Put a condition before its instruction: "If X, do Y."
+- Avoid -ing verb forms. Rewrite as imperative or simple present. Keep
+  -ing only when the word is a technical noun, adjective, or preposition.
+- Use sentence-case headings (`## Summary`, `## Details`, `## Breaking`).
+  Use serial commas.
+- Keep articles (a, the) when they make grammar clear. Use American
+  spelling.
+- Keep necessary technical nouns (API names, flags, path segments). Put
+  code, flags, and paths in code font. Define a rare term once in the same
+  bullet if a stranger would misread it.
 - Do not soften claims with empty hedges. If the diff does not prove a
   claim, delete the claim.
+- Body states what changed and why the locked diff proves it, not how the
+  implementation works.
 
-Title lines keep the Step 2 title rules; still prefer active imperative
-wording and plain words.
+Title lines: Pope/Beams imperative, no trailing period. Default title uses
+sentence case and stays at most 60 characters. Conventional title follows
+commit conventional rules (lowercase description, 50 characters, no scope).
+
+Provenance (principles only; do not copy the STE dictionary):
+https://www.asd-ste100.org/STE_faq.html
+https://developers.google.com/style
+https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+https://cbea.ms/git-commit/
 
 ## Body hygiene
 

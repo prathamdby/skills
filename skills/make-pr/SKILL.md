@@ -47,12 +47,12 @@ who has only this diff and the explicit ticket ID.
 - Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
   ticket claims in the body and does not count toward the subject limit.
 - Body: measure the locked diff, pick the tier, and draft per Body scale and
-  STE100 in `./REFERENCE.md`. Group related hunks, never commits. Include no
+  Body style in `./REFERENCE.md`. Group related hunks, never commits. Include no
   test, rollout, motive, ticket claim the diff cannot prove, or harness footer.
 
 Map every title phrase and body line to proving paths and hunks. Rewrite
-untraced copy. Done when format, chosen tier, STE100, and clean-room trace
-pass.
+untraced copy. Done when format, chosen tier, Body style, and clean-room
+trace pass.
 
 ## 3. Publish
 

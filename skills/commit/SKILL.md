@@ -51,9 +51,10 @@ Done when the exact bytes intended for the commit are fixed.
 
 ## 2. Draft and trace
 
-Load the chosen style section in `./REFERENCE.md`. Infer type and wording from
-the locked diff only. Produce a subject and, for conventional style only, an
-optional bullet body.
+Load the chosen style section in `./REFERENCE.md`. That section includes wrap,
+why-vs-how, and the imperative test. Infer type and wording from the locked
+diff only. Produce a subject and, for conventional style only, an optional
+bullet body.
 
 Before mutation, map every subject and body line to proving paths and hunks.
 Delete or rewrite unproved text. Reject ticket IDs, reviewer references,
