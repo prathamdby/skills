@@ -47,10 +47,11 @@ who has only this diff and the explicit ticket ID.
 - Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
   ticket claims in the body and does not count toward the subject limit.
 - Body: measure the locked diff, pick the tier, and draft per Body scale and
-  Body style in `./REFERENCE.md`. If the tier is M or L and a theme's shape
-  needs a sketch, pick the smallest view from Body visuals in
-  `./REFERENCE.md`. Group related hunks, never commits. Include no test,
-  rollout, motive, ticket claim the diff cannot prove, or harness footer.
+  Body style in `./REFERENCE.md`. For every tier, including S, if the locked
+  diff has a proved shape, draft rich views from Body visuals in
+  `./REFERENCE.md` and place each view next to its theme. Group related
+  hunks, never commits. Include no test, rollout, motive, ticket claim
+  the diff cannot prove, or harness footer.
 
 Map every title phrase, body line, and visual label to proving paths and
 hunks. Rewrite untraced copy. Done when format, chosen tier, Body style,

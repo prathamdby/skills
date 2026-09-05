@@ -19,17 +19,20 @@ Pick **exactly one** tier with this order (first match wins):
 
 | Tier | Summary bullets | Extra sections | Depth |
 |---|---|---|---|
-| S | 1–3 | none | Outcomes only. Name what changed for the user of the code. Skip deep call chains. Skip visuals. |
-| M | 3–7 | Add `## Details` when two or more themes need more than one line each. Add a Body visuals sketch when a theme's shape needs more than one prose line. | Name key files and symbols the diff proves. State behavior change in plain words. |
-| L | 5–12 | `## Details` required. Add `## Breaking` only when the diff proves a break. Add a Body visuals sketch when a theme changes a module, contract, or call path that one bullet cannot name. | Explain modules, contracts, and call-path deltas the hunks show. |
+| S | 2 or more | Add `## Details` when a theme needs more than one line. Add Body visuals when the locked diff has a proved shape. | Name what changed for the user of the code. Include the proved shape. Do not skip a call chain, module, or contract the hunks show. |
+| M | 4 or more | Add `## Details` when two or more themes need more than one line each. Add Body visuals for every theme with a proved shape. | Name key files and symbols the diff proves. State the behavior change in plain words. Add every view that makes the shape obvious at a glance. |
+| L | 6 or more | `## Details` required. Add `## Breaking` only when the diff proves a break. Add Body visuals for every theme with a proved shape. | Explain modules, contracts, and call-path deltas the hunks show. Use several views when one view leaves a boundary unclear. |
 
 Rules for every tier:
 
 - Cluster related hunks into themes. Never one bullet per commit.
-- Bullet count is a range, not a quota. Cover each theme once. Do not pad.
+- The bullet counts are floors, not caps. Cover every theme. Do not drop
+  a theme to stay short. Do not pad empty themes.
 - Default body always starts with `## Summary` and its bullets.
-- Open extra sections only when the tier allows them **and** the locked
+- Open extra sections when the tier allows them **and** the locked
   diff supplies evidence for that section.
+- Prefer detailed proved prose plus visuals. Do not cut a file, symbol,
+  call, or boundary to keep the body short.
 - Include no test, rollout, motive, or ticket claim the diff cannot prove.
 - Never draft harness footers (`Made with Cursor`, identity trailers, peers).
 - Record the chosen tier in the ledger next to title/body so Step 4 can
@@ -40,11 +43,13 @@ Rules for every tier:
 1. Measure `files`, `churn`, and `areas` from the locked diff.
 2. Select the tier with the first-match order above.
 3. Cluster hunks into themes.
-4. Write `## Summary` bullets at that tier's depth and count range.
-5. Add allowed extra sections only when evidence exists.
-6. If the tier is M or L and a theme's shape needs a sketch, pick the
-   smallest matching view from Body visuals. Place it next to the prose
-   it supports.
+4. Write `## Summary` bullets at that tier's depth and at least that
+   floor. Keep writing while a theme remains.
+5. Add allowed extra sections when evidence exists.
+6. For every tier, including S, if a theme has a proved shape, emit
+   every Body visuals view that makes that shape clear at a glance.
+   Place each view next to the prose it supports. Use several views
+   when one view leaves a boundary, call, or layout unclear.
 7. Apply Body style below to every body sentence and bullet. Fence
    contents keep the view's syntax.
 8. Map every title phrase, body line, and visual label to proving paths
@@ -55,30 +60,36 @@ all pass.
 
 ## Body visuals
 
-Load during Step 2 after you cluster the themes. Load this section only
-when the chosen tier is M or L and a theme's shape needs a sketch.
+Load during Step 2 after you cluster the themes. Load this section for
+every tier, including S, when the locked diff has a proved shape.
 
-A visual is a fenced sketch next to the short prose it supports. Pick
-the smallest view that makes that theme's key point clear. Keep only
-calls, files, props, states, and boundaries the locked diff proves.
-Place each visual beside its theme. Do not add a `## Visuals` section.
-Use one view, or several for several themes. Do not use every view.
+A visual is a fenced sketch next to the detailed prose it supports.
+Write enough prose that a stranger can name the change without opening
+the diff. Then add the views that make that change obvious at a glance.
+Keep only calls, files, props, states, and boundaries the locked diff
+proves. Place each visual beside its theme. Do not add a `## Visuals`
+section. Use every view a theme proves. Do not skip a useful view to
+keep the body short.
 
 Rules:
 
 - Delete a visual that names anything the locked diff does not prove.
   Include no motive, test, or rollout claim.
-- Body style applies to the prose around a visual.
-- Prefer Mermaid and `diff` fences. GitHub renders those in a PR body.
-- Use fenced HTML or a linked file only when UI, layout, or state is too
-  dense for Mermaid. Do not run a local open command.
+- Body style applies to the prose around a visual. Fence contents keep
+  the view's syntax and may be as long as the proved shape requires.
+- Prefer Mermaid and `diff` fences when GitHub can render the point.
+  Add other views beside them when they name a second boundary.
+- Use fenced HTML or a linked file when UI, layout, or state is too
+  dense for Mermaid. Match product colors, type, spacing, and
+  components. Use real labels and data. Cover desktop and mobile. Do
+  not run a local open command.
 
-### Pick the view
+### Pick the views
 
-If the surrounding shape already exists and the point is the delta, use
-a `diff` sketch of that same shape.
-
-Otherwise match the theme's proved shape. The first matching row wins.
+For each theme, collect every proved shape in the table. Emit a view
+for each collected shape. If an existing shape has a delta, emit the
+`diff` sketch of that shape and emit the current-shape view when both
+help a glance.
 
 | Theme shape | View |
 |---|---|
@@ -87,64 +98,99 @@ Otherwise match the theme's proved shape. The first matching row wins.
 | UI structure with state or module bounds | Component tree |
 | File responsibility or a broad refactor | Shallow file tree |
 | Interaction, control, or data flow | Mermaid |
+| Existing shape with a delta | `diff` sketch of that same shape |
 | Most of the shape is new, omitted names hide order, or a copyable target is needed | Full block |
 | UI, layout, or state too dense for Mermaid | One focused HTML fence or a linked file |
 
 ### Views
 
-**Pseudocode.** Put logic or an algorithm in a `text` fence.
+**Pseudocode.** Put logic or an algorithm in a `text` fence. Name each
+branch, guard, and result the hunks prove. Keep the indent as the
+control-flow nest.
 
 ```text
 on(save)
   if content is unchanged
     return cached result
   write new content
+  invalidate cache
   return fresh result
 ```
 
-**Call tree.** Put runtime control flow in a `text` fence.
+**Call tree.** Put runtime control flow in a `text` fence. Name the
+entry, each callee, and the order the hunks prove. Nest children under
+the caller. Keep sibling calls at the same indent.
 
 ```text
 submitForm
+  validateCart
   createSession
     persistPrompt
+    attachReceipt
     launchAgent
   navigateToSession
+    subscribeToEvents
 ```
 
-**Component tree.** Name UI structure, plus state and module bounds that
-matter.
+**Component tree.** Name UI structure, plus every state hook and module
+bound the hunks prove. Put the owning path beside a node that crosses
+a package or route.
 
 ```tsx
 <CheckoutPage> (apps/web/src/routes/checkout.tsx)
   useCart()
+  useCheckoutSession()
   <CheckoutToolbar>
     <PayButton> (packages/ui)
+    <PromoField>
+  <CheckoutTimeline>
+    <ReceiptCard> (packages/ui)
 ```
 
-**File tree.** Keep a responsibility or broad-refactor tree shallow.
+**File tree.** Put a responsibility map or broad refactor in a shallow
+tree. Name each top directory the hunks touch and the job it owns. Do
+not hide a moved or split path.
 
 ```text
 src/
 ├── commands/       # parses user actions
+│   └── parseCommand.ts
 ├── sessions/       # owns session state
 └── transport/      # sends API requests
+    ├── client.ts
+    └── stream.ts
 ```
 
 **Mermaid.** Put interaction, control flow, or data flow in a `mermaid`
-fence.
+fence. Name each participant or node the hunks prove. Add a second
+Mermaid diagram when sequence and state are both in the diff.
 
 ```mermaid
 sequenceDiagram
     participant User
     participant UI
     participant Worker
+    participant Store
     User->>UI: choose command
     UI->>Worker: send expanded prompt
+    Worker->>Store: persist session
+    Store-->>Worker: session id
     Worker-->>UI: stream result
 ```
 
-**Diff sketch.** Match the `diff` fence to the theme's shape.
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Cached: content unchanged
+    Draft --> Written: content changed
+    Written --> Invalidated: cache drop
+    Cached --> [*]
+    Invalidated --> [*]
+```
+
+**Diff sketch.** Match the `diff` fence to the theme's shape. Emit one
+fence per changed shape. Keep unchanged neighbors that fix ownership
+or order.
 
 Component change:
 
@@ -196,24 +242,35 @@ State or control-flow change:
 
 **Full block.** Put the whole block when most of it is new, when omitted
 names would hide ownership or order, or when the reviewer needs a
-copyable target shape.
+copyable target shape. Keep the real signature, return shape, and
+callee names the hunks prove.
 
 ```ts
 function parseCommand(input: string): Command {
   const name = input.slice(1)
-  return { name, args: [] }
+  const args = input.split(/\s+/).slice(1)
+  return { name, args }
 }
 ```
 
-**HTML artifact.** Write one focused `html` fence or link one file.
-Match product colors, type, spacing, and components. Use real labels
-and data. Cover desktop and mobile. Prefer Mermaid or `diff` when
-GitHub can render the point.
+**HTML artifact.** Use this view when UI, layout, or state is too dense
+for Mermaid. Write one focused `html` fence or link one file. Match
+product colors, type, spacing, and components. Use real labels and
+data from the locked diff. Cover desktop and mobile in the same
+artifact. Prefer Mermaid or `diff` beside the HTML when GitHub can
+render part of the point. Do not run a local open command.
 
 ```html
 <figure>
-  <p>On desktop, Pay stays in the toolbar.</p>
-  <p>On mobile, Pay stays pinned to the footer.</p>
+  <header>Checkout</header>
+  <section data-viewport="desktop">
+    <p>Toolbar: Promo, then Pay.</p>
+    <p>Timeline: ReceiptCard under the cart lines.</p>
+  </section>
+  <section data-viewport="mobile">
+    <p>Promo stays in the form.</p>
+    <p>Pay stays pinned to the footer.</p>
+  </section>
 </figure>
 ```
 
@@ -233,8 +290,9 @@ Apply ASD-STE100 and Google developer documentation style to body prose
   verbs as imperative or simple present: "The handler starts the job."
   not "The skill is handling the job." Prefer "The skill runs the
   checks." over "The skill is running the checks."
-- Keep instructional lines at 20 words or fewer. Keep descriptive bullets
-  at 25 words or fewer.
+- Write complete proved detail. Do not cut a file, symbol, or shape to
+  shorten a line. Split a sentence that carries two thoughts. A long
+  bullet that names one proved change is fine.
 - Keep one topic per sentence and one idea per bullet.
 - Use a list when three or more parallel points appear.
 - Address the reviewer or a future reader as you. Use imperative for any
@@ -251,8 +309,9 @@ Apply ASD-STE100 and Google developer documentation style to body prose
   bullet if a stranger would misread it.
 - Do not soften claims with empty hedges. If the diff does not prove a
   claim, delete the claim.
-- Body states what changed and why the locked diff proves it, not how the
-  implementation works. A Body visuals fence may name the proved shape.
+- Body states what changed and why the locked diff proves it. Add the
+  detailed proved prose and Body visuals a stranger needs to read the
+  shape at a glance. A Body visuals fence may name the proved shape.
 
 Title lines: Pope/Beams imperative, no trailing period. Default title uses
 sentence case and stays at most 60 characters. Conventional title follows
