@@ -19,7 +19,7 @@ Pick **exactly one** tier with this order (first match wins):
 
 | Tier | Summary bullets | Extra sections | Depth |
 |---|---|---|---|
-| S | 2 or more | Add `## Details` when a theme needs more than one line. Add Body visuals when the locked diff has a proved shape. | Name what changed for the user of the code. Include the proved shape. Do not skip a call chain, module, or contract the hunks show. |
+| S | 2 or more | Add `## Details` when a theme needs more than one line. Add Body visuals for every theme with a proved shape. | Name what changed for the user of the code. Include the proved shape. Do not skip a call chain, module, or contract the hunks show. |
 | M | 4 or more | Add `## Details` when two or more themes need more than one line each. Add Body visuals for every theme with a proved shape. | Name key files and symbols the diff proves. State the behavior change in plain words. Add every view that makes the shape obvious at a glance. |
 | L | 6 or more | `## Details` required. Add `## Breaking` only when the diff proves a break. Add Body visuals for every theme with a proved shape. | Explain modules, contracts, and call-path deltas the hunks show. Use several views when one view leaves a boundary unclear. |
 
@@ -38,6 +38,11 @@ Rules for every tier:
 - Record the chosen tier in the ledger next to title/body so Step 4 can
   restate it.
 
+A theme has a **proved shape** when the locked diff matches at least
+one row in Pick the views. Match only names, calls, files, props,
+states, and boundaries in that diff. Do not match on a color, type
+token, spacing value, label, datum, or viewport the hunks omit.
+
 ### Draft procedure
 
 1. Measure `files`, `churn`, and `areas` from the locked diff.
@@ -46,10 +51,10 @@ Rules for every tier:
 4. Write `## Summary` bullets at that tier's depth and at least that
    floor. Keep writing while a theme remains.
 5. Add allowed extra sections when evidence exists.
-6. For every tier, including S, if a theme has a proved shape, emit
-   every Body visuals view that makes that shape clear at a glance.
-   Place each view next to the prose it supports. Use several views
-   when one view leaves a boundary, call, or layout unclear.
+6. For every tier, including S, add Body visuals for every theme with a
+   proved shape. Emit every matching view from Body visuals. Place each
+   view next to the prose it supports. Use several views when one view
+   leaves a boundary, call, or layout unclear.
 7. Apply Body style below to every body sentence and bullet. Fence
    contents keep the view's syntax.
 8. Map every title phrase, body line, and visual label to proving paths
@@ -60,8 +65,8 @@ all pass.
 
 ## Body visuals
 
-Load during Step 2 after you cluster the themes. Load this section for
-every tier, including S, when the locked diff has a proved shape.
+Load during Step 2 after you cluster the themes. For every tier,
+including S, add Body visuals for every theme with a proved shape.
 
 A visual is a fenced sketch next to the detailed prose it supports.
 Write enough prose that a stranger can name the change without opening
@@ -73,23 +78,29 @@ keep the body short.
 
 Rules:
 
-- Delete a visual that names anything the locked diff does not prove.
-  Include no motive, test, or rollout claim.
+- A fence may include only names, calls, files, props, states, and
+  boundaries the locked diff proves. Delete any color, type token,
+  spacing value, label, datum, or viewport the hunks omit. Include no
+  motive, test, or rollout claim.
 - Body style applies to the prose around a visual. Fence contents keep
   the view's syntax and may be as long as the proved shape requires.
-- Prefer Mermaid and `diff` fences when GitHub can render the point.
-  Add other views beside them when they name a second boundary.
-- Use fenced HTML or a linked file when UI, layout, or state is too
-  dense for Mermaid. Match product colors, type, spacing, and
-  components. Use real labels and data. Cover desktop and mobile. Do
-  not run a local open command.
+- Prefer Mermaid, `diff`, and component-tree fences. GitHub renders
+  those in a PR body. Add other table views beside them when they name
+  a second boundary.
+- If Mermaid or a component tree cannot carry a proved layout or
+  state, emit another publishable view from this table. Use a `diff`,
+  a second Mermaid diagram, or a fuller component tree. Do not write
+  an `html` fence. Do not link an HTML file. make-pr blocks untracked
+  files and never commits, so a new artifact cannot publish.
 
 ### Pick the views
 
 For each theme, collect every proved shape in the table. Emit a view
 for each collected shape. If an existing shape has a delta, emit the
 `diff` sketch of that shape and emit the current-shape view when both
-help a glance.
+help a glance. If Mermaid or a component tree cannot carry a proved
+layout or state, still emit another publishable row. Do not stop at
+the first row.
 
 | Theme shape | View |
 |---|---|
@@ -100,7 +111,6 @@ help a glance.
 | Interaction, control, or data flow | Mermaid |
 | Existing shape with a delta | `diff` sketch of that same shape |
 | Most of the shape is new, omitted names hide order, or a copyable target is needed | Full block |
-| UI, layout, or state too dense for Mermaid | One focused HTML fence or a linked file |
 
 ### Views
 
@@ -251,27 +261,6 @@ function parseCommand(input: string): Command {
   const args = input.split(/\s+/).slice(1)
   return { name, args }
 }
-```
-
-**HTML artifact.** Use this view when UI, layout, or state is too dense
-for Mermaid. Write one focused `html` fence or link one file. Match
-product colors, type, spacing, and components. Use real labels and
-data from the locked diff. Cover desktop and mobile in the same
-artifact. Prefer Mermaid or `diff` beside the HTML when GitHub can
-render part of the point. Do not run a local open command.
-
-```html
-<figure>
-  <header>Checkout</header>
-  <section data-viewport="desktop">
-    <p>Toolbar: Promo, then Pay.</p>
-    <p>Timeline: ReceiptCard under the cart lines.</p>
-  </section>
-  <section data-viewport="mobile">
-    <p>Promo stays in the form.</p>
-    <p>Pay stays pinned to the footer.</p>
-  </section>
-</figure>
 ```
 
 ## Body style
