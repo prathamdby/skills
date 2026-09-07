@@ -97,5 +97,4 @@ stop | terminal`. `SUCCESS`, `ALL_PASS`, `ALL_FAIL`, `NO_IMPROVEMENT`,
 | "Score them 1-10"           | Discrete judge. Trust observed execution.     |
 
 ## Red flags
-
 Parent wrote a candidate; same-tree or branch-as-parallel workers; N inferred; a 1–10; no swing `w_i/c_i`; no A/B swap.

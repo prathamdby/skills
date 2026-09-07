@@ -7,7 +7,6 @@ description: >
 ---
 
 # Fix PR feedback
-
 ## Flags
 
 | Flag            | Default           | Effect                     |
@@ -19,7 +18,6 @@ description: >
 Missing values are `BLOCKED`.
 
 ## 1. Resolve and synchronize
-
 Resolve owner, repo, number, URL, base, head branch, and remote head SHA. Block
 on auth failure, missing/closed PR, dirty tree, or unsafe head checkout.
 Fetch, check out the head, and fast-forward to the remote SHA. Never reset,
@@ -28,33 +26,30 @@ force, or discard local work. Record:
 Done when local HEAD equals the PR head SHA and the ledger identifies the PR.
 
 ## 2. Hunt before editing
-
 **REQUIRED SUB-SKILL:** Read `../gh/SKILL.md` before any GitHub I/O. A script
 path is not a substitute. Hunt through that skill: surfaces 1–2 with
 `pr-threads.ts --json --open --complete`; CI snippets with
 `ci-failures.ts --json --pr N --sha <head>`. Surfaces:
-
 1. unresolved review threads, including outdated ones
 2. every comment page inside each thread
 3. review-comment API chains reconciled to thread roots
 4. actionable top-level review bodies
 5. actionable PR conversation comments
 6. PR CI on the head SHA: terminal non-success required/blocking checks and annotations
-   Every hunt reconciles review-comment chains unless every root is proved present.
-   Always load recipe 3 in `./REFERENCE.md` (REST reconcile); a successful script
-   is not proof REST roots are present. Skip 4–5 only when JSON
-   `moreReviews`/`moreComments`/`moreConvo` are false after `--complete`; else
-   load them there. Recipe 6 always SHA-pins required/blocking checks and
-   annotations here; `ci-failures` is drilldown only. Load remaining recipes only
-   after `run` exits following every runtime, or a cap marker. Record counts and
-   page markers. No triage or edit before all six passes finish. Normalize one
-   finding per claim (source, URL/ID, reply target, author, path/line, rule ID,
-   body, replies). Drop acknowledgments and status noise. Deduplicate only
-   identical stable keys from `./REFERENCE.md`; preserve every native reply
-   target. Done when pagination is exhausted and every finding is in the ledger.
+Every hunt reconciles review-comment chains unless every root is proved present.
+Always load recipe 3 in `./REFERENCE.md` (REST reconcile); a successful script
+is not proof REST roots are present. Skip 4–5 only when JSON
+`moreReviews`/`moreComments`/`moreConvo` are false after `--complete`; else
+load them there. Recipe 6 always SHA-pins required/blocking checks and
+annotations here; `ci-failures` is drilldown only. Load remaining recipes only
+after `run` exits following every runtime, or a cap marker. Record counts and
+page markers. No triage or edit before all six passes finish. Normalize one
+finding per claim (source, URL/ID, reply target, author, path/line, rule ID,
+body, replies). Drop acknowledgments and status noise. Deduplicate only
+identical stable keys from `./REFERENCE.md`; preserve every native reply
+target. Done when pagination is exhausted and every finding is in the ledger.
 
 ## 3. Triage every finding
-
 Read surrounding code and trace the claimed path. Reproduce with the narrowest
 test, type check, or call trace when possible. Assign exactly one verdict:
 `fix`, `reject`, `clarify`, or `already-fixed`, with one evidence line. If
@@ -62,14 +57,12 @@ reproduction is skipped, record why. No edits until every finding has a
 verdict. Done when none are untriaged and rejects have concrete evidence.
 
 ## 4. Fix and verify
-
 Apply only `fix` verdicts in focused edits. Run the narrowest covering checks
 for each fixed cluster. A failed required check is `BLOCKED`; if none exists,
 record that evidence. Do not change code for rejected or clarification
 findings. Done when every fix has a verified diff or no code fix was needed.
 
 ## 5. Commit and push
-
 When a diff exists, discard every pre-drafted subject (ledger, teammate,
 manager, branch, "review follow-up"). Read `../commit/SKILL.md` and run it
 once with `--unstaged` so that skill alone drafts from the locked diff as
@@ -88,14 +81,12 @@ appear, then re-check the push gate. Done when there is no diff, or one verified
 clean-room commit is local and pushed.
 
 ## 6. Re-hunt until stable
-
 Repeat all six hunt passes after the last code or remote mutation. Normalize
 and triage arrivals, then repeat Steps 4–6. After any hunt whose actionable
 set changed, require two consecutive hunts with the same set. Done when no
 finding is new, untriaged, or waiting on a local fix and consecutive stable hunts have completed.
 
 ## 7. Reply and report
-
 Unless `--no-reply`, skip targets whose existing replies already satisfy the
 verdict, draft remaining replies using `./REFERENCE.md`, then apply
 `./references/unslop-reply-drafts.md`. Preserve bot command prefixes.

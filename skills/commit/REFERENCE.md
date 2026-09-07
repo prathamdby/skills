@@ -54,7 +54,7 @@ Reject and rewrite a draft containing:
 
 - ticket IDs, reviewer names, review or plan language, or unstated motives
 - review-session framing such as `address review feedback`, `address review
-findings`, `address PR feedback`, `review follow-up`, or `per review`
+  findings`, `address PR feedback`, `review follow-up`, or `per review`
 - a claim inferred from the branch name, commit history, or conversation
 - scope notation such as `feat(api):`
 - a vague verb such as update, change, address, or improve when a hunk supports
