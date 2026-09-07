@@ -20,7 +20,7 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Create or update a PR                                      | `make-pr` (`../make-pr/SKILL.md`)           |
 | Address PR feedback                                        | `fix-pr` (`../fix-pr/SKILL.md`)             |
 | Inspect a PR, read threads, why CI is red, or post a reply | `gh` (`../gh/SKILL.md`)                     |
-| Review an implementation plan                              | `peer-review` (`../peer-review/SKILL.md`)   |
+| Review a plan, design, implementation, or proposal         | `peer-review` (`../peer-review/SKILL.md`)   |
 | Select among candidates or score progress                  | `verify` (`../verify/SKILL.md`)             |
 | Explain a diff as HTML                                     | `explain-diff` (`../explain-diff/SKILL.md`) |
 | Map or refresh the current repo                            | `recon` (`../recon/SKILL.md`)               |
@@ -30,7 +30,8 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 
 For one action, route to its leaf. Use `orchestrate` for several in-harness
 delegates. Chain only for a complete terminal outcome; several explicit
-outcomes select the matching chain.
+outcomes select the matching chain. A review-shaped ask stays on
+`peer-review`. Do not prepend it to Ship planned work.
 Orientation or reply-only terminals go to `gh`; any fix, push, or "handle
 review feedback" stays `fix-pr`. `fix-pr` loads `gh` for GitHub I/O. `/gh`
 never continues into `fix-pr`.
@@ -39,7 +40,7 @@ never continues into `fix-pr`.
 
 | Requested outcome                 | Ordered owners                                                   | Complete when                                 |
 | --------------------------------- | ---------------------------------------------------------------- | --------------------------------------------- |
-| Ship planned work                 | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | approved plan diff tested and PR URL verified |
+| Ship planned work                 | implementation → `deslop` → `commit` → `make-pr`                 | planned work diff tested and PR URL verified  |
 | Save current work                 | optional `deslop` → `commit`                                     | new commit verified                           |
 | Finish PR feedback                | `fix-pr`                                                         | `fix-pr` report complete                      |
 | Inspect PR or CI, or post a reply | `gh`                                                             | script report or reply URL verified           |
@@ -51,7 +52,7 @@ Implementation is normal agent work, not a leaf. `fix-pr` already owns its
 fix, commit, push, re-hunt, and reply loop; never append those actions.
 `deslop` is required in Ship planned work and optional in custom or Save chains.
 Resolve mixed staged/unstaged paths before it. Implementation is done when the
-approved plan's diff and relevant tests are recorded.
+planned work's diff and relevant tests are recorded.
 
 ## 1. Match
 
@@ -59,6 +60,7 @@ Record a run ledger:
 
 `route | plan path/hash/verdict | current owner | completed owners | diff/tests | terminal`
 
+Leave plan hash and verdict empty unless the route is review-shaped.
 If no route matches, ask one question about the intended outcome. Done when one
 leaf or chain and its terminal condition are recorded.
 
@@ -77,10 +79,13 @@ Read the current leaf in full and run it to one of its terminal states. Advance
 only after success or no-op; pause the chain on blocked or waiting. After an
 interruption, verify the last owner's artifacts before continuing.
 
-In Ship planned work, continue past `peer-review` only on `Ship it.` An
-`UPDATED` plan is reviewed again. Lock its content hash before implementation;
-if it changes, return to `peer-review`. Before `make-pr`, require a clean tree.
-For implementation, verify the locked plan diff and test evidence in the ledger.
+Ship planned work never enters `peer-review`. Before `make-pr`, require a
+clean tree. For implementation, verify the planned work diff and test
+evidence in the ledger.
+
+On a review-shaped route, continue past `peer-review` only on `Ship it.`
+An `UPDATED` plan is reviewed again. Lock its content hash before later
+implementation. If it changes, return to `peer-review`.
 
 Done when the recorded chain terminal condition is observed or the current
 leaf has reported why progress paused.
