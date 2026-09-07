@@ -30,8 +30,7 @@ Require a task. Write 2–4 independent criteria plus a ground-truth note that
 trusts observed tool output, not narration. Write that file using the
 layout in `REFERENCE.md`.
 
-Record:
-`task | criteria | generate | path | n/k/pivots/rounds | current | terminal`
+Record: `task | criteria | generate | path | n/k/pivots/rounds | current | terminal`.
 
 Done when task and criteria are fixed, or `BLOCKED`.
 
@@ -97,4 +96,5 @@ stop | terminal`. `SUCCESS`, `ALL_PASS`, `ALL_FAIL`, `NO_IMPROVEMENT`,
 | "Score them 1-10"           | Discrete judge. Trust observed execution.     |
 
 ## Red flags
+
 Parent wrote a candidate; same-tree or branch-as-parallel workers; N inferred; a 1–10; no swing `w_i/c_i`; no A/B swap.
