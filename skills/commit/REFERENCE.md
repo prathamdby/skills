@@ -30,10 +30,12 @@ Load Trailer hygiene only during Step 4 verify, or when drafting under
   Before (77, reject):
   `- Add webhook parser tests under skills/commit/REFERENCE.md for the wrap gate`
   After (72, then a two-space hanging indent):
+
 ```
 - Add webhook parser tests under skills/commit/REFERENCE.md for the wrap
   gate
 ```
+
 - Body states what changed and why the proving hunks exist, not how the code
   works. The diff shows how. Use only facts the locked diff proves. Do not
   add ticket, review, or session motives.
@@ -52,7 +54,7 @@ Reject and rewrite a draft containing:
 
 - ticket IDs, reviewer names, review or plan language, or unstated motives
 - review-session framing such as `address review feedback`, `address review
-  findings`, `address PR feedback`, `review follow-up`, or `per review`
+findings`, `address PR feedback`, `review follow-up`, or `per review`
 - a claim inferred from the branch name, commit history, or conversation
 - scope notation such as `feat(api):`
 - a vague verb such as update, change, address, or improve when a hunk supports

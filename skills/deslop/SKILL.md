@@ -9,11 +9,11 @@ description: >
 
 ## Flags
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--staged` | yes | `git diff --cached` |
-| `--unstaged` | no | `git diff` |
-| `--base <branch>` | no | `git diff <branch>...HEAD` |
+| Flag              | Default | Effect                     |
+| ----------------- | ------- | -------------------------- |
+| `--staged`        | yes     | `git diff --cached`        |
+| `--unstaged`      | no      | `git diff`                 |
+| `--base <branch>` | no      | `git diff <branch>...HEAD` |
 
 The scope flags are mutually exclusive. More than one, a missing base branch,
 or prose that conflicts with a flag is `BLOCKED`; ask which scope to use. Prose

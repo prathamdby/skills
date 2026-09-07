@@ -140,16 +140,28 @@ type GqlFileConn = {
 };
 
 type RollupNode =
-  | { __typename: "CheckRun"; name: string; status: string | null; conclusion: string | null }
+  | {
+      __typename: "CheckRun";
+      name: string;
+      status: string | null;
+      conclusion: string | null;
+    }
   | { __typename: "StatusContext"; context: string; state: string | null }
   | { __typename: string };
 
-function bucketCheckRun(status: string | null, conclusion: string | null): string {
+function bucketCheckRun(
+  status: string | null,
+  conclusion: string | null,
+): string {
   const st = (status ?? "").toUpperCase();
-  if (["IN_PROGRESS", "QUEUED", "WAITING", "PENDING", "REQUESTED"].includes(st)) return "pending";
+  if (["IN_PROGRESS", "QUEUED", "WAITING", "PENDING", "REQUESTED"].includes(st))
+    return "pending";
   const c = (conclusion ?? "").toUpperCase();
   if (c === "SUCCESS") return "pass";
-  if (["FAILURE", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE"].includes(c)) return "fail";
+  if (
+    ["FAILURE", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE"].includes(c)
+  )
+    return "fail";
   if (c === "CANCELLED") return "cancel";
   if (["SKIPPED", "NEUTRAL"].includes(c)) return "skipping";
   return c ? c.toLowerCase() : "pending";
@@ -185,7 +197,9 @@ function mapRollup(nodes: RollupNode[] | undefined): Check[] {
   return checks;
 }
 
-function latestReviews(reviews: { author: { login: string } | null; state: string }[]): Record<string, string> {
+function latestReviews(
+  reviews: { author: { login: string } | null; state: string }[],
+): Record<string, string> {
   const latest = new Map<string, string>();
   for (const r of reviews) {
     if (r.state !== "PENDING") latest.set(ghost(r.author?.login), r.state);
@@ -193,7 +207,10 @@ function latestReviews(reviews: { author: { login: string } | null; state: strin
   return Object.fromEntries(latest);
 }
 
-function threadStats(nodes: { isResolved: boolean }[], capped: boolean): Threads {
+function threadStats(
+  nodes: { isResolved: boolean }[],
+  capped: boolean,
+): Threads {
   return {
     open: nodes.filter((n) => !n.isResolved).length,
     total: nodes.length,
@@ -215,12 +232,18 @@ async function extraFiles(
     }>(FILES_QUERY, { owner, name, number, cursor });
     const conn = data.repository.pullRequest.files;
     files.push(...conn.nodes);
-    cursor = conn.pageInfo.hasNextPage ? conn.pageInfo.endCursor ?? null : null;
+    cursor = conn.pageInfo.hasNextPage
+      ? (conn.pageInfo.endCursor ?? null)
+      : null;
   }
   return files;
 }
 
-async function fromGraphql(repo: string, number: number, paginateFiles: boolean): Promise<Snapshot> {
+async function fromGraphql(
+  repo: string,
+  number: number,
+  paginateFiles: boolean,
+): Promise<Snapshot> {
   const { owner, name } = splitOwnerRepo(repo);
   const data = await graphql<{
     repository: {
@@ -243,9 +266,14 @@ async function fromGraphql(repo: string, number: number, paginateFiles: boolean)
         changedFiles: number;
         body: string | null;
         files: GqlFileConn;
-        reviews: { nodes: { author: { login: string } | null; state: string }[] };
+        reviews: {
+          nodes: { author: { login: string } | null; state: string }[];
+        };
         comments: { nodes: CommentRow[] };
-        reviewThreads: { pageInfo: { hasNextPage: boolean }; nodes: { isResolved: boolean }[] };
+        reviewThreads: {
+          pageInfo: { hasNextPage: boolean };
+          nodes: { isResolved: boolean }[];
+        };
         commits: {
           nodes: {
             commit: {
@@ -286,12 +314,18 @@ async function fromGraphql(repo: string, number: number, paginateFiles: boolean)
     filesCapped,
     comments: pr.comments.nodes,
     checks: mapRollup(rollup),
-    threads: threadStats(pr.reviewThreads.nodes, pr.reviewThreads.pageInfo.hasNextPage),
+    threads: threadStats(
+      pr.reviewThreads.nodes,
+      pr.reviewThreads.pageInfo.hasNextPage,
+    ),
     reviewsLatest: latestReviews(pr.reviews.nodes),
   };
 }
 
-async function threadStatsViaGh(repo: string, number: number): Promise<Threads> {
+async function threadStatsViaGh(
+  repo: string,
+  number: number,
+): Promise<Threads> {
   const { owner, name } = splitOwnerRepo(repo);
   const raw = JSON.parse(
     await gh([
@@ -313,21 +347,52 @@ async function threadStatsViaGh(repo: string, number: number): Promise<Threads> 
 }
 
 async function fromFallback(repo: string, number: number): Promise<Snapshot> {
-  type View = Omit<Snapshot, "checks" | "threads" | "reviewsLatest" | "author" | "reviewDecision" | "body" | "filesCapped"> & {
+  type View = Omit<
+    Snapshot,
+    | "checks"
+    | "threads"
+    | "reviewsLatest"
+    | "author"
+    | "reviewDecision"
+    | "body"
+    | "filesCapped"
+  > & {
     author: { login: string } | null;
     reviewDecision: string | null;
     body: string | null;
     reviews: { author: { login: string } | null; state: string }[];
   };
   const [view, checksRaw, threads] = await Promise.all([
-    ghJson<View>(["pr", "view", String(number), "-R", repo, "--json", VIEW_FIELDS]),
-    gh(["pr", "checks", String(number), "-R", repo, "--json", "name,state,bucket"], { okCodes: [1, 8] }).catch(
-      (e: unknown) => {
-        if (e instanceof Error && /no checks reported/i.test(e.message)) return "[]";
-        throw e;
-      },
-    ),
-    threadStatsViaGh(repo, number).catch(() => ({ open: 0, total: 0, capped: false })),
+    ghJson<View>([
+      "pr",
+      "view",
+      String(number),
+      "-R",
+      repo,
+      "--json",
+      VIEW_FIELDS,
+    ]),
+    gh(
+      [
+        "pr",
+        "checks",
+        String(number),
+        "-R",
+        repo,
+        "--json",
+        "name,state,bucket",
+      ],
+      { okCodes: [1, 8] },
+    ).catch((e: unknown) => {
+      if (e instanceof Error && /no checks reported/i.test(e.message))
+        return "[]";
+      throw e;
+    }),
+    threadStatsViaGh(repo, number).catch(() => ({
+      open: 0,
+      total: 0,
+      capped: false,
+    })),
   ]);
   const checks: Check[] = JSON.parse(checksRaw || "[]");
   return {
@@ -361,14 +426,19 @@ function printText(repo: string, snap: Snapshot, full: boolean): void {
   const log = (line = "") => console.log(sanitizeForTerminal(line));
   const draft = snap.isDraft ? " (draft)" : "";
   log(`${repo}#${snap.number}: ${snap.title}`);
-  log(`${snap.state}${draft} · @${snap.author.login} · created ${snap.createdAt.slice(0, 10)} · ${snap.url}`);
-  log(`${snap.baseRefName} ← ${snap.headRefName} @ ${snap.headRefOid.slice(0, 12)}`);
+  log(
+    `${snap.state}${draft} · @${snap.author.login} · created ${snap.createdAt.slice(0, 10)} · ${snap.url}`,
+  );
+  log(
+    `${snap.baseRefName} ← ${snap.headRefName} @ ${snap.headRefOid.slice(0, 12)}`,
+  );
   log(
     `mergeable ${snap.mergeable} · mergeState ${snap.mergeStateStatus} · review ${snap.reviewDecision || "NONE"}`,
   );
 
   const byBucket = new Map<string, Check[]>();
-  for (const c of snap.checks) byBucket.set(c.bucket, [...(byBucket.get(c.bucket) ?? []), c]);
+  for (const c of snap.checks)
+    byBucket.set(c.bucket, [...(byBucket.get(c.bucket) ?? []), c]);
   const counts = ["pass", "fail", "pending", "skipping", "cancel"]
     .map((b) => [b, byBucket.get(b)?.length ?? 0] as const)
     .filter(([, count]) => count > 0)
@@ -377,12 +447,19 @@ function printText(repo: string, snap: Snapshot, full: boolean): void {
   log(`checks: ${counts || "none reported"}`);
   for (const c of byBucket.get("fail") ?? []) log(`  ✗ ${c.name}`);
 
-  log(`threads: ${snap.threads.open} open / ${snap.threads.total}${snap.threads.capped ? "+" : ""}`);
+  log(
+    `threads: ${snap.threads.open} open / ${snap.threads.total}${snap.threads.capped ? "+" : ""}`,
+  );
 
   log(`files: ${snap.changedFiles} (+${snap.additions} −${snap.deletions})`);
-  for (const f of snap.files.slice(0, 50)) log(`  +${f.additions} −${f.deletions}  ${f.path}`);
-  if (snap.filesCapped) log(`  … file list capped at ${snap.files.length} (more exist; --json pages)`);
-  else if (snap.files.length > 50) log(`  … ${snap.files.length - 50} more files`);
+  for (const f of snap.files.slice(0, 50))
+    log(`  +${f.additions} −${f.deletions}  ${f.path}`);
+  if (snap.filesCapped)
+    log(
+      `  … file list capped at ${snap.files.length} (more exist; --json pages)`,
+    );
+  else if (snap.files.length > 50)
+    log(`  … ${snap.files.length - 50} more files`);
 
   const latest = Object.entries(snap.reviewsLatest);
   if (latest.length > 0) {
@@ -390,10 +467,14 @@ function printText(repo: string, snap: Snapshot, full: boolean): void {
   }
 
   if (snap.comments.length > 0) {
-    log(`comments: ${snap.comments.length}${snap.comments.length > 5 ? " (last 5)" : ""}`);
+    log(
+      `comments: ${snap.comments.length}${snap.comments.length > 5 ? " (last 5)" : ""}`,
+    );
     for (const c of snap.comments.slice(-5)) {
       const body = full ? c.body : truncate(c.body, 400);
-      log(`  @${ghost(c.author?.login)} ${c.createdAt.slice(0, 10)}: ${body.replace(/\n/g, "\n    ")}`);
+      log(
+        `  @${ghost(c.author?.login)} ${c.createdAt.slice(0, 10)}: ${body.replace(/\n/g, "\n    ")}`,
+      );
     }
   }
 

@@ -9,14 +9,14 @@ description: >
 
 ## Flags
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--staged` | yes | Commit the current index |
-| `--unstaged` | no | Stage and commit tracked worktree changes; index must be empty |
-| `--conventional` | yes | `type: description` |
-| `--simple` | no | Plain one-line subject |
-| `--verify` | off | Run hooks; otherwise every commit uses `-n` |
-| `--allow-trailers` | off | Keep user-requested identity trailers; skip strip |
+| Flag               | Default | Effect                                                         |
+| ------------------ | ------- | -------------------------------------------------------------- |
+| `--staged`         | yes     | Commit the current index                                       |
+| `--unstaged`       | no      | Stage and commit tracked worktree changes; index must be empty |
+| `--conventional`   | yes     | `type: description`                                            |
+| `--simple`         | no      | Plain one-line subject                                         |
+| `--verify`         | off     | Run hooks; otherwise every commit uses `-n`                    |
+| `--allow-trailers` | off     | Keep user-requested identity trailers; skip strip              |
 
 Scope flags conflict with each other; style flags conflict with each other.
 Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`,

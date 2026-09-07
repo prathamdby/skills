@@ -13,14 +13,14 @@ One score token is an LM judge, not this method.
 
 ## Flags
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--candidates <n>` | `3` | Pool size N. Not inferred from the task |
-| `--evals <k>` | `2` | Repeats K; swap A/B on every odd pass |
-| `--pivots <k>` | `2` | PPT pivots when N>3; clamp to `[1, N]` |
-| `--max-rounds <n>` | `0` | Extra generate or revise cycles after select |
-| `--criteria <path>` | auto | Criteria file; else write 2–4 inline |
-| `--track` | off | Progress only; skip generate and select |
+| Flag                | Default | Effect                                       |
+| ------------------- | ------- | -------------------------------------------- |
+| `--candidates <n>`  | `3`     | Pool size N. Not inferred from the task      |
+| `--evals <k>`       | `2`     | Repeats K; swap A/B on every odd pass        |
+| `--pivots <k>`      | `2`     | PPT pivots when N>3; clamp to `[1, N]`       |
+| `--max-rounds <n>`  | `0`     | Extra generate or revise cycles after select |
+| `--criteria <path>` | auto    | Criteria file; else write 2–4 inline         |
+| `--track`           | off     | Progress only; skip generate and select      |
 
 A supplied list overrides `--candidates`. N is a budget, not a computed count.
 
@@ -30,8 +30,7 @@ Require a task. Write 2–4 independent criteria plus a ground-truth note that
 trusts observed tool output, not narration. Write that file using the
 layout in `REFERENCE.md`.
 
-Record:
-`task | criteria | generate | path | n/k/pivots/rounds | current | terminal`
+Record: `task | criteria | generate | path | n/k/pivots/rounds | current | terminal`.
 
 Done when task and criteria are fixed, or `BLOCKED`.
 
@@ -90,11 +89,12 @@ stop | terminal`. `SUCCESS`, `ALL_PASS`, `ALL_FAIL`, `NO_IMPROVEMENT`,
 
 ## Rationalizations
 
-| Excuse | Reality |
-|---|---|
-| "I'll just do it myself" | Parent implements zero candidates. Fan out N. |
-| "N should match difficulty" | N is `--candidates`. Do not invent it. |
-| "Score them 1-10" | Discrete judge. Trust observed execution. |
+| Excuse                      | Reality                                       |
+| --------------------------- | --------------------------------------------- |
+| "I'll just do it myself"    | Parent implements zero candidates. Fan out N. |
+| "N should match difficulty" | N is `--candidates`. Do not invent it.        |
+| "Score them 1-10"           | Discrete judge. Trust observed execution.     |
 
 ## Red flags
+
 Parent wrote a candidate; same-tree or branch-as-parallel workers; N inferred; a 1–10; no swing `w_i/c_i`; no A/B swap.

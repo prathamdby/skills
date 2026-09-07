@@ -9,12 +9,12 @@ Load Trace and logs when counting script HTTP or reading job logs.
 `pr-reply.ts` posts one comment. Exactly one target and one body, or
 `BLOCKED`:
 
-| Flag | Effect |
-|---|---|
+| Flag                 | Effect                                                                       |
+| -------------------- | ---------------------------------------------------------------------------- |
 | `--in-reply-to <id>` | Review-thread reply. `id` is a `databaseId`, `discussion_rN`, or comment URL |
-| `--conversation` | New PR conversation comment |
-| `--body-file <path>` | Reply markdown file |
-| `--body <text>` | Reply text via argv; prefer `--body-file` |
+| `--conversation`     | New PR conversation comment                                                  |
+| `--body-file <path>` | Reply markdown file                                                          |
+| `--body <text>`      | Reply text via argv; prefer `--body-file`                                    |
 
 `--in-reply-to` and `--conversation` conflict. `--body` and `--body-file`
 conflict. Empty body is `BLOCKED`. Nested review-comment ids resolve to the

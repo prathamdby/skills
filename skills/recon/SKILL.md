@@ -9,10 +9,10 @@ description: >
 
 ## Flags
 
-| Flag or argument | Default | Effect |
-|---|---|---|
-| `--refresh` | off | Rebuild memory instead of patching it |
-| positional focus | none | Explore and report that area in more depth |
+| Flag or argument | Default | Effect                                     |
+| ---------------- | ------- | ------------------------------------------ |
+| `--refresh`      | off     | Rebuild memory instead of patching it      |
+| positional focus | none    | Explore and report that area in more depth |
 
 Without `--refresh`, use the warm path when memory exists and the cold path
 otherwise.

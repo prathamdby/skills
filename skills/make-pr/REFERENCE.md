@@ -5,11 +5,11 @@
 Load during Step 2 after the locked diff is non-empty. Measure only that
 diff:
 
-| Metric | Source |
-|---|---|
-| `files` | count of paths in `git diff --name-only <target>...HEAD` |
+| Metric  | Source                                                                   |
+| ------- | ------------------------------------------------------------------------ |
+| `files` | count of paths in `git diff --name-only <target>...HEAD`                 |
 | `churn` | sum of added and deleted lines from `git diff --numstat <target>...HEAD` |
-| `areas` | count of distinct top-level path segments among those files |
+| `areas` | count of distinct top-level path segments among those files              |
 
 Pick **exactly one** tier with this order (first match wins):
 
@@ -17,11 +17,11 @@ Pick **exactly one** tier with this order (first match wins):
 2. **S** when `files` ≤ 3 and `churn` ≤ 80.
 3. **M** for every other non-empty diff.
 
-| Tier | Summary bullets | Extra sections | Depth |
-|---|---|---|---|
-| S | 2 or more | Add `## Details` when a theme needs more than one line. Add Body visuals for every theme with a proved shape. | Name what changed for the user of the code. Include the proved shape. Do not skip a call chain, module, or contract the hunks show. |
-| M | 4 or more | Add `## Details` when two or more themes need more than one line each. Add Body visuals for every theme with a proved shape. | Name key files and symbols the diff proves. State the behavior change in plain words. Add every view that makes the shape obvious at a glance. |
-| L | 6 or more | `## Details` required. Add `## Breaking` only when the diff proves a break. Add Body visuals for every theme with a proved shape. | Explain modules, contracts, and call-path deltas the hunks show. Use several views when one view leaves a boundary unclear. |
+| Tier | Summary bullets | Extra sections                                                                                                                    | Depth                                                                                                                                          |
+| ---- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| S    | 2 or more       | Add `## Details` when a theme needs more than one line. Add Body visuals for every theme with a proved shape.                     | Name what changed for the user of the code. Include the proved shape. Do not skip a call chain, module, or contract the hunks show.            |
+| M    | 4 or more       | Add `## Details` when two or more themes need more than one line each. Add Body visuals for every theme with a proved shape.      | Name key files and symbols the diff proves. State the behavior change in plain words. Add every view that makes the shape obvious at a glance. |
+| L    | 6 or more       | `## Details` required. Add `## Breaking` only when the diff proves a break. Add Body visuals for every theme with a proved shape. | Explain modules, contracts, and call-path deltas the hunks show. Use several views when one view leaves a boundary unclear.                    |
 
 Rules for every tier:
 
@@ -102,15 +102,15 @@ help a glance. If Mermaid or a component tree cannot carry a proved
 layout or state, still emit another publishable row. Do not stop at
 the first row.
 
-| Theme shape | View |
-|---|---|
-| Logic or algorithm | Pseudocode in a `text` fence |
-| Runtime control flow | Call tree in a `text` fence |
-| UI structure with state or module bounds | Component tree |
-| File responsibility or a broad refactor | Shallow file tree |
-| Interaction, control, or data flow | Mermaid |
-| Existing shape with a delta | `diff` sketch of that same shape |
-| Most of the shape is new, omitted names hide order, or a copyable target is needed | Full block |
+| Theme shape                                                                        | View                             |
+| ---------------------------------------------------------------------------------- | -------------------------------- |
+| Logic or algorithm                                                                 | Pseudocode in a `text` fence     |
+| Runtime control flow                                                               | Call tree in a `text` fence      |
+| UI structure with state or module bounds                                           | Component tree                   |
+| File responsibility or a broad refactor                                            | Shallow file tree                |
+| Interaction, control, or data flow                                                 | Mermaid                          |
+| Existing shape with a delta                                                        | `diff` sketch of that same shape |
+| Most of the shape is new, omitted names hide order, or a copyable target is needed | Full block                       |
 
 ### Views
 
@@ -257,9 +257,9 @@ callee names the hunks prove.
 
 ```ts
 function parseCommand(input: string): Command {
-  const name = input.slice(1)
-  const args = input.split(/\s+/).slice(1)
-  return { name, args }
+  const name = input.slice(1);
+  const args = input.split(/\s+/).slice(1);
+  return { name, args };
 }
 ```
 

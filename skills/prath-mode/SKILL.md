@@ -13,20 +13,20 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 
 ## Routing map
 
-| Immediate action | Leaf |
-|---|---|
-| Commit scoped changes | `commit` (`../commit/SKILL.md`) |
-| Remove code slop | `deslop` (`../deslop/SKILL.md`) |
-| Create or update a PR | `make-pr` (`../make-pr/SKILL.md`) |
-| Address PR feedback | `fix-pr` (`../fix-pr/SKILL.md`) |
-| Inspect a PR, read threads, why CI is red, or post a reply | `gh` (`../gh/SKILL.md`) |
-| Review an implementation plan | `peer-review` (`../peer-review/SKILL.md`) |
-| Select among candidates or score progress | `verify` (`../verify/SKILL.md`) |
-| Explain a diff as HTML | `explain-diff` (`../explain-diff/SKILL.md`) |
-| Map or refresh the current repo | `recon` (`../recon/SKILL.md`) |
-| Clone or search an external repo | `box` (`../box/SKILL.md`) |
-| Coordinate current-harness subagents | `orchestrate` (`../orchestrate/SKILL.md`) |
-| Save or resume session state | `handoff` (`../handoff/SKILL.md`) |
+| Immediate action                                           | Leaf                                        |
+| ---------------------------------------------------------- | ------------------------------------------- |
+| Commit scoped changes                                      | `commit` (`../commit/SKILL.md`)             |
+| Remove code slop                                           | `deslop` (`../deslop/SKILL.md`)             |
+| Create or update a PR                                      | `make-pr` (`../make-pr/SKILL.md`)           |
+| Address PR feedback                                        | `fix-pr` (`../fix-pr/SKILL.md`)             |
+| Inspect a PR, read threads, why CI is red, or post a reply | `gh` (`../gh/SKILL.md`)                     |
+| Review an implementation plan                              | `peer-review` (`../peer-review/SKILL.md`)   |
+| Select among candidates or score progress                  | `verify` (`../verify/SKILL.md`)             |
+| Explain a diff as HTML                                     | `explain-diff` (`../explain-diff/SKILL.md`) |
+| Map or refresh the current repo                            | `recon` (`../recon/SKILL.md`)               |
+| Clone or search an external repo                           | `box` (`../box/SKILL.md`)                   |
+| Coordinate current-harness subagents                       | `orchestrate` (`../orchestrate/SKILL.md`)   |
+| Save or resume session state                               | `handoff` (`../handoff/SKILL.md`)           |
 
 For one action, route to its leaf. Use `orchestrate` for several in-harness
 delegates. Chain only for a complete terminal outcome; several explicit
@@ -37,15 +37,15 @@ never continues into `fix-pr`.
 
 ## Workflow chains
 
-| Requested outcome | Ordered owners | Complete when |
-|---|---|---|
-| Ship planned work | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | approved plan diff tested and PR URL verified |
-| Save current work | optional `deslop` → `commit` | new commit verified |
-| Finish PR feedback | `fix-pr` | `fix-pr` report complete |
-| Inspect PR or CI, or post a reply | `gh` | script report or reply URL verified |
-| Understand current repo | `recon` | memory and report verified |
-| Research external code | `box` | cited answer returned |
-| End or resume work | `handoff` | create or resume terminal state |
+| Requested outcome                 | Ordered owners                                                   | Complete when                                 |
+| --------------------------------- | ---------------------------------------------------------------- | --------------------------------------------- |
+| Ship planned work                 | `peer-review` → implementation → `deslop` → `commit` → `make-pr` | approved plan diff tested and PR URL verified |
+| Save current work                 | optional `deslop` → `commit`                                     | new commit verified                           |
+| Finish PR feedback                | `fix-pr`                                                         | `fix-pr` report complete                      |
+| Inspect PR or CI, or post a reply | `gh`                                                             | script report or reply URL verified           |
+| Understand current repo           | `recon`                                                          | memory and report verified                    |
+| Research external code            | `box`                                                            | cited answer returned                         |
+| End or resume work                | `handoff`                                                        | create or resume terminal state               |
 
 Implementation is normal agent work, not a leaf. `fix-pr` already owns its
 fix, commit, push, re-hunt, and reply loop; never append those actions.

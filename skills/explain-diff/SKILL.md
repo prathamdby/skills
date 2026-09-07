@@ -9,13 +9,13 @@ description: >
 
 ## Flags
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--target <branch>` | `main` | Explain `<branch>...HEAD` |
-| `--pr <n\|url>` | off | Explain one PR diff and metadata |
-| `--staged` | off | Explain the index |
-| `--unstaged` | off | Explain worktree changes |
-| `--output <path>` | `/tmp/YYYY-MM-DD-explain-<slug>.html` | Set HTML path |
+| Flag                | Default                               | Effect                           |
+| ------------------- | ------------------------------------- | -------------------------------- |
+| `--target <branch>` | `main`                                | Explain `<branch>...HEAD`        |
+| `--pr <n\|url>`     | off                                   | Explain one PR diff and metadata |
+| `--staged`          | off                                   | Explain the index                |
+| `--unstaged`        | off                                   | Explain worktree changes         |
+| `--output <path>`   | `/tmp/YYYY-MM-DD-explain-<slug>.html` | Set HTML path                    |
 
 The four source choices are mutually exclusive; conflicting or valueless flags
 are `BLOCKED`; bare `--pr` is the only value-less exception and may resolve the
