@@ -21,7 +21,6 @@
       "keywords": ["skills", "git", "review", "workflows"],
       "category": "development",
       "skills": [
-        "./skills/assign",
         "./skills/box",
         "./skills/commit",
         "./skills/deslop",
