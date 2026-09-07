@@ -34,18 +34,18 @@ Canonical rejects (rewrite even when the body lists real hunks):
 Conversation-only test: if the subject still makes sense after deleting the
 diff and keeping only the PR conversation, it fails.
 
-| Excuse | Reality |
-|---|---|
-| "Ledger says address review findings" | Ledger labels triage state, not message sources. |
-| "Teammate or manager drafted review framing" | Discard it. Rewrite from proving hunks. |
-| "Body lists the real changes" | The subject must also be clean-room. |
-| "Ban says findings; draft says feedback" | Feedback, findings, comments, and threads are banned. |
-| "Fixed-in reply needs review in the subject" | Replies carry that; the commit does not. |
-| "Paths mention the files so review framing is ok" | Paths prove location, not session motive. |
-| "PR history should show review follow-up" | Threads and replies show that; the commit does not. |
-| "Faster to keep the draft" | Rewrite. A blocked push beats a bad subject. |
-| "Hooks or the agent always add Co-authored-by" | Strip via Trailer hygiene before push. |
-| "Harness appends Made with Cursor" | Strip via Trailer hygiene before push. |
+| Excuse                                            | Reality                                               |
+| ------------------------------------------------- | ----------------------------------------------------- |
+| "Ledger says address review findings"             | Ledger labels triage state, not message sources.      |
+| "Teammate or manager drafted review framing"      | Discard it. Rewrite from proving hunks.               |
+| "Body lists the real changes"                     | The subject must also be clean-room.                  |
+| "Ban says findings; draft says feedback"          | Feedback, findings, comments, and threads are banned. |
+| "Fixed-in reply needs review in the subject"      | Replies carry that; the commit does not.              |
+| "Paths mention the files so review framing is ok" | Paths prove location, not session motive.             |
+| "PR history should show review follow-up"         | Threads and replies show that; the commit does not.   |
+| "Faster to keep the draft"                        | Rewrite. A blocked push beats a bad subject.          |
+| "Hooks or the agent always add Co-authored-by"    | Strip via Trailer hygiene before push.                |
+| "Harness appends Made with Cursor"                | Strip via Trailer hygiene before push.                |
 
 Red flags — rewrite before `git commit` or block before push:
 

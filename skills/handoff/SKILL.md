@@ -9,11 +9,11 @@ description: >
 
 ## Flags
 
-| Flag or argument | Default | Effect |
-|---|---|---|
-| `--resume <path>` | off | Validate a saved handoff and continue its work |
-| `--path <path>` | anchor path | Save a new handoff at this path |
-| positional focus | none | Prioritize this focus during create or resume |
+| Flag or argument  | Default     | Effect                                         |
+| ----------------- | ----------- | ---------------------------------------------- |
+| `--resume <path>` | off         | Validate a saved handoff and continue its work |
+| `--path <path>`   | anchor path | Save a new handoff at this path                |
+| positional focus  | none        | Prioritize this focus during create or resume  |
 
 Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
 Default saves use

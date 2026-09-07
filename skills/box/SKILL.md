@@ -9,12 +9,12 @@ description: >
 
 ## Flags
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--persist` | off | Upsert the local repo in the working directory's `AGENTS.md` |
-| `--update` | off | Pull an existing clone before search |
-| `--list` | off | List the manifest and stop |
-| `--no-subagents` | off | Run every stage in the main thread |
+| Flag             | Default | Effect                                                       |
+| ---------------- | ------- | ------------------------------------------------------------ |
+| `--persist`      | off     | Upsert the local repo in the working directory's `AGENTS.md` |
+| `--update`       | off     | Pull an existing clone before search                         |
+| `--list`         | off     | List the manifest and stop                                   |
+| `--no-subagents` | off     | Run every stage in the main thread                           |
 
 No flags clone if needed, search, and report. Never persist without
 `--persist`.

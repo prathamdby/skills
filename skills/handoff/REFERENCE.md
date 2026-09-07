@@ -16,33 +16,42 @@ opening referenced artifacts.
 # Handoff: <short title>
 
 ## Next session focus
+
 <Only when the user supplied a focus. One concrete outcome.>
 
 ## Context
+
 - <absolute repo root, branch, task, current scope, and active mode or chain>
 
 ## Progress
+
 - <verified result with commit, PR, or file pointer>
 
 ## Decisions
+
 - <durable choice and short reason>
 
 ## Open tasks
+
 1. <highest-priority unblocked task>
 
 ## Blockers
+
 - <blocker and evidence>
 
 ## Working tree
+
 - <staged, unstaged, and untracked paths that matter>
 
 ## Suggested skills
+
 - `<installed-name>`: <why the next task needs it>
 
 ## Artifacts
-| Type | Path or URL | Status |
-|---|---|---|
-| <type> | <pointer> | current, moved, missing, or superseded |
+
+| Type   | Path or URL | Status                                 |
+| ------ | ----------- | -------------------------------------- |
+| <type> | <pointer>   | current, moved, missing, or superseded |
 ```
 
 ## Selection rules
@@ -63,14 +72,14 @@ opening referenced artifacts.
 
 Replace the value while preserving enough context to resume:
 
-| Sensitive value | Replacement |
-|---|---|
-| API key, token, cookie, bearer value | `[REDACTED: token]` |
-| Password or connection-string credential | `[REDACTED: password]` |
-| Private key or certificate body | `[REDACTED: private-key]` |
-| Email address or user PII | `[REDACTED: pii]` |
-| Authenticated or private URL | `[REDACTED: url]` |
-| Environment variable value | `<NAME>=[REDACTED]` |
+| Sensitive value                          | Replacement               |
+| ---------------------------------------- | ------------------------- |
+| API key, token, cookie, bearer value     | `[REDACTED: token]`       |
+| Password or connection-string credential | `[REDACTED: password]`    |
+| Private key or certificate body          | `[REDACTED: private-key]` |
+| Email address or user PII                | `[REDACTED: pii]`         |
+| Authenticated or private URL             | `[REDACTED: url]`         |
+| Environment variable value               | `<NAME>=[REDACTED]`       |
 
 Never weaken redaction to make a command copyable. Record the variable name,
 command shape, exit code, or artifact path instead.

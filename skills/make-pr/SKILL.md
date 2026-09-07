@@ -9,11 +9,11 @@ description: >
 
 ## Flags
 
-| Flag | Default | Effect |
-|---|---|---|
-| `--target <branch>` | `main` | PR base and branch-diff target |
-| `--ticket <id>` | off | Prefix title with `[<id>]` |
-| `--conventional` | off | Use conventional title rules |
+| Flag                | Default | Effect                         |
+| ------------------- | ------- | ------------------------------ |
+| `--target <branch>` | `main`  | PR base and branch-diff target |
+| `--ticket <id>`     | off     | Prefix title with `[<id>]`     |
+| `--conventional`    | off     | Use conventional title rules   |
 
 Missing flag values are `BLOCKED`. Never infer a ticket from branch names,
 commits, issues, or conversation.

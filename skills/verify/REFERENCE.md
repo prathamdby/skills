@@ -2,7 +2,7 @@
 
 Load only when a step names this file.
 
-Paper: Kwok et al., *LLM-as-a-Verifier*, arXiv:2607.05391.
+Paper: Kwok et al., _LLM-as-a-Verifier_, arXiv:2607.05391.
 
 ## Paper method (Eq. 3.1)
 

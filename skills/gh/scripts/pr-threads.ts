@@ -1,6 +1,16 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
-import { graphql, ghost, prArg, resolvePr, resolveRepo, run, sanitizeForTerminal, splitOwnerRepo, truncate } from "./lib.ts";
+import {
+  graphql,
+  ghost,
+  prArg,
+  resolvePr,
+  resolveRepo,
+  run,
+  sanitizeForTerminal,
+  splitOwnerRepo,
+  truncate,
+} from "./lib.ts";
 
 const USAGE = `usage: pr-threads.ts [pr] [--pr n] [-R owner/repo] [--all|--open] [--author login] [--since ISO] [--full] [--json] [--complete] [--help]
 
@@ -171,16 +181,26 @@ function mapIssueComment(c: GqlComment): ConvoItem {
   };
 }
 
-async function pageThreadComments(gqlId: string, startCursor: string | null, comments: Comment[]): Promise<boolean> {
+async function pageThreadComments(
+  gqlId: string,
+  startCursor: string | null,
+  comments: Comment[],
+): Promise<boolean> {
   let cursor = startCursor;
   while (cursor) {
     try {
       const data = await graphql<{
-        node: { comments: { pageInfo: { hasNextPage: boolean; endCursor: string | null }; nodes: GqlComment[] } } | null;
+        node: {
+          comments: {
+            pageInfo: { hasNextPage: boolean; endCursor: string | null };
+            nodes: GqlComment[];
+          };
+        } | null;
       }>(THREAD_COMMENTS_QUERY, { id: gqlId, cursor });
       const conn = data.node?.comments;
       if (!conn) return true;
-      for (const c of conn.nodes) comments.push(mapComment(c, c.createdAt ?? ""));
+      for (const c of conn.nodes)
+        comments.push(mapComment(c, c.createdAt ?? ""));
       cursor = conn.pageInfo.hasNextPage ? conn.pageInfo.endCursor : null;
     } catch {
       return true;
@@ -211,7 +231,9 @@ async function pageOlder<T>(
           };
         };
       }>(query, { owner, name, number, before: cursor });
-      const conn = data.repository.pullRequest.reviews ?? data.repository.pullRequest.comments;
+      const conn =
+        data.repository.pullRequest.reviews ??
+        data.repository.pullRequest.comments;
       if (!conn) {
         return { items, more: true };
       }
@@ -229,7 +251,11 @@ async function fetchConversation(repo: string, pr: number, complete: boolean) {
   const { owner, name } = splitOwnerRepo(repo);
   const convo: ConvoItem[] = [];
   const threads: Thread[] = [];
-  const pendingComments: { gqlId: string; cursor: string | null; comments: Comment[] }[] = [];
+  const pendingComments: {
+    gqlId: string;
+    cursor: string | null;
+    comments: Comment[];
+  }[] = [];
   let moreReviews = false;
   let moreComments = false;
   let moreThreadComments = false;
@@ -267,7 +293,9 @@ async function fetchConversation(repo: string, pr: number, complete: boolean) {
     }
     const conn = p.reviewThreads;
     for (const n of conn.nodes) {
-      const comments = n.comments.nodes.map((c) => mapComment(c, c.createdAt ?? ""));
+      const comments = n.comments.nodes.map((c) =>
+        mapComment(c, c.createdAt ?? ""),
+      );
       if (n.comments.pageInfo.hasNextPage) moreThreadComments = true;
       const root = comments[0];
       threads.push({
@@ -309,22 +337,39 @@ async function fetchConversation(repo: string, pr: number, complete: boolean) {
           moreThreadComments = true;
           return;
         }
-        const truncated = await pageThreadComments(pending.gqlId, pending.cursor, t.comments);
+        const truncated = await pageThreadComments(
+          pending.gqlId,
+          pending.cursor,
+          t.comments,
+        );
         t.moreComments = truncated;
         if (truncated) moreThreadComments = true;
       }),
     );
 
     if (moreReviews && reviewsCursor) {
-      const extra = await pageOlder(REVIEWS_PAGE_QUERY, owner, name, pr, reviewsCursor, moreReviews, (nodes) =>
-        nodes.map(mapReview).filter((x): x is ConvoItem => x != null),
+      const extra = await pageOlder(
+        REVIEWS_PAGE_QUERY,
+        owner,
+        name,
+        pr,
+        reviewsCursor,
+        moreReviews,
+        (nodes) =>
+          nodes.map(mapReview).filter((x): x is ConvoItem => x != null),
       );
       convo.unshift(...extra.items);
       moreReviews = extra.more;
     }
     if (moreComments && commentsCursor) {
-      const extra = await pageOlder(COMMENTS_PAGE_QUERY, owner, name, pr, commentsCursor, moreComments, (nodes) =>
-        nodes.map(mapIssueComment),
+      const extra = await pageOlder(
+        COMMENTS_PAGE_QUERY,
+        owner,
+        name,
+        pr,
+        commentsCursor,
+        moreComments,
+        (nodes) => nodes.map(mapIssueComment),
       );
       convo.unshift(...extra.items);
       moreComments = extra.more;
@@ -333,7 +378,14 @@ async function fetchConversation(repo: string, pr: number, complete: boolean) {
   }
 
   const moreConvo = moreReviews || moreComments;
-  return { convo, threads, moreReviews, moreComments, moreConvo, moreThreadComments };
+  return {
+    convo,
+    threads,
+    moreReviews,
+    moreComments,
+    moreConvo,
+    moreThreadComments,
+  };
 }
 
 run(async () => {
@@ -353,15 +405,19 @@ run(async () => {
     allowPositionals: true,
   });
   if (v.help) return void console.log(USAGE);
-  if (v.all && v.open) throw new Error("--all and --open cannot be used together");
+  if (v.all && v.open)
+    throw new Error("--all and --open cannot be used together");
   const pr = await resolvePr(prArg(v.pr, positionals[0]), v.repo);
   const repo = await resolveRepo(v.repo);
 
-  let { convo, threads, moreReviews, moreComments, moreConvo, moreThreadComments } = await fetchConversation(
-    repo,
-    pr,
-    Boolean(v.complete),
-  );
+  let {
+    convo,
+    threads,
+    moreReviews,
+    moreComments,
+    moreConvo,
+    moreThreadComments,
+  } = await fetchConversation(repo, pr, Boolean(v.complete));
   const totalThreads = threads.length;
   let hidden = 0;
   if (v.all) {
@@ -377,18 +433,34 @@ run(async () => {
   }
   if (v.author) {
     convo = convo.filter((i) => i.author === v.author);
-    threads = threads.filter((t) => t.comments.some((c) => c.author === v.author));
+    threads = threads.filter((t) =>
+      t.comments.some((c) => c.author === v.author),
+    );
   }
   if (v.since) {
     const since = Date.parse(v.since);
-    if (Number.isNaN(since)) throw new Error(`--since is not a date: ${v.since}`);
+    if (Number.isNaN(since))
+      throw new Error(`--since is not a date: ${v.since}`);
     convo = convo.filter((i) => Date.parse(i.createdAt) >= since);
-    threads = threads.filter((t) => t.comments.some((c) => Date.parse(c.createdAt) >= since));
+    threads = threads.filter((t) =>
+      t.comments.some((c) => Date.parse(c.createdAt) >= since),
+    );
   }
 
   if (v.json) {
     return void console.log(
-      JSON.stringify({ conversation: convo, threads, moreReviews, moreComments, moreConvo, moreThreadComments }, null, 2),
+      JSON.stringify(
+        {
+          conversation: convo,
+          threads,
+          moreReviews,
+          moreComments,
+          moreConvo,
+          moreThreadComments,
+        },
+        null,
+        2,
+      ),
     );
   }
 
@@ -407,11 +479,14 @@ run(async () => {
     `${repo}#${pr}: ${reviews} review ${reviews === 1 ? "body" : "bodies"} · ${comments} comment${comments === 1 ? "" : "s"} · ${threadStat}\n`,
   );
   if (convo.length === 0 && threads.length === 0) {
-    return void log(totalThreads === 0 ? "no review activity" : "nothing matches the filters");
+    return void log(
+      totalThreads === 0 ? "no review activity" : "nothing matches the filters",
+    );
   }
 
   for (const item of convo) {
-    const tag = item.kind === "review" ? `[review · ${item.state}]` : "[comment]";
+    const tag =
+      item.kind === "review" ? `[review · ${item.state}]` : "[comment]";
     const body = v.full ? item.body : truncate(item.body, 600);
     log(`${tag} @${item.author} (${item.createdAt.slice(0, 10)})`);
     log(`  ${body.replace(/\n/g, "\n  ")}\n`);
@@ -423,13 +498,17 @@ run(async () => {
   threads.forEach((t, i) => {
     const state = t.isResolved ? "RESOLVED" : "OPEN";
     const outdatedTag = t.isOutdated ? " · outdated" : "";
-    const loc = t.line ?? (t.originalLine != null ? `${t.originalLine} (original)` : "?");
+    const loc =
+      t.line ?? (t.originalLine != null ? `${t.originalLine} (original)` : "?");
     log(`[${i + 1}] ${state}${outdatedTag} · ${t.path}:${loc}`);
     for (const c of t.comments) {
       const body = v.full ? c.body : truncate(c.body, 600);
-      log(`  @${c.author} (${c.createdAt.slice(0, 10)}): ${body.replace(/\n/g, "\n    ")}`);
+      log(
+        `  @${c.author} (${c.createdAt.slice(0, 10)}): ${body.replace(/\n/g, "\n    ")}`,
+      );
     }
-    if (t.moreComments) log("  … thread has more comments omitted (--complete pages them)");
+    if (t.moreComments)
+      log("  … thread has more comments omitted (--complete pages them)");
     log();
   });
 });
