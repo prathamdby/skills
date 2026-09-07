@@ -25,13 +25,12 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Explain a diff as HTML | `explain-diff` (`../explain-diff/SKILL.md`) |
 | Map or refresh the current repo | `recon` (`../recon/SKILL.md`) |
 | Clone or search an external repo | `box` (`../box/SKILL.md`) |
-| Run one task in an external CLI agent | `assign` (`../assign/SKILL.md`) |
 | Coordinate current-harness subagents | `orchestrate` (`../orchestrate/SKILL.md`) |
 | Save or resume session state | `handoff` (`../handoff/SKILL.md`) |
 
 For one action, route to its leaf. Use `orchestrate` for several in-harness
-delegates and `assign` for one external CLI process. Chain only for a complete
-terminal outcome; several explicit outcomes select the matching chain.
+delegates. Chain only for a complete terminal outcome; several explicit
+outcomes select the matching chain.
 Orientation or reply-only terminals go to `gh`; any fix, push, or "handle
 review feedback" stays `fix-pr`. `fix-pr` loads `gh` for GitHub I/O. `/gh`
 never continues into `fix-pr`.

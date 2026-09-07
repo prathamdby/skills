@@ -56,7 +56,7 @@ opening referenced artifacts.
   changed files, and required config. Do not list every file.
 - Suggested skills must exist under the installed `skills/` root containing
   this skill. Common choices are `peer-review`, `deslop`, `commit`, `make-pr`,
-  `fix-pr`, `recon`, `box`, `assign`, `orchestrate`, and `explain-diff`.
+  `fix-pr`, `recon`, `box`, `orchestrate`, and `explain-diff`.
 - A live positional focus overrides a focus saved in the document.
 
 ## Redaction

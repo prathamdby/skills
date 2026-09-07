@@ -43,7 +43,6 @@ codex plugin add skills@pratham-skills
 - `/explain-diff` writes a self-contained HTML walkthrough of a change.
 - `/recon` maps the current repository and refreshes only changed areas later.
 - `/box` clones and searches an external git repository locally.
-- `/assign` runs one exact task through an external coding-agent CLI.
 - `/handoff` saves resumable session state or continues from it.
 - `/orchestrate` coordinates cheaper subagents while the main agent verifies.
 
@@ -71,7 +70,6 @@ codex plugin add skills@pratham-skills
 | A large diff gets a shallow chat summary with no surrounding system context. | [`explain-diff`](./skills/explain-diff/SKILL.md) | Groups the change by theme and writes an evidence-linked HTML page with a working quiz. |
 | Every session re-reads the same repository from scratch. | [`recon`](./skills/recon/SKILL.md) | Stores a bounded evidence map and patches it from committed git drift. |
 | The agent guesses what an external repository contains. | [`box`](./skills/box/SKILL.md) | Clones into a skill-owned sandbox, searches local source, and returns cited findings. |
-| External coding-agent commands break on quoting, permissions, silence, or parallel runs. | [`assign`](./skills/assign/SKILL.md) | Uses collision-safe stdin transport, non-interactive commands, tracked processes, cleanup, and result verification. |
 | A resumed session trusts stale paths, tasks, branches, or PR state. | [`handoff`](./skills/handoff/SKILL.md) | Saves a bounded, redacted handoff and validates every artifact before resuming work. |
 | The main model spends its context on mechanical work or trusts delegate summaries. | [`orchestrate`](./skills/orchestrate/SKILL.md) | Delegates disjoint chunks, verifies evidence and integration, and keeps the parent read-only. |
 | Best-of-N collapses to the first plausible attempt or one yes/no judge call. | [`verify`](./skills/verify/SKILL.md) | Fans out a fixed-N pool, scores pairs on a 20-letter scale, ranks with a pivot tournament, and stops on a named gate. |
@@ -91,7 +89,6 @@ codex plugin add skills@pratham-skills
 | [`explain-diff`](./skills/explain-diff/SKILL.md) | Write an HTML teaching page for a diff, branch, or PR. | `--target <branch>` default `main`, `--pr <n\|url>`, `--staged`, `--unstaged`, `--output <path>` |
 | [`recon`](./skills/recon/SKILL.md) | Build or refresh a persistent map of the current repo. | `--refresh`, positional focus |
 | [`box`](./skills/box/SKILL.md) | Clone, update, list, search, or persist an external repo. | `--persist`, `--update`, `--list`, `--no-subagents` |
-| [`assign`](./skills/assign/SKILL.md) | Run one task with OpenCode, Codex, or Claude Code. | `--agent <name>` default `opencode`, `--model <model>`, `--dir <path>` |
 | [`handoff`](./skills/handoff/SKILL.md) | Save or resume bounded session state. | `--resume <path>`, `--path <path>`, positional focus |
 | [`orchestrate`](./skills/orchestrate/SKILL.md) | Coordinate in-harness subagents as a read-only parent. | Positional task |
 
