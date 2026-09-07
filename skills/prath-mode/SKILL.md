@@ -58,9 +58,8 @@ planned work's diff and relevant tests are recorded.
 
 Record a run ledger:
 
-`route | plan path/hash/verdict | current owner | completed owners | diff/tests | terminal`
+`route | current owner | completed owners | diff/tests | terminal`
 
-Leave plan hash and verdict empty unless the route is review-shaped.
 If no route matches, ask one question about the intended outcome. Done when one
 leaf or chain and its terminal condition are recorded.
 
@@ -79,13 +78,8 @@ Read the current leaf in full and run it to one of its terminal states. Advance
 only after success or no-op; pause the chain on blocked or waiting. After an
 interruption, verify the last owner's artifacts before continuing.
 
-Ship planned work never enters `peer-review`. Before `make-pr`, require a
-clean tree. For implementation, verify the planned work diff and test
-evidence in the ledger.
-
-On a review-shaped route, continue past `peer-review` only on `Ship it.`
-An `UPDATED` plan is reviewed again. Lock its content hash before later
-implementation. If it changes, return to `peer-review`.
+Before `make-pr`, require a clean tree. For implementation, verify the
+planned work diff and test evidence in the ledger.
 
 Done when the recorded chain terminal condition is observed or the current
 leaf has reported why progress paused.
