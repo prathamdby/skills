@@ -42,8 +42,10 @@ For every skill you touched:
 5. **Markdown links resolve**, every real `.md` path linked or backticked in
    `SKILL.md` points to a file that exists. Ignore template paths containing
    `<...>` placeholders.
+6. **Claude marketplace**, `plugins[0].skills` lists every `skills/*/SKILL.md`
+   directory, sorted, no extras.
 
-Fix every failure before committing. Do not commit until all five pass.
+Fix every failure before committing. Do not commit until all six pass.
 
 ---
 
