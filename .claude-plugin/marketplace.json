@@ -22,7 +22,10 @@
       "category": "development",
       "skills": [
         "./skills/box",
+        "./skills/claude-code",
+        "./skills/codex",
         "./skills/commit",
+        "./skills/cursor-agent",
         "./skills/deslop",
         "./skills/explain-diff",
         "./skills/fix-pr",

@@ -27,6 +27,9 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Clone or search an external repo                           | `box` (`../box/SKILL.md`)                   |
 | Coordinate current-harness subagents                       | `orchestrate` (`../orchestrate/SKILL.md`)   |
 | Save or resume session state                               | `handoff` (`../handoff/SKILL.md`)           |
+| Launch Cursor Agent CLI                                    | `cursor-agent` (`../cursor-agent/SKILL.md`) |
+| Launch Claude Code CLI                                     | `claude-code` (`../claude-code/SKILL.md`)   |
+| Launch Codex CLI                                           | `codex` (`../codex/SKILL.md`)               |
 
 For one action, route to its leaf. Use `orchestrate` for several in-harness
 delegates. Chain only for a complete terminal outcome; several explicit

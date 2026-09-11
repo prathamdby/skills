@@ -46,6 +46,8 @@ codex plugin add skills@pratham-skills
 - `/handoff` saves resumable session state or continues from it.
 - `/orchestrate` coordinates cheaper subagents while the main agent verifies.
 - `/cursor-agent` drives the local Cursor Agent CLI for first-run install, interactive, one-shot, persist, worktree, MCP, plugin, worker, or Bedrock runs.
+- `/claude-code` drives the local Claude Code CLI for first-run, interactive, one-shot print, resume, worktree, MCP, or plugin runs.
+- `/codex` drives the local Codex CLI for first-run, interactive, one-shot exec, review, resume, worktree, MCP, or plugin runs.
 
 ## Why these skills exist
 
@@ -74,6 +76,8 @@ codex plugin add skills@pratham-skills
 | A resumed session trusts stale paths, tasks, branches, or PR state.                                                         | [`handoff`](./skills/handoff/SKILL.md)           | Saves a bounded, redacted handoff and validates every artifact before resuming work.                                                                              |
 | The main model spends its context on mechanical work or trusts delegate summaries.                                          | [`orchestrate`](./skills/orchestrate/SKILL.md)   | Delegates disjoint chunks, verifies evidence and integration, and keeps the parent read-only.                                                                     |
 | The agent invents an unsupported `--mode` value, treats `--print` as read-only, or bypasses workspace trust with `--yolo`.  | [`cursor-agent`](./skills/cursor-agent/SKILL.md) | Runs current local `cursor-agent` syntax, gates `--trust`, and verifies the working tree.                                                                         |
+| The agent treats `claude -p` as skip-all-permissions, or pastes `--workspace` / `--trust` / `--yolo` onto `claude`.         | [`claude-code`](./skills/claude-code/SKILL.md)   | Runs current local `claude` syntax, keeps `--print` under permission mode, and verifies the working tree.                                                         |
+| The agent runs `codex` as a PTY TUI, `--full-auto`, or `--sandbox workspace-write` as auto-approve.                         | [`codex`](./skills/codex/SKILL.md)               | Runs `codex exec -C`, treats sandbox as not approval, and verifies the working tree.                                                                              |
 | Best-of-N collapses to the first plausible attempt or one yes/no judge call.                                                | [`verify`](./skills/verify/SKILL.md)             | Fans out a fixed-N pool, scores pairs on a 20-letter scale, ranks with a pivot tournament, and stops on a named gate.                                             |
 
 ## Reference
@@ -94,17 +98,13 @@ codex plugin add skills@pratham-skills
 | [`handoff`](./skills/handoff/SKILL.md)           | Save or resume bounded session state.                                                                       | `--resume <path>`, `--path <path>`, positional focus                                                                                                                                                 |
 | [`orchestrate`](./skills/orchestrate/SKILL.md)   | Coordinate in-harness subagents as a read-only parent.                                                      | Positional task                                                                                                                                                                                      |
 | [`cursor-agent`](./skills/cursor-agent/SKILL.md) | Drive the Cursor Agent CLI for one-shot and related runs.                                                   | `--print` default, `--plan`, `--mode ask`, `--model`, `--resume <id>`, `--continue`, `--worktree [name]`, `--output-format` default `text`, `--trust`, `--auto-review`, `--wall-clock` default `15m` |
+| [`claude-code`](./skills/claude-code/SKILL.md)   | Drive the Claude Code CLI for one-shot and related runs.                                                    | `--print` default, `--permission-mode plan`, `--model`, `--resume <id>`, `--continue`, `--worktree [name]`, `--output-format` default `text`, `--wall-clock` default `15m`                           |
+| [`codex`](./skills/codex/SKILL.md)               | Drive the Codex CLI for one-shot exec and related runs.                                                     | `exec` default, `-C, --cd <DIR>`, `--sandbox <mode>`, `-m, --model <model>`, `--worktree`, `--wall-clock` default `15m`                                                                              |
 
 ## Development
 
 Before committing a skill edit, run the manual checks in
-[`AGENTS.md`](./AGENTS.md):
-
-1. Frontmatter name matches the skill directory.
-2. Description is present and at most 1,024 characters.
-3. `SKILL.md` is at most 100 lines.
-4. Quickstart and Reference both include the skill.
-5. Every real Markdown path in the skill resolves.
+[`AGENTS.md`](./AGENTS.md).
 
 ## License
 
