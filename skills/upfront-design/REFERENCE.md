@@ -6,10 +6,11 @@ file holds templates.
 ## Design document template
 
 Load in Step 0 when creating the file. Write one section per approved phase;
-leave later sections absent until their phase is approved. Every slice starts
-unticked. Store repo roots as absolute paths.
+leave later sections absent until their phase is approved. Prose comes first
+and each fenced block sits beside the prose it supports. Store repo roots as
+absolute paths.
 
-```markdown
+````markdown
 ---
 request: <one-line request, or the path or URL it came from>
 repos:
@@ -22,42 +23,101 @@ status: draft
 
 ## Product review
 
-- Problem: <who is blocked and how>
-- Desired behavior: <observable outcomes, one per bullet>
-- Non-goals: <what this work will not do>
-- Acceptance checks: <numbered; each names an observable result>
-- Mockup: <supplied path, or a draft wireframe or state table labelled draft>
+### Problem to solve
 
-## System architecture
+<One paragraph: who starts where and what is missing.>
 
-- Components: <name and responsibility, one per bullet>
-- Contracts: <component A to component B: interface and data shape>
-- Data models: <entity, fields, owning component>
-- Constraints: <compatibility, performance, security, rollout>
-- Boundaries: <what stays outside this design>
-- Diagram: <one component diagram>
-- ADR conflicts: <ADR-NNNN and the conflict, or none>
+- <Concrete pain, quoting what the user does or says today>
+
+### Success and how to measure it
+
+- <Outcome stated as a change in behavior>
+- Measurable signals: <counts, rates, or deltas readable from data>
+
+### Proposed solution
+
+**<One-line shape of the solution.>** <How it works and where it lives.>
+
+<Mockup: supplied image path, or a text wireframe or state table labelled draft.>
+
+<Delivery paragraph: how the user reaches it and how it ships.>
+
+## System design
+
+**<One-line shape statement naming the existing pattern it follows.>**
+<Paragraph: what it parallels and what stays unchanged.>
+
+```text
+<contract path>    NEW        <role>
+<api path>         CHANGED    <role>
+<ui path>          NEW        <role>
+```
+
+<Paragraph: data sources, constraints, and the cost reason for each.>
+
+ADR conflicts: <ADR-NNNN and the conflict, or none>
+
+```mermaid
+sequenceDiagram
+    participant A as <Component>
+    participant B as <Component>
+    rect rgb(230, 230, 250)
+    Note over A,B: <phase name>
+    A->>B: method(args)
+    B-->>A: <result>
+    end
+```
 
 ## Program design
 
-- Types: <name and fields, one per bullet>
-- Signatures: <module.function(args) -> return, one per bullet>
-- Layout: <path and purpose for each new or changed file>
-- Call graphs: <one per Phase 1 outcome, entry to exit>
-- Alternatives: <second shape considered and why it lost, or none>
+### <Boundary thesis as one sentence>
+
+<Paragraph: which pattern it follows and how callers use it.>
+
+```<lang>
+<usage snippet with real signatures and types>
+```
+
+```text
+<boundary>
+  <caller> -> <Service.method(args)>
+```
+
+```diff
+ <dir>/
++  <new file>        # <role>
+   <existing file>   # unchanged
+```
+
+```diff
+ <caller dir>/
+   <changed file>    # + <Service.method(args)>
+```
+
+```text
+<entry>
+  -> <callee>
+    -> <callee>
+```
+
+<Paragraph: second shape considered and why it lost, or omit.>
 
 ## Vertical slices
 
-- [ ] S1 <behavior it delivers>
+- [ ] M1 <title>: <behavior delivered>
+  - Path: <layers touched, in stub, mock, wire, logic, error handling order>
   - Symbols: <Phase 3 names landed here>
-  - Verify: `<command or test>`
-  - Deviations: <none, or promised X; landed Y; reason>
-- [ ] S2 ...
+  - Automated verification:
+    - [ ] `<exact command>` <caveat when the path or package matters>
+  - Manual verification:
+    - [ ] <step, then the observable result>
+  - Deviations: none, or promised X; landed Y; reason
+- [ ] M2 <title>: <behavior delivered> deferred (<reason or ticket>)
 
 ## Decisions
 
 - <decision>: ADR at <absolute path>, or recorded here only
-```
+````
 
 ## ADR template
 
@@ -87,11 +147,14 @@ Optional sections, added only when they carry information the body lacks:
 Load in Check only.
 
 ```text
-slice: S<n> <behavior>
-command: <verification command>
-exit: <code>
+milestone: M<n> <title>
+automated:
+  `<command>` | pass | fail (exit <code>)
+manual:
+  <step> | confirmed | unconfirmed
 symbols:
-  <promised name and signature> | <landed, missing, or changed: detail>
-result: ticked | deviation
-next: S<n+1> | all slices complete
+  <promised name and signature> | landed | missing | changed: <detail>
+result: ticked | awaiting manual | deviation
+next: M<n+1> | all milestones complete
+deferred: <M<n> and unlanded symbols, or none>
 ```

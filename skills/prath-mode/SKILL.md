@@ -16,7 +16,7 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Immediate action                                           | Leaf                                            |
 | ---------------------------------------------------------- | ----------------------------------------------- |
 | Design a feature before implementation                     | `upfront-design` (`../upfront-design/SKILL.md`) |
-| Check a landed slice against its design                    | `upfront-design --check`                        |
+| Check a landed milestone against its design                | `upfront-design` with the approved design path  |
 | Commit scoped changes                                      | `commit` (`../commit/SKILL.md`)                 |
 | Remove code slop                                           | `deslop` (`../deslop/SKILL.md`)                 |
 | Create or update a PR                                      | `make-pr` (`../make-pr/SKILL.md`)               |
@@ -43,16 +43,16 @@ never continues into `fix-pr`.
 
 ## Workflow chains
 
-| Requested outcome                 | Ordered owners                                                                                           | Complete when                                |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Ship planned work                 | implementation → `deslop` → `commit` → `make-pr`                                                         | planned work diff tested and PR URL verified |
-| Design then ship                  | `upfront-design` → per slice: implementation, `upfront-design --check` → `deslop` → `commit` → `make-pr` | every slice ticked and PR URL verified       |
-| Save current work                 | optional `deslop` → `commit`                                                                             | new commit verified                          |
-| Finish PR feedback                | `fix-pr`                                                                                                 | `fix-pr` report complete                     |
-| Inspect PR or CI, or post a reply | `gh`                                                                                                     | script report or reply URL verified          |
-| Understand current repo           | `recon`                                                                                                  | memory and report verified                   |
-| Research external code            | `box`                                                                                                    | cited answer returned                        |
-| End or resume work                | `handoff`                                                                                                | create or resume terminal state              |
+| Requested outcome                 | Ordered owners                                                                                                     | Complete when                                                    |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Ship planned work                 | implementation → `deslop` → `commit` → `make-pr`                                                                   | planned work diff tested and PR URL verified                     |
+| Design then ship                  | `upfront-design` → per milestone: implementation, `upfront-design <design path>` → `deslop` → `commit` → `make-pr` | every milestone ticked, deferred, or skipped and PR URL verified |
+| Save current work                 | optional `deslop` → `commit`                                                                                       | new commit verified                                              |
+| Finish PR feedback                | `fix-pr`                                                                                                           | `fix-pr` report complete                                         |
+| Inspect PR or CI, or post a reply | `gh`                                                                                                               | script report or reply URL verified                              |
+| Understand current repo           | `recon`                                                                                                            | memory and report verified                                       |
+| Research external code            | `box`                                                                                                              | cited answer returned                                            |
+| End or resume work                | `handoff`                                                                                                          | create or resume terminal state                                  |
 
 Implementation is normal agent work, not a leaf. `fix-pr` already owns its
 fix, commit, push, re-hunt, and reply loop; never append those actions.
