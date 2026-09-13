@@ -13,23 +13,25 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 
 ## Routing map
 
-| Immediate action                                           | Leaf                                        |
-| ---------------------------------------------------------- | ------------------------------------------- |
-| Commit scoped changes                                      | `commit` (`../commit/SKILL.md`)             |
-| Remove code slop                                           | `deslop` (`../deslop/SKILL.md`)             |
-| Create or update a PR                                      | `make-pr` (`../make-pr/SKILL.md`)           |
-| Address PR feedback                                        | `fix-pr` (`../fix-pr/SKILL.md`)             |
-| Inspect a PR, read threads, why CI is red, or post a reply | `gh` (`../gh/SKILL.md`)                     |
-| Review a plan, design, implementation, or proposal         | `peer-review` (`../peer-review/SKILL.md`)   |
-| Select among candidates or score progress                  | `verify` (`../verify/SKILL.md`)             |
-| Explain a diff as HTML                                     | `explain-diff` (`../explain-diff/SKILL.md`) |
-| Map or refresh the current repo                            | `recon` (`../recon/SKILL.md`)               |
-| Clone or search an external repo                           | `box` (`../box/SKILL.md`)                   |
-| Coordinate current-harness subagents                       | `orchestrate` (`../orchestrate/SKILL.md`)   |
-| Save or resume session state                               | `handoff` (`../handoff/SKILL.md`)           |
-| Launch Cursor Agent CLI                                    | `cursor-agent` (`../cursor-agent/SKILL.md`) |
-| Launch Claude Code CLI                                     | `claude-code` (`../claude-code/SKILL.md`)   |
-| Launch Codex CLI                                           | `codex` (`../codex/SKILL.md`)               |
+| Immediate action                                           | Leaf                                            |
+| ---------------------------------------------------------- | ----------------------------------------------- |
+| Design a feature before implementation                     | `upfront-design` (`../upfront-design/SKILL.md`) |
+| Check a landed milestone against its design                | `upfront-design` with the approved design path  |
+| Commit scoped changes                                      | `commit` (`../commit/SKILL.md`)                 |
+| Remove code slop                                           | `deslop` (`../deslop/SKILL.md`)                 |
+| Create or update a PR                                      | `make-pr` (`../make-pr/SKILL.md`)               |
+| Address PR feedback                                        | `fix-pr` (`../fix-pr/SKILL.md`)                 |
+| Inspect a PR, read threads, why CI is red, or post a reply | `gh` (`../gh/SKILL.md`)                         |
+| Review a plan, design, implementation, or proposal         | `peer-review` (`../peer-review/SKILL.md`)       |
+| Select among candidates or score progress                  | `verify` (`../verify/SKILL.md`)                 |
+| Explain a diff as HTML                                     | `explain-diff` (`../explain-diff/SKILL.md`)     |
+| Map or refresh the current repo                            | `recon` (`../recon/SKILL.md`)                   |
+| Clone or search an external repo                           | `box` (`../box/SKILL.md`)                       |
+| Coordinate current-harness subagents                       | `orchestrate` (`../orchestrate/SKILL.md`)       |
+| Save or resume session state                               | `handoff` (`../handoff/SKILL.md`)               |
+| Launch Cursor Agent CLI                                    | `cursor-agent` (`../cursor-agent/SKILL.md`)     |
+| Launch Claude Code CLI                                     | `claude-code` (`../claude-code/SKILL.md`)       |
+| Launch Codex CLI                                           | `codex` (`../codex/SKILL.md`)                   |
 
 For one action, route to its leaf. Use `orchestrate` for several in-harness
 delegates. Chain only for a complete terminal outcome; several explicit
@@ -41,15 +43,16 @@ never continues into `fix-pr`.
 
 ## Workflow chains
 
-| Requested outcome                 | Ordered owners                                                   | Complete when                                 |
-| --------------------------------- | ---------------------------------------------------------------- | --------------------------------------------- |
-| Ship planned work                 | implementation → `deslop` → `commit` → `make-pr`                 | planned work diff tested and PR URL verified  |
-| Save current work                 | optional `deslop` → `commit`                                     | new commit verified                           |
-| Finish PR feedback                | `fix-pr`                                                         | `fix-pr` report complete                      |
-| Inspect PR or CI, or post a reply | `gh`                                                             | script report or reply URL verified           |
-| Understand current repo           | `recon`                                                          | memory and report verified                    |
-| Research external code            | `box`                                                            | cited answer returned                         |
-| End or resume work                | `handoff`                                                        | create or resume terminal state               |
+| Requested outcome                 | Ordered owners                                                                                                     | Complete when                                                    |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Ship planned work                 | implementation → `deslop` → `commit` → `make-pr`                                                                   | planned work diff tested and PR URL verified                     |
+| Design then ship                  | `upfront-design` → per milestone: implementation, `upfront-design <design path>` → `deslop` → `commit` → `make-pr` | every milestone ticked, deferred, or skipped and PR URL verified |
+| Save current work                 | optional `deslop` → `commit`                                                                                       | new commit verified                                              |
+| Finish PR feedback                | `fix-pr`                                                                                                           | `fix-pr` report complete                                         |
+| Inspect PR or CI, or post a reply | `gh`                                                                                                               | script report or reply URL verified                              |
+| Understand current repo           | `recon`                                                                                                            | memory and report verified                                       |
+| Research external code            | `box`                                                                                                              | cited answer returned                                            |
+| End or resume work                | `handoff`                                                                                                          | create or resume terminal state                                  |
 
 Implementation is normal agent work, not a leaf. `fix-pr` already owns its
 fix, commit, push, re-hunt, and reply loop; never append those actions.
@@ -61,10 +64,12 @@ planned work's diff and relevant tests are recorded.
 
 Record a run ledger:
 
-`route | current owner | completed owners | diff/tests | terminal`
+`route | current owner | completed owners | design path | diff/tests | terminal`
 
-If no route matches, ask one question about the intended outcome. Done when one
-leaf or chain and its terminal condition are recorded.
+If no route matches, ask one question about the intended outcome. A `DIRECT`
+result from `upfront-design` is a no-op success; `DESIGNED` and `CHECKED` are
+success. The chain continues on either. Done when one leaf or chain and its
+terminal condition are recorded.
 
 ## 2. Verify installation
 
