@@ -67,9 +67,9 @@ Record a run ledger:
 `route | current owner | completed owners | design path | diff/tests | terminal`
 
 If no route matches, ask one question about the intended outcome. A `DIRECT`
-result from `upfront-design` is a no-op success; the chain continues to
-implementation. Done when one leaf or chain and its terminal condition are
-recorded.
+result from `upfront-design` is a no-op success; `DESIGNED` and `CHECKED` are
+success. The chain continues on either. Done when one leaf or chain and its
+terminal condition are recorded.
 
 ## 2. Verify installation
 

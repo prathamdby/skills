@@ -155,6 +155,6 @@ manual:
 symbols:
   <promised name and signature> | landed | missing | changed: <detail>
 result: ticked | awaiting manual | deviation
-next: M<n+1> | all milestones complete
+next: <first still-open M<n>> | all milestones complete
 deferred: <M<n> and unlanded symbols, or none>
 ```

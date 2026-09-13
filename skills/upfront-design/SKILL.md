@@ -18,22 +18,23 @@ Resolve `<anchor>` as the absolute directory containing this `SKILL.md`. Write
 new designs to `<anchor>/designs/<basename>-<slug>-<YYYY-MM-DD-HHmmss>.md`,
 with `<basename>` the root directory name of the first repo, never inside it.
 
-Record after every step, persisted at `<design path>.ledger` through a temp
-sibling and atomic rename and deleted on any terminal except `AWAITING_USER`:
+After a design path exists, record after every step at `<design path>.ledger`
+through a temp sibling and atomic rename; delete it on any terminal except
+`AWAITING_USER`:
 `request | size | design path | phase | approved phases | adr offers | terminal`.
 Write each approved phase to the document the same way before the next phase
-starts; the document, not the conversation, holds the design. Each phase
-pauses with `AWAITING_USER` until the user approves or asks for changes.
+starts. Each phase pauses with `AWAITING_USER` until approved or revised.
 
 ## 0. Triage
 
 A request is small when all hold: it changes one module or package, it adds or
 changes no contract, data model, or public signature, and its desired behavior
-is one sentence. Small stops with `DIRECT` plus that sentence and no pause.
-Otherwise create the design file from the template in `./REFERENCE.md`, locate
-an existing ADR tree (`docs/adr/`, `adr/`, `doc/adr/`, `docs/decisions/`), and
-note ADRs touching this area; if none exists, proceed silently. Done when size
-is recorded and, for non-small work, the file has frontmatter.
+is one sentence. Small stops with `DIRECT` plus that sentence and no pause; do
+not write a design-path ledger. Otherwise create the design file from
+`./REFERENCE.md`, locate an ADR tree (`docs/adr/`, `adr/`, `doc/adr/`,
+`docs/decisions/`), and note ADRs touching this area; if none exists, proceed
+silently. Done when size is recorded and, for non-small work, the file has
+frontmatter.
 
 ## 1. Product review
 
@@ -46,11 +47,11 @@ recommended answer per question. Pause. Done when the approved section is writte
 
 ## 2. System design
 
-State the shape in one bold sentence and the existing pattern it follows. Add
-a layer map of paths marked NEW or CHANGED with a role each, the data sources
-and constraints with their cost reason, and a sequence diagram with a band per
-phase. Flag a conflict with an existing ADR by number instead of overriding
-it. Pause. Done when the approved section is written.
+State the shape in one bold sentence and the pattern it follows. Add a layer
+map of paths marked NEW or CHANGED with a role each, data sources and
+constraints with their cost reason, and a sequence diagram with a band per
+phase. Flag ADR conflicts by number instead of overriding them. Pause. Done
+when the approved section is written.
 
 ## 3. Program design
 
@@ -79,22 +80,21 @@ ADR only when all three hold: hard to reverse, surprising without context,
 chosen over a real alternative. On confirmation write it with the ADR template
 in `./REFERENCE.md` into the tree found in Step 0, or `docs/adr/` created
 lazily, in the repo that owns the decided component. Report the design path,
-ADR paths, and the next step: `/peer-review` on the design, then pass the
-approved design after each milestone; to revise, set `status: draft`, name the
-phase, and pass the path. Done when all four sections exist and every offer is
-written or declined.
+ADR paths, and next steps (`/peer-review`, then pass the design after each
+milestone; to revise, set `status: draft`, name the phase, pass the path).
+Done with `DESIGNED` when Product review, System design, Program design,
+Vertical slices, and Decisions exist and every offer is written or declined.
 
 ## Check
 
-Given an approved design, take the first open milestone that is not deferred
-or skipped. Run its automated commands and tick each that passes. Compare
-promised symbols to the working tree by name and signature. If any manual box
-is open, report the steps with expected results and stop with `AWAITING_USER`.
-When every box is ticked and symbols match, tick the milestone; on mismatch
-add `promised X; landed Y; reason` and leave it open. Use the report format in
-`./REFERENCE.md`; never edit product files. Done when the milestone is ticked,
-awaiting manual confirmation, or has a deviation line, and the report names
-the next open milestone or `all milestones complete` with deferred symbols.
+Take the first open milestone that is not deferred or skipped. Show each
+automated command and run it only after the user approves that exact string;
+tick each that passes. Compare promised symbols by name and signature. If any
+manual box is open, report steps and stop with `AWAITING_USER`. When every box
+is ticked and symbols match, tick the milestone; on mismatch add
+`promised X; landed Y; reason` and leave it open. Use `./REFERENCE.md`; never
+edit product files. Done with `CHECKED` when the milestone is ticked or all
+milestones are complete; with `AWAITING_USER` when manual steps await or a
+deviation names the still-open milestone.
 
-Terminal values: `DIRECT` (no-op success for routers), `AWAITING_USER`,
-`DESIGNED`, `CHECKED`, `BLOCKED`.
+Terminal values: `DIRECT` (no-op success for routers), `AWAITING_USER`, `DESIGNED`, `CHECKED`, `BLOCKED`.
