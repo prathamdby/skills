@@ -85,10 +85,11 @@ Compare the new commit diff and paths with the locked snapshot and
 one-or-two `-m` shape, and preservation of out-of-scope work. A mismatch is
 `BLOCKED`; report the created SHA and exact difference.
 
-Then apply Trailer hygiene in `./REFERENCE.md`: scan `%B` for banned keys; if
-dirty and trailers are denied (or unexpected under allow), amend once to the
-ledger message when this run owns unpushed `HEAD`, then re-read `%B`. Still
-dirty or amend unsafe is `BLOCKED`. Report whether a trailer amend ran.
+Then apply Trailer hygiene in `./REFERENCE.md`. After every commit when
+trailers are denied, and on that amend path, open a Python or Node.js REPL,
+read `HEAD` `%B` there, and strip banned keys and freeform harness footers.
+Hooks often re-add trailers after `-m`. A shell one-liner is not the strip.
+Still dirty or amend unsafe is `BLOCKED`. Report whether a trailer amend ran.
 
 Report commit SHA, subject, scope, hooks, trailers policy, trace summary, and
 remaining unstaged tracked and untracked work.

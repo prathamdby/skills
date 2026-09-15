@@ -79,23 +79,40 @@ Banned freeform harness lines (case-insensitive substring match on a whole
 line): `Made with Cursor`, `Generated with Claude`, `Generated with Claude
 Code`.
 
-Detect: scan `git log -1 --format=%B` for lines matching banned keys in git
+Many harness `commit-msg` and `prepare-commit-msg` hooks cannot be turned
+off. They re-add these trailers after `-m` or `-n`. A clean draft is not a
+clean `HEAD`. When trailers are denied (default), a Python or Node.js REPL
+must inspect and strip after commit. Do not weaken `--allow-trailers`
+opt-in. A shell `sed`, `awk`, or `perl` one-liner is not the strip.
+
+Detect: in a `python` or `node` REPL, run `git log -1 --format=%B` via
+subprocess or `child_process` and scan that text for banned keys in git
 trailer form `Key: value`, or a banned freeform harness line.
 
-When trailers are denied, or when allow-trailers is on but `%B` contains a
-banned key or freeform harness line the user did not request:
+When trailers are denied, run this REPL path after every commit. When
+allow-trailers is on, run the same path if `%B` contains a banned key or
+freeform harness line the user did not request:
 
-1. Confirm this run created `HEAD`, it is not on the remote, and no later
-   commit landed. Otherwise `BLOCKED`.
-2. Amend once with the exact ledger subject and optional body, using the same
-   `-n` / `--verify` policy as the original commit, and no trailer `-m` args.
-   Replace the full message from the ledger; do not use `git interpret-trailers`
-   to add or edit trailers.
-3. Re-read `%B`. Any remaining banned (or unexpected) trailer or harness line
-   is `BLOCKED`; report the SHA and the leftover lines.
+1. Open a `python` or `node` REPL. Read `HEAD` `%B` there and detect banned
+   keys and freeform harness footers.
+2. If dirty, confirm this run created `HEAD`, it is not on the remote, and
+   no later commit landed. Otherwise `BLOCKED`.
+3. If dirty, build the cleaned subject and optional body in the REPL from
+   the ledger. Amend once with REPL-built argv: the same `-n` or `--verify`
+   policy as the original commit, one subject `-m` and at most one body
+   `-m`, no HEREDOC, `-F`, editor, or trailer `-m` args. Do not use
+   `git interpret-trailers` to add or edit trailers.
+4. Re-read `%B` in the REPL. Any remaining banned or unexpected trailer or
+   harness line is `BLOCKED`. Report the SHA and the leftover lines.
 
 Under allow-trailers, keep only trailers the user requested for this run.
 Report whether a trailer amend ran.
+
+| Excuse                            | Reality                                              |
+| --------------------------------- | ---------------------------------------------------- |
+| "I passed a clean `-m`"           | Hooks rewrite after `-m`. Read `%B` in the REPL.     |
+| "I disabled the hook"             | Many harness hooks cannot be turned off. Use the REPL. |
+| "A shell one-liner stripped it"   | The strip is the REPL. Re-read `%B` there.           |
 
 Provenance (principles only; do not copy the STE dictionary):
 https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
