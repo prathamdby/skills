@@ -36,6 +36,7 @@
         "./skills/peer-review",
         "./skills/prath-mode",
         "./skills/recon",
+        "./skills/todoist-task",
         "./skills/upfront-design",
         "./skills/verify"
       ]
