@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 # Prath mode
 
-The leaf owns its triggers, flags, procedure, and terminal states. Read it
+The leaf owns its triggers, options, procedure, and terminal states. Read it
 before acting. Never recreate a missing leaf or copy its procedure here.
 
 ## Routing map

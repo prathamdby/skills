@@ -7,15 +7,13 @@ description: >
 
 # Recon
 
-## Flags
+## Options
 
-| Flag or argument | Default | Effect                                     |
-| ---------------- | ------- | ------------------------------------------ |
-| `--refresh`      | off     | Rebuild memory instead of patching it      |
-| positional focus | none    | Explore and report that area in more depth |
-
-Without `--refresh`, use the warm path when memory exists and the cold path
-otherwise.
+Derive rebuild versus patch, and any focus, from the request. Unspecified:
+warm path when memory exists, else cold.
+"refresh" / "rebuild" / "from scratch" → rebuild memory.
+A named area is the focus. Conflicting rebuild-plus-patch wording is
+`BLOCKED`.
 
 ## Memory
 
@@ -46,7 +44,7 @@ Persist it after each item through a sibling temporary file and atomic rename at
 Explore breadth first: manifests, top-level layout, entry points, dependency
 boundaries, commands, and conventions. Read at most three representative anchor
 files for at most 30 modules named by workspace manifests; go deeper only for
-the positional focus. Use non-overlapping read-only subagents when available.
+the named focus. Use non-overlapping read-only subagents when available.
 Write every required section and evidence path, then prune to the limits.
 
 Done when the memory file exists, its `head` equals current HEAD, and every
@@ -63,8 +61,8 @@ Otherwise read committed HEAD blobs for changed paths and memory claims citing
 them; never use dirty worktree content. Follow renames, rewrite every evidence
 path through the rename map, remove deleted evidence, and inspect one-hop
 importers when a package root, manifest, or exported entry changed. Remove or
-rewrite claims contradicted by changed files. With a positional focus, reread
-that subtree within the same cap. Report dirty paths only as an overlay.
+rewrite claims contradicted by changed files. With a named focus, reread that
+subtree within the same cap. Report dirty paths only as an overlay.
 
 Done when each committed changed path is reflected, affected claims are
 revalidated or removed, limits hold, and frontmatter names current HEAD.

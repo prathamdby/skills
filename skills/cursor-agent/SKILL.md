@@ -8,27 +8,27 @@ description: >
 
 # Cursor Agent CLI
 
-Default run is `cursor-agent --print` in the target workspace with `--mode` omitted. Read-only values are `plan` and `ask`.
+Default run is `cursor-agent --print` in the target workspace with `--mode`
+omitted. Read-only values are `plan` and `ask`.
 
-## Flags
+## Options
 
-| Flag                      | Default | Effect                                                                 |
-| ------------------------- | ------- | ---------------------------------------------------------------------- |
-| `--print`                 | yes     | Noninteractive. Write and shell are enabled                            |
-| `--plan`                  | no      | Read-only planning (`--mode plan`)                                     |
-| `--mode ask`              | off     | Read-only Q&A                                                          |
-| `--model <model>`         | CLI     | Use that model. Only if the user named one                             |
-| `--resume <id>`           | off     | Resume that session                                                    |
-| `--continue`              | off     | Continue the previous session                                          |
-| `--worktree [name]`       | off     | Isolated worktree under `~/.cursor/worktrees/<reponame>/<name>`        |
-| `--output-format`         | `text`  | With `--print`: `text`, `json`, or `stream-json`                       |
-| `--trust`                 | off     | Trust this workspace for this run. User-named only                     |
-| `--auto-review`           | off     | Classifier auto-runs "safe" tools. User-asked only. Not a trust bypass |
-| `--wall-clock <duration>` | `15m`   | Parent wait before kill. Not a CLI flag. CLI has no `--max-turns`      |
-
-`--plan` conflicts with `--mode ask`. `--resume` conflicts with `--continue`.
-Conflicting flags are `BLOCKED`. No flags mean `--print`, omit `--mode`, `text`
-output. `--print` stays modifying-capable unless `--plan` or `--mode ask` is set.
+Derive product CLI argv from the request. Unspecified: `--print`, omit
+`--mode`, `--output-format text`, parent wait `15m`. `--print` stays
+modifying-capable unless plan or ask is set.
+"plan" / "read-only plan" → `--plan` (`--mode plan`).
+"ask" / "Q&A" → `--mode ask`. Plan and ask together is `BLOCKED`.
+"use <model>" → `--model` only when named.
+"resume <id>" → `--resume <id>`. "continue" → `--continue`. Both is
+`BLOCKED`.
+"worktree [name]" → `--worktree [name]` under
+`~/.cursor/worktrees/<reponame>/<name>`. Do not invent a path.
+"json" / "stream-json" → that `--output-format` with `--print`.
+"trust this workspace" → `--trust` only. A coding task is not trust.
+"auto-review" → `--auto-review` only when asked. Not a trust bypass.
+"interactive" / "TUI" → omit `--print`.
+Gated product flags (`--yolo`, `-f`, `--force`, `--sandbox disabled`,
+`--approve-mcps`) need a named waiver. Ambiguous wording is `BLOCKED`.
 
 ## Iron laws
 
@@ -47,7 +47,7 @@ output. `--print` stays modifying-capable unless `--plan` or `--mode ask` is set
 
 Confirm `cursor-agent` is on PATH. If missing, follow First-run in
 `./references/cli-surface.md`. Record workspace, prompt, mode, session,
-worktree, output format, and `--wall-clock`. Check auth with
+worktree, output format, and wall-clock. Check auth with
 `cursor-agent status --format json`. Do not print secrets. Missing login is
 `BLOCKED`. Record:
 `cmd | workspace | mode | session | worktree | trust | verified | terminal | wall-clock`.
@@ -65,7 +65,7 @@ Done when trust is already present, `--trust` is authorized and recorded, or the
 
 ## 3. Build the command
 
-Construct argv from the Flags table. Add `--plan` or `--mode ask` for
+Construct argv from the derived options. Add `--plan` or `--mode ask` for
 read-only work. Quote the prompt. Pass `--workspace` when cwd is not the
 target. No gated flag without a named waiver. If `--output-format` is `json`
 or `stream-json`, parse events with the catalog in
@@ -78,7 +78,7 @@ Done when argv is recorded.
 
 Follow the matching recipe in `./references/orchestration.md` for one-shot,
 streaming, sessions, worktrees, parallelism, cleanup, or failures. Wait for
-exit or `--wall-clock`. Do not kill a still-working process.
+exit or the recorded wall-clock. Do not kill a still-working process.
 
 Done when the process exits, a persist session is the intended live handle,
 or a named failure recipe applies.

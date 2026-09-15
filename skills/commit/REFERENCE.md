@@ -2,9 +2,9 @@
 
 Load only the selected style section, then run the shared rejection check.
 Load Trailer hygiene only during Step 4 verify, or when drafting under
-`--allow-trailers` / an explicit user trailer request.
+allow-trailers / an explicit user trailer request.
 
-## `--conventional` formatting rules
+## Conventional formatting rules
 
 - Format: `type: description`
 - Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`
@@ -40,7 +40,7 @@ Load Trailer hygiene only during Step 4 verify, or when drafting under
   works. The diff shows how. Use only facts the locked diff proves. Do not
   add ticket, review, or session motives.
 
-## `--simple` formatting rules
+## Simple formatting rules
 
 - One line, no type prefix or body, at most 72 characters.
 - Capitalize the first word; use sentence case; no trailing period.
@@ -65,7 +65,7 @@ findings`, `address PR feedback`, `review follow-up`, or `per review`
 - an unwrapped body line over 72 characters
 - a conventional body that only restates how the diff works and states no
   what or why the hunks prove
-- hook behavior that disagrees with `--verify`
+- hook behavior that disagrees with the recorded verify policy
 - banned identity or harness trailer lines (`Co-authored-by:`, `Signed-off-by:`,
   `Made-with:`) or freeform harness footers (`Made with Cursor`, Claude
   marketing lines) unless allow-trailers is on
@@ -82,7 +82,7 @@ Code`.
 Many harness `commit-msg` and `prepare-commit-msg` hooks cannot be turned
 off. They re-add these trailers after `-m` or `-n`. A clean draft is not a
 clean `HEAD`. When trailers are denied (default), a Python or Node.js REPL
-must inspect and strip after commit. Do not weaken `--allow-trailers`
+must inspect and strip after commit. Do not weaken allow-trailers
 opt-in. A shell `sed`, `awk`, or `perl` one-liner is not the strip.
 
 Detect: in a `python` or `node` REPL, run `git log -1 --format=%B` via
@@ -98,7 +98,7 @@ freeform harness line the user did not request:
 2. If dirty, confirm this run created `HEAD`, it is not on the remote, and
    no later commit landed. Otherwise `BLOCKED`.
 3. If dirty, build the cleaned subject and optional body in the REPL from
-   the ledger. Amend once with REPL-built argv: the same `-n` or `--verify`
+   the ledger. Amend once with REPL-built argv: the same `-n` or verify
    policy as the original commit, one subject `-m` and at most one body
    `-m`, no HEREDOC, `-F`, editor, or trailer `-m` args. Do not use
    `git interpret-trailers` to add or edit trailers.

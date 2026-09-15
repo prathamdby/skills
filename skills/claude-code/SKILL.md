@@ -12,21 +12,20 @@ Default run is `claude --print --output-format text "<prompt>"` from the
 target directory. Read-only is `--permission-mode plan`. `--print` writes
 unless plan is set. Wrong cwd is `BLOCKED`.
 
-## Flags
+## Options
 
-| Flag                     | Default | Effect                                              |
-| ------------------------ | ------- | --------------------------------------------------- |
-| `--print`                | yes     | Noninteractive. Writes unless plan is set           |
-| `--permission-mode plan` | off     | Read-only                                           |
-| `--model`                | CLI     | User-named only. Aliases: `fable`, `opus`, `sonnet` |
-| `--resume <id>`          | off     | Resume that session. No picker under `--print`      |
-| `--continue`             | off     | Continue the previous session in this directory     |
-| `--worktree [name]`      | off     | Isolated worktree. Do not invent a path             |
-| `--output-format`        | `text`  | With `--print`: `text`, `json`, or `stream-json`    |
-| `--wall-clock`           | `15m`   | Parent wait before kill. Not a Claude flag          |
-
-`--resume` conflicts with `--continue`. Conflict is `BLOCKED`. No flags mean
-`--print`, omit permission mode, `text` output, from the target directory.
+Derive product CLI argv from the request. Unspecified: `--print`, omit
+permission mode, `--output-format text`, from the target directory, parent
+wait `15m`.
+"read-only" / "plan" → `--permission-mode plan`.
+"use opus" / named model → `--model` with that alias (`fable`, `opus`,
+`sonnet`). Unspecified model stays CLI default.
+"resume session <id>" → `--resume <id>`. "continue" → `--continue`. Both
+is `BLOCKED`.
+"worktree [name]" → `--worktree [name]`. Do not invent a path.
+"json" / "stream-json" → that `--output-format` with `--print`.
+"interactive" / "TUI" → omit `--print`.
+A missing needed session id or conflicting wording is `BLOCKED`.
 
 ## Iron laws
 
@@ -45,7 +44,7 @@ unless plan is set. Wrong cwd is `BLOCKED`.
 
 Confirm `claude` is on PATH. If missing, follow First-run in
 `./references/cli-surface.md`. Record workspace, prompt, permission mode,
-session, worktree, output format, and `--wall-clock`. Check auth with
+session, worktree, output format, and wall-clock. Check auth with
 `claude auth status --text`. Do not print secrets. Missing login is
 `BLOCKED`. Record:
 `cmd | workspace | mode | session | worktree | gated | verified | terminal | wall-clock`.
@@ -62,7 +61,7 @@ Done when gated state is recorded, or the run is `BLOCKED` / `AWAITING_USER`.
 
 ## 3. Build the command
 
-Construct argv from the Flags table. Add `--permission-mode plan` for
+Construct argv from the derived options. Add `--permission-mode plan` for
 read-only work. Quote the prompt. Run from the target directory. If
 `--output-format` is `json` or `stream-json`, follow `--print` output in
 `./references/cli-surface.md`. If the user asked to install, update, or
@@ -74,7 +73,7 @@ Done when argv is recorded.
 
 Follow the matching recipe in `./references/orchestration.md` for one-shot,
 streaming, sessions, worktrees, parallelism, cleanup, or failures. Wait for
-exit or `--wall-clock`. Do not kill a still-working process.
+exit or the recorded wall-clock. Do not kill a still-working process.
 
 Done when the process exits, a live handle is the intended outcome, or a
 named failure recipe applies.

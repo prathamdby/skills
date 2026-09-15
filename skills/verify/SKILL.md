@@ -11,18 +11,15 @@ description: >
 Sample N isolated trajectories, then rank them (Kwok et al., arXiv:2607.05391).
 One score token is an LM judge, not this method.
 
-## Flags
+## Options
 
-| Flag                | Default | Effect                                       |
-| ------------------- | ------- | -------------------------------------------- |
-| `--candidates <n>`  | `3`     | Pool size N. Not inferred from the task      |
-| `--evals <k>`       | `2`     | Repeats K; swap A/B on every odd pass        |
-| `--pivots <k>`      | `2`     | PPT pivots when N>3; clamp to `[1, N]`       |
-| `--max-rounds <n>`  | `0`     | Extra generate or revise cycles after select |
-| `--criteria <path>` | auto    | Criteria file; else write 2–4 inline         |
-| `--track`           | off     | Progress only; skip generate and select      |
-
-A supplied list overrides `--candidates`. N is a budget, not a computed count.
+Derive N, K, pivots, rounds, criteria, and track from the request.
+Unspecified: N `3`, evals `2`, pivots `2`, max-rounds `0`, auto criteria,
+track off. A supplied attempt list overrides N.
+"5 candidates" → N=5. "track progress" → track; skip generate and select.
+"criteria in <path>" → that file.
+N is a budget, not inferred from hardness. Conflicting numbers or a missing
+needed path is `BLOCKED`.
 
 ## 1. Lock task and criteria
 
@@ -36,9 +33,9 @@ Done when task and criteria are fixed, or `BLOCKED`.
 
 ## 2. Generate
 
-`--track`: skip. If the user supplied attempts, use them unchanged.
+Track: skip. If the user supplied attempts, use them unchanged.
 
-Else dispatch `--candidates` workers in one parallel wave. Each brief:
+Else dispatch N workers in one parallel wave. Each brief:
 locked task + criteria + "one complete attempt; no siblings; no rank."
 Write scope is a worktree or copy using Isolation in `REFERENCE.md`, never
 a branch on this tree. Same-tree parallel writes are `BLOCKED`. Parent
@@ -50,10 +47,10 @@ Done when N traces are locked, or `BLOCKED`.
 
 Run candidates when a criterion is empirical. Classify all-pass / all-fail
 / swing. Skip scoring on skip classes. all-fail is unwinnable here: if
-`--max-rounds` remain, consume one and return to Step 2; else `ALL_FAIL`.
+max-rounds remain, consume one and return to Step 2; else `ALL_FAIL`.
 
 On swing, one criterion per comparison. N≤3: every directed pair. N>3:
-clamp `--pivots` to `[1, N]`, then run the PPT procedure in `REFERENCE.md`.
+clamp pivots to `[1, N]`, then run the PPT procedure in `REFERENCE.md`.
 Average over C and K. Soft win `p = 1/(1+exp(-(R_a-R_b)))`. Accumulate
 `w_i`, `c_i`.
 
@@ -64,19 +61,19 @@ Scoring path (first match); pick it from `REFERENCE.md`:
 3. This harness only: emit A–T, map, average over K and C. Not Eq. 3.1.
    Still pairwise, decomposed, swapped. Never a 1–10.
 
-`--track`: score the prefix against "already complete?"; no siblings.
+Track: score the prefix against "already complete?"; no siblings.
 
 Done when each scored candidate has `w_i/c_i`, or a skip class applies.
 
 ## 4. Select
 
-`--track` or all-fail: no winner. all-pass: lowest-index passer. swing:
+Track or all-fail: no winner. all-pass: lowest-index passer. swing:
 `argmax w_i/c_i` (index tie-break). Done when that choice is recorded.
 
 ## 5. Revise or stop
 
-Stop on: all-pass; `--track` and score ≥ 0.8 with observed checks;
-`--max-rounds` exhausted (default: no revise); no score gain. Else revise
+Stop on: all-pass; track and score ≥ 0.8 with observed checks;
+max-rounds exhausted (default: no revise); no score gain. Else revise
 only the swing winner on its weakest criteria and return to Step 3.
 
 Done when a stop rule fires.
@@ -92,7 +89,7 @@ stop | terminal`. `SUCCESS`, `ALL_PASS`, `ALL_FAIL`, `NO_IMPROVEMENT`,
 | Excuse                      | Reality                                       |
 | --------------------------- | --------------------------------------------- |
 | "I'll just do it myself"    | Parent implements zero candidates. Fan out N. |
-| "N should match difficulty" | N is `--candidates`. Do not invent it.        |
+| "N should match difficulty" | N is the stated budget. Do not invent it.     |
 | "Score them 1-10"           | Discrete judge. Trust observed execution.     |
 
 ## Red flags

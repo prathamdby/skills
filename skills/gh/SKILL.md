@@ -14,28 +14,22 @@ reimplemented). Requires authenticated `gh`. Scripts are TypeScript. `run`
 tries bun, nub, tsx, then Node (native TS or `--experimental-strip-types`),
 including nvm installs.
 
-## Flags
+## Options
 
-| Flag                | Default           | Effect                                                                       |
-| ------------------- | ----------------- | ---------------------------------------------------------------------------- |
-| `[pr]` / `--pr <n>` | current branch PR | Target PR                                                                    |
-| `-R owner/repo`     | cwd repo          | Target repo; with `-R` also pass `pr` / `--pr`                               |
-| `--json`            | off               | Structured output                                                            |
-| `--full`            | off               | Snapshot/threads: do not truncate bodies. CI: accepted; snippets stay capped |
-| `--all`             | off               | Threads: include resolved and outdated                                       |
-| `--open`            | off               | Threads: unresolved including outdated                                       |
-| `--author <login>`  | off               | Threads: filter by author                                                    |
-| `--since <ISO>`     | off               | Threads: activity at/after timestamp                                         |
-| `--complete`        | off               | Threads: page leftover comments and reviews                                  |
-| `--sha <SHA>`       | off               | CI: pin commit; not hunt surface 6                                           |
-| `--list`            | off               | CI: recent runs instead of drilldown                                         |
-| `-L <n>`            | 10                | CI `--list`: how many runs                                                   |
-| `--workflow <W>`    | off               | CI `--list`: filter by name or file                                          |
-| `[run-id]`          | PR failing checks | CI: analyze that Actions run                                                 |
-
-`--all` and `--open` conflict: `BLOCKED`. Missing values are `BLOCKED`. No flags
-mean current-branch PR, cwd repo, truncated text. When posting a reply, use
-exactly one target and one body from Reply in `./REFERENCE.md`.
+Derive the surface and script argv from the request. Unspecified: current
+branch PR, cwd repo, truncated text.
+"PR 12" / a PR URL → that PR. "repo owner/repo" → emit `-R owner/repo` and
+require a PR.
+"json" → `--json`. "full bodies" → `--full`.
+"open threads" → `--open`. "all threads" → `--all`. Both is `BLOCKED`.
+"complete paging" / leftover comments → `--complete`.
+"by <login>" → `--author`. "since <time>" → `--since`.
+"CI" / "failing checks" → `ci-failures.ts`. "list runs" → `--list`
+(default `-L 10`). "workflow <name>" → `--workflow`. A run id analyzes
+that run. A known head SHA → `--sha`.
+Reply: one target and one body from Reply in `./REFERENCE.md`.
+"reply on thread <id>" → `--in-reply-to`. "PR comment" → `--conversation`.
+A missing needed value is `BLOCKED`.
 
 ## Iron laws
 

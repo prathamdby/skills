@@ -7,7 +7,7 @@ description: >
 
 # Peer review
 
-There are no flags. A review request authorizes analysis, not file edits.
+A review request authorizes analysis, not file edits.
 
 ## 1. Resolve the review target
 
