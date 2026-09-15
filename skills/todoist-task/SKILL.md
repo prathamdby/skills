@@ -10,8 +10,8 @@ description: >
 ## Contract
 
 Create tasks that remain clear without their originating conversation. Preserve
-meaning, technical literals, links, and stated constraints. Do not invent
-requirements, metadata, or completion criteria.
+meaning, technical literals, links, and stated constraints, except secrets that
+redaction replaces. Do not invent requirements, metadata, or completion criteria.
 
 Derive the project, parent, due date, priority, and whether to create or preview
 from the user's natural-language request. Default to Inbox, no due date, `p4`,
@@ -69,14 +69,19 @@ headings only when a long task contains separate areas of work. Clarify the
 wording without making it formal, repetitive, or impersonal. Do not repeat
 metadata or add work the user did not request.
 
-Done when the title identifies the work and the description reads naturally
-without depending on the original conversation.
+Before create or preview, redact credentials, tokens, passwords, private keys,
+authenticated URLs, email addresses, and environment values from the title and
+description. Replace each with a placeholder such as `[REDACTED: token]`.
+
+Done when the title identifies the work, the description reads naturally without
+the original conversation, and redaction has run.
 
 ## 4. Check and create
 
-Resolve the project and parent through read-only calls. Search for an active task
-with the same normalized title and parent. If found, report `DUPLICATE` and do
-not create another.
+Resolve the project and parent through read-only calls. Normalize a title by
+trimming ends, collapsing internal whitespace to one space, and casefolding.
+Search for an active task with the same project, parent, and normalized title.
+If found, report `DUPLICATE` and do not create another.
 
 If the user requested a preview, present the exact title, description, and
 metadata, then stop with `PREVIEW`. Otherwise create the recorded task once. In
@@ -87,8 +92,9 @@ Done when creation returns an ID or every failure is identified.
 ## 5. Verify
 
 Fetch each created task and compare its title, description, project, parent, due
-date, and priority with the recorded payload. Correct an authorized mismatch
-once. If it remains, report `BLOCKED` with the ID and exact difference.
+date, and priority with the recorded payload. A mismatch against that payload is
+authorized: update the field once toward the recorded value. If it still differs,
+report `BLOCKED` with the ID and exact difference.
 
 Report the verified title, project, parent when present, and due date.
 Done when every reported success matches Todoist.
