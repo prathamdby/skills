@@ -28,7 +28,9 @@ Do not commit the skill without the README update.
 ## Meta-Rule: Self-Check Before Committing
 
 **Before committing any skill addition or update, verify every rule below by
-reading the files. There is no validator script; you are the check.**
+reading the files. Run `scripts/skill-guards.test.sh` for marketplace set
+equality and README `./skills/` link existence. You remain the check for the
+other rules.**
 
 For every skill you touched:
 

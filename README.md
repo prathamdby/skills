@@ -35,13 +35,11 @@ codex plugin add skills@pratham-skills
 - `/prath-mode` routes work to one skill or a delivery chain.
 - `/upfront-design` gates product review, system design, program design, and vertical slices on user approval before code, then checks each landed milestone when given the approved design.
 - `/peer-review` checks an implementation plan before work starts.
-- `/verify` fans out N isolated attempts, ranks them, and stops on a named gate.
 - `/deslop` removes needless complexity from a selected diff.
 - `/commit` creates a clean-room commit from staged or tracked unstaged work.
 - `/make-pr` pushes committed work and creates or updates its pull request.
 - `/fix-pr` hunts, triages, fixes, and replies to pull-request feedback and CI.
 - `/gh` orients on a PR, review threads, or red CI, or posts one reply.
-- `/explain-diff` writes a self-contained HTML walkthrough of a change.
 - `/recon` maps the current repository and refreshes only changed areas later.
 - `/box` clones and searches an external git repository locally.
 - `/todoist-task` creates specific, naturally written Todoist tasks from conversational requests.
@@ -59,7 +57,6 @@ codex plugin add skills@pratham-skills
 | The agent starts coding from a one-line request; the PR needs rework and review drags.                                      | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Triages size, writes each approved design phase to a file outside the repo, records only hard-to-reverse decisions as ADRs, and checks landed milestones against the design. |
 | A plan misses a requirement or carries a risky assumption into implementation.                                              | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhausts every material finding, ranks them, and issues a fixed verdict. It edits only with explicit authority.                                                              |
 | A plan review stops after the first risk and leaves other blockers unlisted.                                                | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Surfaces every material finding with no count cap, then maps the full ranked list to the verdict.                                                                            |
-| The agent ships the first attempt or picks a winner from narration instead of observed evidence.                            | [`verify`](./skills/engineering/verify/SKILL.md)                 | Fans out N isolated attempts, pairwise-verifies on decomposed criteria, ranks with PPT, and stops on a named gate.                                                           |
 | Generated code adds guards, wrappers, comments, or indirection that the codebase does not need.                             | [`deslop`](./skills/engineering/deslop/SKILL.md)                 | Classifies the selected diff against six categories, preserves staging intent, and verifies behavior-sensitive edits.                                                        |
 | Commit messages leak ticket or review context and do not match the committed hunks.                                         | [`commit`](./skills/engineering/commit/SKILL.md)                 | Locks the snapshot, traces every message line to a hunk, applies the selected hook policy, and verifies the commit.                                                          |
 | PR creation misses local commits, duplicates an existing PR, or describes work absent from the diff.                        | [`make-pr`](./skills/engineering/make-pr/SKILL.md)               | Blocks on a dirty or diverged branch, publishes committed work, reuses the open PR, and verifies its fields.                                                                 |
@@ -73,7 +70,6 @@ codex plugin add skills@pratham-skills
 | Agents burn 3–5 `gh` calls and dump CI logs into context when inspecting a PR.                                              | [`gh`](./skills/engineering/gh/SKILL.md)                         | One script per I/O loop; bounded snippets; logs on disk; raw `gh` only after gotchas.                                                                                        |
 | A fix-pr hunt runs `gh` scripts without loading the gh skill, then invents raw `gh` to reply.                               | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Requires the gh skill before any GitHub I/O and posts replies through `pr-reply.ts`.                                                                                         |
 | Agents skip the `.ts` inspect scripts on Node 22 and dump GraphQL instead of probing bun, nub, tsx, or type-stripping Node. | [`gh`](./skills/engineering/gh/SKILL.md)                         | `scripts/run` tries bun, nub, tsx, then Node (native TS or `--experimental-strip-types`, including nvm); GraphQL inspect is blocked until that list is exhausted.            |
-| A large diff gets a shallow chat summary with no surrounding system context.                                                | [`explain-diff`](./skills/engineering/explain-diff/SKILL.md)     | Groups the change by theme and writes an evidence-linked HTML page with a working quiz.                                                                                      |
 | Every session re-reads the same repository from scratch.                                                                    | [`recon`](./skills/engineering/recon/SKILL.md)                   | Stores a bounded evidence map and patches it from committed git drift.                                                                                                       |
 | The agent guesses what an external repository contains.                                                                     | [`box`](./skills/engineering/box/SKILL.md)                       | Clones into a skill-owned sandbox, searches local source, and returns cited findings.                                                                                        |
 | A Todoist task depends on chat context, silently invents metadata, or duplicates existing work.                             | [`todoist-task`](./skills/personal/todoist-task/SKILL.md)     | Resolves task metadata, requires missing identifiers, writes natural descriptions, checks duplicates, and verifies the saved task.                                         |
@@ -82,7 +78,6 @@ codex plugin add skills@pratham-skills
 | The agent invents an unsupported `--mode` value, treats `--print` as read-only, or bypasses workspace trust with `--yolo`.  | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md)     | Runs current local `cursor-agent` syntax, gates `--trust`, and verifies the working tree.                                                                                    |
 | The agent treats `claude -p` as skip-all-permissions, or pastes `--workspace` / `--trust` / `--yolo` onto `claude`.         | [`claude-code`](./skills/engineering/claude-code/SKILL.md)       | Runs current local `claude` syntax, keeps `--print` under permission mode, and verifies the working tree.                                                                    |
 | The agent runs `codex` as a PTY TUI, `--full-auto`, or `--sandbox workspace-write` as auto-approve.                         | [`codex`](./skills/engineering/codex/SKILL.md)                   | Runs `codex exec -C`, treats sandbox as not approval, and verifies the working tree.                                                                                         |
-| Best-of-N collapses to the first plausible attempt or one yes/no judge call.                                                | [`verify`](./skills/engineering/verify/SKILL.md)                 | Fans out a fixed-N pool, scores pairs on a 20-letter scale, ranks with a pivot tournament, and stops on a named gate.                                                        |
 
 ## Reference
 
@@ -91,13 +86,11 @@ codex plugin add skills@pratham-skills
 | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Route one action or a complete workflow chain.                                                                 |
 | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Agree product review, system design, program design, and vertical slices before code; check landed milestones. |
 | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhaustively review a plan or proposed change and issue a fixed verdict.                                       |
-| [`verify`](./skills/engineering/verify/SKILL.md)                 | Fan out N isolated attempts, pairwise-verify, and select, or score current progress.                           |
 | [`deslop`](./skills/engineering/deslop/SKILL.md)                 | Remove code slop from one git diff without changing behavior.                                                  |
 | [`commit`](./skills/engineering/commit/SKILL.md)                 | Commit a locked snapshot with hunk-traced copy.                                                                |
 | [`make-pr`](./skills/engineering/make-pr/SKILL.md)               | Publish a branch and create or update its PR with a diff-scaled body and rich proved visuals on every tier.    |
 | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Resolve open PR feedback and CI, then reply with evidence.                                                     |
 | [`gh`](./skills/engineering/gh/SKILL.md)                         | Orient on PR state, review threads, or CI, or post one reply.                                                  |
-| [`explain-diff`](./skills/engineering/explain-diff/SKILL.md)     | Write an HTML teaching page for a diff, branch, or PR.                                                         |
 | [`recon`](./skills/engineering/recon/SKILL.md)                   | Build or refresh a persistent map of the current repo.                                                         |
 | [`box`](./skills/engineering/box/SKILL.md)                       | Clone, update, list, search, or persist an external repo.                                                      |
 | [`todoist-task`](./skills/personal/todoist-task/SKILL.md)     | Create or preview specific, naturally written Todoist tasks from conversational requests.                     |
@@ -109,8 +102,9 @@ codex plugin add skills@pratham-skills
 
 ## Development
 
-Before committing a skill edit, run the manual checks in
-[`AGENTS.md`](./AGENTS.md).
+Before committing a skill edit, run
+[`scripts/skill-guards.test.sh`](./scripts/skill-guards.test.sh) and the
+manual checks in [`AGENTS.md`](./AGENTS.md).
 
 ## License
 

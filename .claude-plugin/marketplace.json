@@ -32,7 +32,6 @@
         "./skills/engineering/commit",
         "./skills/engineering/cursor-agent",
         "./skills/engineering/deslop",
-        "./skills/engineering/explain-diff",
         "./skills/engineering/fix-pr",
         "./skills/engineering/gh",
         "./skills/engineering/handoff",
@@ -42,7 +41,6 @@
         "./skills/engineering/prath-mode",
         "./skills/engineering/recon",
         "./skills/engineering/upfront-design",
-        "./skills/engineering/verify",
         "./skills/personal/todoist-task"
       ]
     }
