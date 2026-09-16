@@ -21,7 +21,7 @@ This applies to every skill, no exceptions.
 
 1. Add the skill to the quickstart invocation list.
 2. Add a failure mode entry in `## Why These Skills Exist` if applicable.
-3. Add a row to the `## Reference` table with name, link, description, and options.
+3. Add a row to the `## Reference` table with name, link, and description.
 
 Do not commit the skill without the README update.
 

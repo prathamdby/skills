@@ -3,7 +3,7 @@
 Syntax follows local `codex --help`. If a flag is rejected, re-run
 `codex --help` or `codex exec --help` and use what the binary prints.
 Sandbox, gated flags, and `--skip-git-repo-check` stay in `./sandbox.md`.
-`--wall-clock` stays in `SKILL.md`.
+The parent wall-clock stays in `SKILL.md`.
 
 ## First-run
 
@@ -58,8 +58,8 @@ before it.
 ## Exec output
 
 Default `exec` prints assistant text on stdout. Nothing until the
-process exits. Silence is not a hang. Wait using `--wall-clock` in
-`SKILL.md`.
+process exits. Silence is not a hang. Wait using the wall-clock recorded
+per `SKILL.md`.
 
 `--json` prints events to stdout as JSONL. Read line by line. Do not
 invent an event schema. A non-zero exit is a failed run even if a line

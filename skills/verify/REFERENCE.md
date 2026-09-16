@@ -145,11 +145,3 @@ attempts). Do not name a host CLI or product.
 A worker brief contains only: task, criteria, ground-truth note, write
 scope, and "return the attempt + how to reproduce the check." No sibling
 ids. No ranking instructions.
-
-## Defaults
-
-Candidates default to `3`. N is that budget; do not infer it from
-task hardness. Evals default to `2` to bound in-harness cost; raise
-it when ties survive. Pivots default to `2`; clamp to `[1, N]` when
-N>3. Max-rounds default to `0` (one generate + one select). Raise it
-to resample the swing winner or replace an all-fail pool.

@@ -27,8 +27,7 @@ modifying-capable unless plan or ask is set.
 "trust this workspace" → `--trust` only. A coding task is not trust.
 "auto-review" → `--auto-review` only when asked. Not a trust bypass.
 "interactive" / "TUI" → omit `--print`.
-Gated product flags (`--yolo`, `-f`, `--force`, `--sandbox disabled`,
-`--approve-mcps`) need a named waiver. Ambiguous wording is `BLOCKED`.
+Ambiguous wording is `BLOCKED`.
 
 ## Iron laws
 

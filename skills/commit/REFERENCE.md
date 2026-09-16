@@ -1,8 +1,8 @@
 # Commit reference
 
 Load only the selected style section, then run the shared rejection check.
-Load Trailer hygiene only during Step 4 verify, or when drafting under
-allow-trailers / an explicit user trailer request.
+Load Trailer hygiene only during Step 4 verify, or when drafting with
+trailers allowed.
 
 ## Conventional formatting rules
 
@@ -65,10 +65,10 @@ findings`, `address PR feedback`, `review follow-up`, or `per review`
 - an unwrapped body line over 72 characters
 - a conventional body that only restates how the diff works and states no
   what or why the hunks prove
-- hook behavior that disagrees with the recorded verify policy
+- hook behavior that disagrees with the recorded hooks policy
 - banned identity or harness trailer lines (`Co-authored-by:`, `Signed-off-by:`,
   `Made-with:`) or freeform harness footers (`Made with Cursor`, Claude
-  marketing lines) unless allow-trailers is on
+  marketing lines) unless trailers are allowed
 
 ## Trailer hygiene
 
@@ -82,15 +82,15 @@ Code`.
 Many harness `commit-msg` and `prepare-commit-msg` hooks cannot be turned
 off. They re-add these trailers after `-m` or `-n`. A clean draft is not a
 clean `HEAD`. When trailers are denied (default), a Python or Node.js REPL
-must inspect and strip after commit. Do not weaken allow-trailers
-opt-in. A shell `sed`, `awk`, or `perl` one-liner is not the strip.
+must inspect and strip after commit. Do not weaken the trailer opt-in. A
+shell `sed`, `awk`, or `perl` one-liner is not the strip.
 
 Detect: in a `python` or `node` REPL, run `git log -1 --format=%B` via
 subprocess or `child_process` and scan that text for banned keys in git
 trailer form `Key: value`, or a banned freeform harness line.
 
 When trailers are denied, run this REPL path after every commit. When
-allow-trailers is on, run the same path if `%B` contains a banned key or
+trailers are allowed, run the same path if `%B` contains a banned key or
 freeform harness line the user did not request:
 
 1. Open a `python` or `node` REPL. Read `HEAD` `%B` there and detect banned
@@ -98,14 +98,14 @@ freeform harness line the user did not request:
 2. If dirty, confirm this run created `HEAD`, it is not on the remote, and
    no later commit landed. Otherwise `BLOCKED`.
 3. If dirty, build the cleaned subject and optional body in the REPL from
-   the ledger. Amend once with REPL-built argv: the same `-n` or verify
-   policy as the original commit, one subject `-m` and at most one body
+   the ledger. Amend once with REPL-built argv: the same hooks policy as
+   the original commit, one subject `-m` and at most one body
    `-m`, no HEREDOC, `-F`, editor, or trailer `-m` args. Do not use
    `git interpret-trailers` to add or edit trailers.
 4. Re-read `%B` in the REPL. Any remaining banned or unexpected trailer or
    harness line is `BLOCKED`. Report the SHA and the leftover lines.
 
-Under allow-trailers, keep only trailers the user requested for this run.
+When trailers are allowed, keep only trailers the user requested for this run.
 Report whether a trailer amend ran.
 
 | Excuse                            | Reality                                              |

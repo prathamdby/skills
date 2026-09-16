@@ -36,9 +36,9 @@ Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
    write to a sibling temporary file, then rename atomically. Scan the final
    file once more.
    Done when required sections, bounds, and all three scans pass.
-5. Report the path, what was captured, and that a later handoff should resume
-   from that absolute path.
-   Success is the existing file plus the reported resume path.
+5. Report the path, what was captured, and the resume request
+   `resume the handoff at <absolute-path>`.
+   Success is the existing file plus the reported resume request.
 
 ## Resume
 

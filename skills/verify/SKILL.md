@@ -14,8 +14,9 @@ One score token is an LM judge, not this method.
 ## Options
 
 Derive N, K, pivots, rounds, criteria, and track from the request.
-Unspecified: N `3`, evals `2`, pivots `2`, max-rounds `0`, auto criteria,
-track off. A supplied attempt list overrides N.
+Unspecified: N `3`, evals `2`, pivots `2`, rounds `0`, auto criteria,
+track off. A supplied attempt list overrides N. Raise evals when ties
+survive; raise rounds to resample a swing winner or replace an all-fail pool.
 "5 candidates" → N=5. "track progress" → track; skip generate and select.
 "criteria in <path>" → that file.
 N is a budget, not inferred from hardness. Conflicting numbers or a missing
@@ -27,7 +28,7 @@ Require a task. Write 2–4 independent criteria plus a ground-truth note that
 trusts observed tool output, not narration. Write that file using the
 layout in `REFERENCE.md`.
 
-Record: `task | criteria | generate | path | n/k/pivots/rounds | current | terminal`.
+Record: `task | criteria | track | generate | path | n/k/pivots/rounds | current | terminal`.
 
 Done when task and criteria are fixed, or `BLOCKED`.
 
@@ -47,7 +48,7 @@ Done when N traces are locked, or `BLOCKED`.
 
 Run candidates when a criterion is empirical. Classify all-pass / all-fail
 / swing. Skip scoring on skip classes. all-fail is unwinnable here: if
-max-rounds remain, consume one and return to Step 2; else `ALL_FAIL`.
+rounds remain, consume one and return to Step 2; else `ALL_FAIL`.
 
 On swing, one criterion per comparison. N≤3: every directed pair. N>3:
 clamp pivots to `[1, N]`, then run the PPT procedure in `REFERENCE.md`.
@@ -73,7 +74,7 @@ Track or all-fail: no winner. all-pass: lowest-index passer. swing:
 ## 5. Revise or stop
 
 Stop on: all-pass; track and score ≥ 0.8 with observed checks;
-max-rounds exhausted (default: no revise); no score gain. Else revise
+rounds exhausted (default: no revise); no score gain. Else revise
 only the swing winner on its weakest criteria and return to Step 3.
 
 Done when a stop rule fires.

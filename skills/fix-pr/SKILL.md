@@ -11,10 +11,10 @@ description: >
 ## Options
 
 Derive the PR, push, and reply behavior from the request. Unspecified:
-current branch PR, push, and reply.
+current branch PR, push on, replies on.
 "PR 42" / a PR URL → that PR. "this PR" may use the current branch PR.
-"do not push" / "keep commits local" → no-push.
-"do not reply" / "no review replies" → no-reply.
+"do not push" / "keep commits local" → push off.
+"do not reply" / "no review replies" → replies off.
 A named PR without a usable number or URL is `BLOCKED`.
 
 ## 1. Resolve and synchronize
@@ -22,7 +22,7 @@ A named PR without a usable number or URL is `BLOCKED`.
 Resolve owner, repo, number, URL, base, head branch, and remote head SHA. Block
 on auth failure, missing/closed PR, dirty tree, or unsafe head checkout.
 Fetch, check out head, and fast-forward to remote SHA; never reset or force.
-Record: `PR/head SHA | hunt counts | current finding | verdicts | commit/push | replies | terminal`.
+Record: `PR/head SHA | push=on|off | replies=on|off | hunt counts | current finding | verdicts | commit/push | replies | terminal`.
 Done when local HEAD equals the PR head SHA and the ledger identifies the PR.
 
 ## 2. Hunt before editing
@@ -71,8 +71,8 @@ run it with unstaged scope so it drafts from the locked diff as
 `type: <concrete code action proved by dominant hunks>`. Trailers default deny
 per Commit clean-room in `./REFERENCE.md` (identity trailers and harness
 footers). Require no ban-list token and passing conversation-only test; reject
-canonical excuses there. Skip commit on a clean tree. Unless no-push, push
-and verify remote SHA; never force. With no-push, fixed findings become
+canonical excuses there. Skip commit on a clean tree. When push is on, push
+and verify remote SHA; never force. When push is off, fixed findings become
 `AWAITING_PUSH`. Remote movement or push rejection is `BLOCKED`. Re-read
 `git log -1 --format=%B`; ban-list tokens or banned trailers are `BLOCKED`.
 Apply Trailer hygiene in `../commit/REFERENCE.md` if needed. Done when there is
@@ -87,7 +87,7 @@ finish.
 
 ## 7. Reply and report
 
-Unless no-reply, skip targets whose replies satisfy the verdict, draft
+When replies are on, skip targets whose replies satisfy the verdict, draft
 remaining replies using `./REFERENCE.md`, then apply
 `./references/unslop-reply-drafts.md`. Preserve bot prefixes. Consolidate
 shared targets. Post replies through loaded gh skill (`pr-reply.ts`); do not
