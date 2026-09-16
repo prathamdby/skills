@@ -38,11 +38,11 @@ For every skill you touched:
 3. **SKILL.md length**, 100 lines or fewer.
 4. **README coverage**, the skill appears in the `README.md` quickstart list
    (as `/<name>`) and has a row in the `## Reference` table linking
-   `./skills/<name>/SKILL.md`.
+   `./skills/<category>/<name>/SKILL.md`.
 5. **Markdown links resolve**, every real `.md` path linked or backticked in
    `SKILL.md` points to a file that exists. Ignore template paths containing
    `<...>` placeholders.
-6. **Claude marketplace**, `plugins[0].skills` lists every `skills/*/SKILL.md`
+6. **Claude marketplace**, `plugins[0].skills` lists every `skills/*/*/SKILL.md`
    directory, sorted, no extras.
 
 Fix every failure before committing. Do not commit until all six pass.
@@ -51,7 +51,8 @@ Fix every failure before committing. Do not commit until all six pass.
 
 ## Project Structure
 
-- Skills live in `skills/<name>/SKILL.md` (project-level)
+- Skills live in `skills/<category>/<name>/SKILL.md` (project-level)
+- Top-level categories are `personal/` and `engineering/` unless a third is clearly needed
 - Never use `.agents/skills/` for this repo
 - Each skill is a directory containing `SKILL.md` at minimum
 - Optional: `REFERENCE.md`, `references/`, `assets/`

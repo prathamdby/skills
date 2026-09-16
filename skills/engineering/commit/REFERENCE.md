@@ -28,11 +28,11 @@ Load Trailer hygiene only during Step 4 verify, or when drafting under
   line, including `- `, the hanging indent, and path or code literals.
   Continue a wrapped `- ` bullet with a hanging indent of two spaces.
   Before (77, reject):
-  `- Add webhook parser tests under skills/commit/REFERENCE.md for the wrap gate`
+  `- Add webhook parser tests under skills/engineering/commit/REFERENCE.md for the wrap gate`
   After (72, then a two-space hanging indent):
 
 ```
-- Add webhook parser tests under skills/commit/REFERENCE.md for the wrap
+- Add webhook parser tests under skills/engineering/commit/REFERENCE.md for the wrap
   gate
 ```
 
