@@ -108,11 +108,11 @@ freeform harness line the user did not request:
 When trailers are allowed, keep only trailers the user requested for this run.
 Report whether a trailer amend ran.
 
-| Excuse                            | Reality                                              |
-| --------------------------------- | ---------------------------------------------------- |
-| "I passed a clean `-m`"           | Hooks rewrite after `-m`. Read `%B` in the REPL.     |
-| "I disabled the hook"             | Many harness hooks cannot be turned off. Use the REPL. |
-| "A shell one-liner stripped it"   | The strip is the REPL. Re-read `%B` there.           |
+| Excuse                          | Reality                                                |
+| ------------------------------- | ------------------------------------------------------ |
+| "I passed a clean `-m`"         | Hooks rewrite after `-m`. Read `%B` in the REPL.       |
+| "I disabled the hook"           | Many harness hooks cannot be turned off. Use the REPL. |
+| "A shell one-liner stripped it" | The strip is the REPL. Re-read `%B` there.             |
 
 Provenance (principles only; do not copy the STE dictionary):
 https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html

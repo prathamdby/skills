@@ -40,15 +40,15 @@ dialogs". It skips the trust dialog only.
 Named user waiver required. Never as a default. Never to recover a
 prompt. A waiver for one row does not waive the others.
 
-| Argv | Help text / why gated |
-| --- | --- |
-| `--dangerously-skip-permissions` | "Bypass all permission checks. Recommended only for sandboxes with no internet access." |
-| `--allow-dangerously-skip-permissions` | "Enable bypassing all permission checks as an option, without it being enabled by default. Recommended only for sandboxes with no internet access." |
-| `--permission-mode bypassPermissions` | Same bypass, via mode. |
-| `--permission-mode dontAsk` | Skips asking. Do not assume it is safe. |
-| `--permission-mode auto` | Auto-mode classifier. User-asked only. |
-| `--permission-prompts none` | User-named. Denies prompts. Not a bypass. |
-| `claude agents --dangerously-skip-permissions` | Same bypass on dispatched sessions. |
+| Argv                                           | Help text / why gated                                                                                                                               |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--dangerously-skip-permissions`               | "Bypass all permission checks. Recommended only for sandboxes with no internet access."                                                             |
+| `--allow-dangerously-skip-permissions`         | "Enable bypassing all permission checks as an option, without it being enabled by default. Recommended only for sandboxes with no internet access." |
+| `--permission-mode bypassPermissions`          | Same bypass, via mode.                                                                                                                              |
+| `--permission-mode dontAsk`                    | Skips asking. Do not assume it is safe.                                                                                                             |
+| `--permission-mode auto`                       | Auto-mode classifier. User-asked only.                                                                                                              |
+| `--permission-prompts none`                    | User-named. Denies prompts. Not a bypass.                                                                                                           |
+| `claude agents --dangerously-skip-permissions` | Same bypass on dispatched sessions.                                                                                                                 |
 
 `--permission-mode` help choices: `acceptEdits`, `auto`,
 `bypassPermissions`, `manual`, `dontAsk`, `plan`. This skill defaults

@@ -18,12 +18,7 @@
       "strict": false,
       "homepage": "https://github.com/prathamdby/skills",
       "license": "MIT",
-      "keywords": [
-        "skills",
-        "git",
-        "review",
-        "workflows"
-      ],
+      "keywords": ["skills", "git", "review", "workflows"],
       "category": "development",
       "skills": [
         "./skills/engineering/box",

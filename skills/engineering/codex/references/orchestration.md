@@ -43,11 +43,11 @@ Done when the process exits or a last-message file is written.
 
 ## Sessions
 
-| Need                    | Command                                      |
-| ----------------------- | -------------------------------------------- |
-| Follow-up with a known id | `codex exec resume <id> "<follow-up>"`     |
-| Most recent recorded    | `codex exec resume --last "<follow-up>"`     |
-| Fork a known id         | `codex exec fork <id> "<follow-up>"`         |
+| Need                      | Command                                  |
+| ------------------------- | ---------------------------------------- |
+| Follow-up with a known id | `codex exec resume <id> "<follow-up>"`   |
+| Most recent recorded      | `codex exec resume --last "<follow-up>"` |
+| Fork a known id           | `codex exec fork <id> "<follow-up>"`     |
 
 `codex resume`, `codex fork`, and `codex queue` are `BLOCKED`. Ask for
 `exec resume` and an id.
@@ -97,16 +97,16 @@ Done when every worktree this run started is removed or explicitly kept.
 Do not infer a hang from no output. Default exec text stays silent until
 exit. Restrict event liveness to `--json`.
 
-| Signal | Action |
-| ------ | ------ |
-| Auth / login error | Follow Auth in `./cli-surface.md`. `BLOCKED` unless the user asked to log in. |
-| `unexpected argument '--full-auto'` | Stop. `--full-auto` is rejected. Do not retry it. |
-| `unexpected argument '--search'` or `'--ask-for-approval'` after `exec` | Stop. Those flags go before `exec`. Follow Flag order in `./cli-surface.md`. |
-| Non-zero exit after a started run | Capture stderr. Inspect the tree. Report `BLOCKED`. Do not retry with a gated flag. |
-| Default exec, no output, still running | Normal. Wait for exit or the wall-clock. Do not kill. |
-| `--json`, new lines or CPU or tree changing | Still working. Do not kill. |
-| Wall-clock exceeded, process still running | Kill that pid only. Cleanup. `BLOCKED`. |
-| Interactive TUI when `exec` was intended | Stop. Rerun with `codex exec`. |
-| `codex queue` or TUI `codex resume` picker | `BLOCKED`. Ask for `exec resume` and an id. |
+| Signal                                                                  | Action                                                                              |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Auth / login error                                                      | Follow Auth in `./cli-surface.md`. `BLOCKED` unless the user asked to log in.       |
+| `unexpected argument '--full-auto'`                                     | Stop. `--full-auto` is rejected. Do not retry it.                                   |
+| `unexpected argument '--search'` or `'--ask-for-approval'` after `exec` | Stop. Those flags go before `exec`. Follow Flag order in `./cli-surface.md`.        |
+| Non-zero exit after a started run                                       | Capture stderr. Inspect the tree. Report `BLOCKED`. Do not retry with a gated flag. |
+| Default exec, no output, still running                                  | Normal. Wait for exit or the wall-clock. Do not kill.                               |
+| `--json`, new lines or CPU or tree changing                             | Still working. Do not kill.                                                         |
+| Wall-clock exceeded, process still running                              | Kill that pid only. Cleanup. `BLOCKED`.                                             |
+| Interactive TUI when `exec` was intended                                | Stop. Rerun with `codex exec`.                                                      |
+| `codex queue` or TUI `codex resume` picker                              | `BLOCKED`. Ask for `exec resume` and an id.                                         |
 
 Done when the matching row is applied and the ledger has the signal.

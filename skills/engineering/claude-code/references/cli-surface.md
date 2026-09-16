@@ -50,23 +50,23 @@ Done when the user owns the live TUI, or `BLOCKED` / `AWAITING_USER`.
 
 ## Global flags
 
-| Flag                                        | Notes                                                                                         |
-| ------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `-p, --print`                               | Noninteractive. Default for this skill. Skips the workspace trust dialog. Permissions remain. |
-| `--output-format <text\|json\|stream-json>` | Only with `--print`. Default `text`.                                                          |
-| `--include-partial-messages`                | Requires `--print` and `--output-format stream-json`.                                         |
-| `--include-hook-events`                     | Requires `--output-format stream-json`.                                                       |
-| `--input-format <text\|stream-json>`        | Only with `--print`. Default `text`.                                                          |
-| `-r, --resume <id>`                         | Session ID required under `--print`. A bare `-r` opens a picker.                              |
-| `-c, --continue`                            | Previous session in this directory.                                                           |
+| Flag                                        | Notes                                                                                              |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `-p, --print`                               | Noninteractive. Default for this skill. Skips the workspace trust dialog. Permissions remain.      |
+| `--output-format <text\|json\|stream-json>` | Only with `--print`. Default `text`.                                                               |
+| `--include-partial-messages`                | Requires `--print` and `--output-format stream-json`.                                              |
+| `--include-hook-events`                     | Requires `--output-format stream-json`.                                                            |
+| `--input-format <text\|stream-json>`        | Only with `--print`. Default `text`.                                                               |
+| `-r, --resume <id>`                         | Session ID required under `--print`. A bare `-r` opens a picker.                                   |
+| `-c, --continue`                            | Previous session in this directory.                                                                |
 | `--model <model>`                           | User-named only. Help aliases: `fable`, `opus`, `sonnet`, or a full name such as `claude-fable-5`. |
-| `-w, --worktree [name]`                     | Optional name. Help does not state the path. Record whatever the CLI prints.                  |
-| `--permission-mode plan`                    | Read-only. Other values stay in `./permissions.md`.                                           |
-| `--session-id <uuid>`                       | Must be a valid UUID.                                                                         |
-| `--no-session-persistence`                  | Print only.                                                                                   |
-| `--max-budget-usd <amount>`                 | Print only.                                                                                   |
-| `--add-dir <directories...>`                | Extra tool-access directories.                                                                |
-| `--json-schema <schema>`                    | Structured output.                                                                            |
+| `-w, --worktree [name]`                     | Optional name. Help does not state the path. Record whatever the CLI prints.                       |
+| `--permission-mode plan`                    | Read-only. Other values stay in `./permissions.md`.                                                |
+| `--session-id <uuid>`                       | Must be a valid UUID.                                                                              |
+| `--no-session-persistence`                  | Print only.                                                                                        |
+| `--max-budget-usd <amount>`                 | Print only.                                                                                        |
+| `--add-dir <directories...>`                | Extra tool-access directories.                                                                     |
+| `--json-schema <schema>`                    | Structured output.                                                                                 |
 
 Gated flags stay in `./permissions.md`. Do not add them here as defaults.
 
@@ -95,19 +95,19 @@ prompts in `./permissions.md`. Do not add a gated skip to satisfy it.
 
 ## Subcommands
 
-| Command                         | Use                                                                                  |
-| ------------------------------- | ------------------------------------------------------------------------------------ |
-| `claude [prompt]`               | Interactive TUI. Follow Interactive above.                                           |
-| `claude --print [prompt]`       | One-shot. Default.                                                                   |
-| `claude auth status --text`     | Auth check. Default of `auth status` is JSON. Do not print secrets.                  |
-| `claude auth login`             | Only if the user asked.                                                              |
-| `claude auth logout`            | Only if the user asked.                                                              |
-| `claude --resume <id>`          | Resume. Id required under `--print`.                                                 |
-| `claude mcp …`                  | Only if the user asked. Run `claude mcp --help` for current syntax.                  |
-| `claude plugin …`               | Only if the user asked. Run `claude plugin --help`.                                  |
-| `claude update` / `install`     | First-run. Only if asked.                                                            |
-| `claude doctor`                 | Health check. Only if asked. Reads settings without a trust prompt.                  |
-| `attach` / `logs` / `stop` / `rm` | Follow Background in `./orchestration.md`. Only if asked.                          |
+| Command                           | Use                                                                 |
+| --------------------------------- | ------------------------------------------------------------------- |
+| `claude [prompt]`                 | Interactive TUI. Follow Interactive above.                          |
+| `claude --print [prompt]`         | One-shot. Default.                                                  |
+| `claude auth status --text`       | Auth check. Default of `auth status` is JSON. Do not print secrets. |
+| `claude auth login`               | Only if the user asked.                                             |
+| `claude auth logout`              | Only if the user asked.                                             |
+| `claude --resume <id>`            | Resume. Id required under `--print`.                                |
+| `claude mcp …`                    | Only if the user asked. Run `claude mcp --help` for current syntax. |
+| `claude plugin …`                 | Only if the user asked. Run `claude plugin --help`.                 |
+| `claude update` / `install`       | First-run. Only if asked.                                           |
+| `claude doctor`                   | Health check. Only if asked. Reads settings without a trust prompt. |
+| `attach` / `logs` / `stop` / `rm` | Follow Background in `./orchestration.md`. Only if asked.           |
 
 There is no top-level `claude status`. Use `claude auth status --text`.
 

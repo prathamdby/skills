@@ -8,11 +8,11 @@ value, or when a bypass is requested.
 `-s, --sandbox <SANDBOX_MODE>` selects the sandbox policy for
 model-generated shell commands. Values:
 
-| Value                 | Meaning                                                      |
-| --------------------- | ------------------------------------------------------------ |
-| `read-only`           | Constrains model-generated shell only                        |
-| `workspace-write`     | Constrains model-generated shell only. Not auto-approve      |
-| `danger-full-access`  | Gated. Named waiver required                                 |
+| Value                | Meaning                                                 |
+| -------------------- | ------------------------------------------------------- |
+| `read-only`          | Constrains model-generated shell only                   |
+| `workspace-write`    | Constrains model-generated shell only. Not auto-approve |
+| `danger-full-access` | Gated. Named waiver required                            |
 
 Omit `--sandbox` unless the user named one. Help lists no default.
 
@@ -51,15 +51,15 @@ error: unexpected argument '--skip-git-repo-check' found
 Named user waiver required. Never a default. A waiver for one row does
 not waive the others.
 
-| Flag or value | Allowed only when |
-| ------------- | ----------------- |
-| `--dangerously-bypass-approvals-and-sandbox` | User named this bypass |
-| `--dangerously-bypass-hook-trust` | User named hook-trust bypass |
-| `--sandbox danger-full-access` | User named this sandbox value |
-| `--approve-for-me` | User named automatic approval routing |
-| `--yolo` | User named this flag. Accepted and unlisted. Forbidden without a waiver |
-| `--ask-for-approval never` | User named silent approval. Global, before `exec` only |
-| `--ignore-rules` | User named dropping execpolicy `.rules` |
+| Flag or value                                | Allowed only when                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| `--dangerously-bypass-approvals-and-sandbox` | User named this bypass                                                  |
+| `--dangerously-bypass-hook-trust`            | User named hook-trust bypass                                            |
+| `--sandbox danger-full-access`               | User named this sandbox value                                           |
+| `--approve-for-me`                           | User named automatic approval routing                                   |
+| `--yolo`                                     | User named this flag. Accepted and unlisted. Forbidden without a waiver |
+| `--ask-for-approval never`                   | User named silent approval. Global, before `exec` only                  |
+| `--ignore-rules`                             | User named dropping execpolicy `.rules`                                 |
 
 Do not claim what `--yolo` aliases. Do not add any row to recover from a
 sandbox setup failure.

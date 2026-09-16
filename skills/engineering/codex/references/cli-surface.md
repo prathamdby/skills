@@ -101,13 +101,13 @@ picker or continue a TUI session. `codex queue` sends work. Those are
 
 ## Auth
 
-| Command                            | Use                                                                  |
-| ---------------------------------- | -------------------------------------------------------------------- |
-| `codex login status`               | Check login. Do not print tokens or keys.                            |
-| `codex login`                      | Only when the user asked to authenticate. Starts a login flow.       |
-| `codex login --with-api-key`       | Reads the API key from stdin. Only if asked. Do not echo the key.    |
-| `codex login --with-access-token`  | Reads `CODEX_ACCESS_TOKEN` from stdin. Only if asked.                |
-| `codex logout`                     | Only when the user asked to sign out.                                |
+| Command                           | Use                                                               |
+| --------------------------------- | ----------------------------------------------------------------- |
+| `codex login status`              | Check login. Do not print tokens or keys.                         |
+| `codex login`                     | Only when the user asked to authenticate. Starts a login flow.    |
+| `codex login --with-api-key`      | Reads the API key from stdin. Only if asked. Do not echo the key. |
+| `codex login --with-access-token` | Reads `CODEX_ACCESS_TOKEN` from stdin. Only if asked.             |
+| `codex logout`                    | Only when the user asked to sign out.                             |
 
 Missing auth is `BLOCKED`.
 
@@ -115,14 +115,14 @@ Missing auth is `BLOCKED`.
 
 Only when the user asked to configure MCP.
 
-| Command                                                      | Use                                                         |
-| ------------------------------------------------------------ | ----------------------------------------------------------- |
-| `codex mcp list [--json]`                                    | Names.                                                      |
-| `codex mcp get <NAME> [--json]`                              | One server.                                                 |
-| `codex mcp add <NAME> (--url <URL> \| -- <COMMAND>...)`      | User-named. Optional `--env`, `--bearer-token-env-var`.     |
-| `codex mcp remove <NAME>`                                    | User-named.                                                 |
-| `codex mcp login <NAME>`                                     | User-authorized.                                            |
-| `codex mcp logout <NAME>`                                    | User-authorized.                                            |
+| Command                                                 | Use                                                     |
+| ------------------------------------------------------- | ------------------------------------------------------- |
+| `codex mcp list [--json]`                               | Names.                                                  |
+| `codex mcp get <NAME> [--json]`                         | One server.                                             |
+| `codex mcp add <NAME> (--url <URL> \| -- <COMMAND>...)` | User-named. Optional `--env`, `--bearer-token-env-var`. |
+| `codex mcp remove <NAME>`                               | User-named.                                             |
+| `codex mcp login <NAME>`                                | User-authorized.                                        |
+| `codex mcp logout <NAME>`                               | User-authorized.                                        |
 
 Do not add or remove servers unless the user named them.
 
@@ -130,29 +130,29 @@ Do not add or remove servers unless the user named them.
 
 Only when the user asked to manage plugins.
 
-| Command                                      | Use                                              |
-| -------------------------------------------- | ------------------------------------------------ |
-| `codex plugin add <PLUGIN[@MARKETPLACE]>`    | Optional `-m`. User-authorized.                  |
-| `codex plugin list`                          | Optional `-m`, `--json`, `--available`.          |
-| `codex plugin remove <PLUGIN[@MARKETPLACE]>` | User-authorized.                                 |
-| `codex plugin marketplace add <SOURCE>`      | Optional `--ref`, `--sparse`. User-authorized.   |
-| `codex plugin marketplace list`              | List sources.                                    |
-| `codex plugin marketplace upgrade`           | User-authorized.                                 |
-| `codex plugin marketplace remove <NAME>`     | User-authorized.                                 |
+| Command                                      | Use                                            |
+| -------------------------------------------- | ---------------------------------------------- |
+| `codex plugin add <PLUGIN[@MARKETPLACE]>`    | Optional `-m`. User-authorized.                |
+| `codex plugin list`                          | Optional `-m`, `--json`, `--available`.        |
+| `codex plugin remove <PLUGIN[@MARKETPLACE]>` | User-authorized.                               |
+| `codex plugin marketplace add <SOURCE>`      | Optional `--ref`, `--sparse`. User-authorized. |
+| `codex plugin marketplace list`              | List sources.                                  |
+| `codex plugin marketplace upgrade`           | User-authorized.                               |
+| `codex plugin marketplace remove <NAME>`     | User-authorized.                               |
 
 Do not add or remove plugins or marketplaces unless the user named them.
 
 ## Subcommands
 
-| Command              | Use                                              |
-| -------------------- | ------------------------------------------------ |
-| `codex [prompt]`     | Interactive TUI. Follow Interactive above.       |
-| `codex exec [prompt]`| One-shot. Default.                               |
-| `codex review`       | Review branch. Follow Review above.              |
-| `codex exec resume`  | Noninteractive resume. Follow Sessions.          |
-| `codex exec fork`    | Noninteractive fork. Follow Sessions.            |
-| `codex exec review`  | Review with exec output flags.                   |
-| `codex login` / `logout` | Auth. Follow Auth above.                     |
-| `codex mcp …`        | Follow MCP above.                                |
-| `codex plugin …`     | Follow Plugins above.                            |
-| `codex update`       | Follow First-run. Only if asked.                 |
+| Command                  | Use                                        |
+| ------------------------ | ------------------------------------------ |
+| `codex [prompt]`         | Interactive TUI. Follow Interactive above. |
+| `codex exec [prompt]`    | One-shot. Default.                         |
+| `codex review`           | Review branch. Follow Review above.        |
+| `codex exec resume`      | Noninteractive resume. Follow Sessions.    |
+| `codex exec fork`        | Noninteractive fork. Follow Sessions.      |
+| `codex exec review`      | Review with exec output flags.             |
+| `codex login` / `logout` | Auth. Follow Auth above.                   |
+| `codex mcp …`            | Follow MCP above.                          |
+| `codex plugin …`         | Follow Plugins above.                      |
+| `codex update`           | Follow First-run. Only if asked.           |
