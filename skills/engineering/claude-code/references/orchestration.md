@@ -45,10 +45,10 @@ Done when the process exits.
 
 ## Sessions
 
-| Need                          | Command                                           |
-| ----------------------------- | ------------------------------------------------- |
-| Resume known id               | `claude --print --resume <id> "<follow-up>"`      |
-| Same directory, previous chat | `claude --print --continue "<follow-up>"`         |
+| Need                          | Command                                      |
+| ----------------------------- | -------------------------------------------- |
+| Resume known id               | `claude --print --resume <id> "<follow-up>"` |
+| Same directory, previous chat | `claude --print --continue "<follow-up>"`    |
 
 `--resume` without an id is an interactive picker. Do not use it under
 `--print`. `--resume` conflicts with `--continue`. Record the id in the
@@ -126,16 +126,16 @@ explicitly kept.
 Do not infer a hang from no output. `text` and `json` stay silent until
 exit. Restrict event liveness to `stream-json`.
 
-| Signal                                         | Action                                                                                      |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Auth / login error                             | `BLOCKED` unless the user asked to log in. Follow First-run in `./cli-surface.md`.          |
-| Permission prompt under `--print`              | Follow Print-mode prompts in `./permissions.md`. Do not add a gated skip.                   |
-| Non-zero exit after a started run              | Capture stderr. Inspect the tree. Report `BLOCKED`. Do not retry with a gated skip.         |
-| `text` / `json`, no output, still running      | Normal. Wait for exit or the wall-clock. Do not kill.                                       |
-| `stream-json`, new events or CPU or tree changing | Still working. Do not kill.                                                              |
-| Wall-clock exceeded, process still running     | Kill that pid only. Cleanup. `BLOCKED`.                                                     |
-| Interactive TUI when `--print` was intended    | Stop. Rerun with `--print`.                                                                 |
-| `claude help` started a session                | Stop. Use `claude --help`. Report `BLOCKED`.                                                |
-| Cwd is not the target directory                | Stop. `BLOCKED`. Do not invent a flag that retargets cwd.                                   |
+| Signal                                            | Action                                                                              |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Auth / login error                                | `BLOCKED` unless the user asked to log in. Follow First-run in `./cli-surface.md`.  |
+| Permission prompt under `--print`                 | Follow Print-mode prompts in `./permissions.md`. Do not add a gated skip.           |
+| Non-zero exit after a started run                 | Capture stderr. Inspect the tree. Report `BLOCKED`. Do not retry with a gated skip. |
+| `text` / `json`, no output, still running         | Normal. Wait for exit or the wall-clock. Do not kill.                               |
+| `stream-json`, new events or CPU or tree changing | Still working. Do not kill.                                                         |
+| Wall-clock exceeded, process still running        | Kill that pid only. Cleanup. `BLOCKED`.                                             |
+| Interactive TUI when `--print` was intended       | Stop. Rerun with `--print`.                                                         |
+| `claude help` started a session                   | Stop. Use `claude --help`. Report `BLOCKED`.                                        |
+| Cwd is not the target directory                   | Stop. `BLOCKED`. Do not invent a flag that retargets cwd.                           |
 
 Done when the matching row is applied and the ledger has the signal.

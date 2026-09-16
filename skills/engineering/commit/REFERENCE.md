@@ -28,11 +28,11 @@ trailers allowed.
   line, including `- `, the hanging indent, and path or code literals.
   Continue a wrapped `- ` bullet with a hanging indent of two spaces.
   Before (77, reject):
-  `- Add webhook parser tests under skills/commit/REFERENCE.md for the wrap gate`
+  `- Add webhook parser tests under skills/engineering/commit/REFERENCE.md for the wrap gate`
   After (72, then a two-space hanging indent):
 
 ```
-- Add webhook parser tests under skills/commit/REFERENCE.md for the wrap
+- Add webhook parser tests under skills/engineering/commit/REFERENCE.md for the wrap
   gate
 ```
 
@@ -108,11 +108,11 @@ freeform harness line the user did not request:
 When trailers are allowed, keep only trailers the user requested for this run.
 Report whether a trailer amend ran.
 
-| Excuse                            | Reality                                              |
-| --------------------------------- | ---------------------------------------------------- |
-| "I passed a clean `-m`"           | Hooks rewrite after `-m`. Read `%B` in the REPL.     |
-| "I disabled the hook"             | Many harness hooks cannot be turned off. Use the REPL. |
-| "A shell one-liner stripped it"   | The strip is the REPL. Re-read `%B` there.           |
+| Excuse                          | Reality                                                |
+| ------------------------------- | ------------------------------------------------------ |
+| "I passed a clean `-m`"         | Hooks rewrite after `-m`. Read `%B` in the REPL.       |
+| "I disabled the hook"           | Many harness hooks cannot be turned off. Use the REPL. |
+| "A shell one-liner stripped it" | The strip is the REPL. Re-read `%B` there.             |
 
 Provenance (principles only; do not copy the STE dictionary):
 https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html

@@ -23,8 +23,6 @@ before acting. Never recreate a missing leaf or copy its procedure here.
 | Address PR feedback                                        | `fix-pr` (`../fix-pr/SKILL.md`)                 |
 | Inspect a PR, read threads, why CI is red, or post a reply | `gh` (`../gh/SKILL.md`)                         |
 | Review a plan, design, implementation, or proposal         | `peer-review` (`../peer-review/SKILL.md`)       |
-| Select among candidates or score progress                  | `verify` (`../verify/SKILL.md`)                 |
-| Explain a diff as HTML                                     | `explain-diff` (`../explain-diff/SKILL.md`)     |
 | Map or refresh the current repo                            | `recon` (`../recon/SKILL.md`)                   |
 | Clone or search an external repo                           | `box` (`../box/SKILL.md`)                       |
 | Coordinate current-harness subagents                       | `orchestrate` (`../orchestrate/SKILL.md`)       |
