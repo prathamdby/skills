@@ -1,7 +1,7 @@
 # Orchestration
 
 Follow the recipe for the branch in use. Default is Safe one-shot. Trust and
-gated flags stay in `./trust-integrations.md`. `--wall-clock` stays in
+gated flags stay in `./trust-integrations.md`. The parent wall-clock stays in
 `SKILL.md` and is never passed to `cursor-agent`.
 
 Set `--workspace` to the absolute target when cwd might differ. Quote the
@@ -119,9 +119,9 @@ exit. Restrict event liveness to `stream-json`.
 | Auth / login error                                | Follow Auth in `./trust-integrations.md`. `BLOCKED` unless the user asked to log in.            |
 | `--stream-partial-output` without `stream-json`   | Fix argv. Do not retry with gated flags.                                                        |
 | Non-zero exit after a started run                 | Capture stderr. Inspect the tree. Report `BLOCKED`. Do not retry with `--yolo`.                 |
-| `text` / `json`, no output, still running         | Normal. Wait for exit or `--wall-clock`. Do not kill.                                           |
+| `text` / `json`, no output, still running         | Normal. Wait for exit or the wall-clock. Do not kill.                                           |
 | `stream-json`, new events or CPU or tree changing | Still working. Do not kill.                                                                     |
-| `--wall-clock` exceeded, process still running    | Kill that pid only. Cleanup. `BLOCKED`.                                                         |
+| Wall-clock exceeded, process still running        | Kill that pid only. Cleanup. `BLOCKED`.                                                         |
 | Interactive TUI when `--print` was intended       | Stop. Rerun with `--print`.                                                                     |
 
 Done when the matching row is applied and the ledger has the signal.

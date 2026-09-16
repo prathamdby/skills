@@ -2,8 +2,8 @@
 
 Syntax follows local `cursor-agent --help`. If a flag is rejected, re-run
 `cursor-agent --help` and use what the binary prints. Do not copy other CLI
-or SDK flags. Modes, `--print` writes, `--trust`, and `--wall-clock` stay in
-`SKILL.md`.
+or SDK flags. Modes, `--print` writes, `--trust`, and the parent wall-clock
+stay in `SKILL.md`.
 
 ## First-run
 
@@ -72,7 +72,8 @@ as defaults.
 ## `--print` output
 
 `text` (default): final assistant text on stdout. Nothing until the process
-exits. Silence is not a hang. Wait using `--wall-clock` in `SKILL.md`.
+exits. Silence is not a hang. Wait using the wall-clock recorded per
+`SKILL.md`.
 
 `json`: one object on stdout.
 

@@ -7,17 +7,15 @@ description: >
 
 # Box
 
-## Flags
+## Options
 
-| Flag             | Default | Effect                                                       |
-| ---------------- | ------- | ------------------------------------------------------------ |
-| `--persist`      | off     | Upsert the local repo in the working directory's `AGENTS.md` |
-| `--update`       | off     | Pull an existing clone before search                         |
-| `--list`         | off     | List the manifest and stop                                   |
-| `--no-subagents` | off     | Run every stage in the main thread                           |
-
-No flags clone if needed, search, and report. Never persist without
-`--persist`.
+Derive persist, update, list, and thread mode from the request. Unspecified:
+clone if needed, search, and report. Never persist unless asked.
+"persist" / "add to AGENTS.md" → persist after search.
+"update" / "pull first" → pull an existing clone before search.
+"list" / "what is cloned" → list the manifest and stop.
+"no subagents" / "run in this thread" → Direct mode.
+Conflicting list-plus-search wording or a missing needed URL is `BLOCKED`.
 
 ## Paths and mode
 
@@ -26,12 +24,12 @@ Use `<anchor>/sandbox/manifest.json` and `<anchor>/sandbox/<slug>/`. Include
 absolute paths in every brief. Resolve the working directory and its
 `AGENTS.md` to absolute paths; never place sandbox data there.
 
-Use Direct mode for `--no-subagents` or when no subagent tool exists. Otherwise
-use Delegated mode. Direct runs each contract itself. Delegated uses one Prepare
-writer, disjoint read-only Search workers, and one Persist writer; the
-coordinator only detects, dispatches, aggregates, and reports.
-In Delegated mode the coordinator never executes a stage contract. A failed
-stage worker makes the run `BLOCKED`. Direct mode uses the same ledger.
+Use Direct mode when the request asks for no subagents or when no subagent
+tool exists. Otherwise use Delegated mode. Direct runs each contract itself.
+Delegated uses one Prepare writer, disjoint read-only Search workers, and one
+Persist writer; the coordinator only detects, dispatches, aggregates, and
+reports. In Delegated mode the coordinator never executes a stage contract. A
+failed stage worker makes the run `BLOCKED`. Direct mode uses the same ledger.
 
 Record:
 `mode | slug | URL | prepare | search scopes | persist | current | terminal`.
@@ -41,10 +39,10 @@ redispatch any search scope without a result.
 
 ## 1. Detect
 
-`--list` or a bare invocation treats a missing manifest as `[]`, prints each
-slug, URL, and local path, marks invalid clones stale, then stops. With a URL,
-use its final path segment without `.git` as the slug. With a name, match slug
-case-sensitively. Zero or several matches ask for the URL.
+A list request or a bare invocation treats a missing manifest as `[]`, prints
+each slug, URL, and local path, marks invalid clones stale, then stops. With a
+URL, use its final path segment without `.git` as the slug. With a name, match
+slug case-sensitively. Zero or several matches ask for the URL.
 
 Done when the list is reported or slug, URL, and local path are resolved.
 
@@ -71,7 +69,7 @@ Done when every scope returned evidence or an explicit no-match result.
 ## 4. Aggregate and persist
 
 Answer the user's question by theme, deduplicate citations, and disclose
-unsearched areas. With `--persist`, run or dispatch the Persist contract only
+unsearched areas. When persist is on, run or dispatch the Persist contract only
 after search. It may edit only the working directory's `AGENTS.md`.
 
 Done when the answer is cited and, when requested, the marker block exists

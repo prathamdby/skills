@@ -7,21 +7,16 @@ description: >
 
 # Explain diff
 
-## Flags
+## Options
 
-| Flag                | Default                               | Effect                           |
-| ------------------- | ------------------------------------- | -------------------------------- |
-| `--target <branch>` | `main`                                | Explain `<branch>...HEAD`        |
-| `--pr <n\|url>`     | off                                   | Explain one PR diff and metadata |
-| `--staged`          | off                                   | Explain the index                |
-| `--unstaged`        | off                                   | Explain worktree changes         |
-| `--output <path>`   | `/tmp/YYYY-MM-DD-explain-<slug>.html` | Set HTML path                    |
-
-The four source choices are mutually exclusive; conflicting or valueless flags
-are `BLOCKED`; bare `--pr` is the only value-less exception and may resolve the
-current branch PR. With no source flag, use the equivalent of `--target main`.
-Block when PR diff cannot be fetched. Missing optional PR metadata permits a
-diff-only page with no motive claims.
+Derive one source and the output path from the request. Unspecified:
+`main...HEAD`, output `/tmp/YYYY-MM-DD-explain-<slug>.html`.
+"against <branch>" → `<branch>...HEAD`.
+"PR 12" / a PR URL → that PR. "this PR" may resolve the current branch PR.
+"staged" → index. "unstaged" / "worktree" → worktree.
+"write to <path>" → that absolute path outside the repo.
+Naming several sources, a missing needed value, or an in-repo output is
+`BLOCKED`.
 
 ## 1. Lock source and output
 

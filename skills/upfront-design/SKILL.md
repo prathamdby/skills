@@ -8,7 +8,7 @@ description: >
 
 # Upfront design
 
-The positional argument is the request, or the path of an existing design: a
+The request is the work, or the path of an existing design: a
 file with `request` and `status` frontmatter and a `# Design:` title. `draft`
 resumes at the first missing section, or at a phase the user names, deleting
 later sections; `approved` checks the next open milestone; any other status

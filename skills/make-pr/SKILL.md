@@ -7,16 +7,16 @@ description: >
 
 # Make PR
 
-## Flags
+## Options
 
-| Flag                | Default | Effect                         |
-| ------------------- | ------- | ------------------------------ |
-| `--target <branch>` | `main`  | PR base and branch-diff target |
-| `--ticket <id>`     | off     | Prefix title with `[<id>]`     |
-| `--conventional`    | off     | Use conventional title rules   |
-
-Missing flag values are `BLOCKED`. Never infer a ticket from branch names,
-commits, issues, or conversation.
+Derive base, ticket, and title style from the request. Unspecified: target
+`main`, no ticket, default title.
+"target develop" / "base release-1" → that branch.
+"ticket PROJ-123" / "prefix [PROJ-123]" → prepend `[PROJ-123] ` exactly as
+supplied. Never infer a ticket from branch names, commits, issues, or
+conversation.
+"conventional title" → conventional title rules.
+A named target or ticket without a usable value is `BLOCKED`.
 
 ## 1. Preflight
 

@@ -11,21 +11,19 @@ description: >
 Default run is `codex exec -C <abs-dir> "<prompt>"`. Omit `--sandbox`.
 `--sandbox workspace-write` is not auto-approve. Closest read-only match
 is `--sandbox read-only`, which only constrains model-generated shell.
-Review is `codex review`, a branch, not a `--plan` flag.
+Review is `codex review`, a branch, not a plan flag.
 
-## Flags
+## Options
 
-| Flag                      | Default | Effect                                                                 |
-| ------------------------- | ------- | ---------------------------------------------------------------------- |
-| `exec`                    | yes     | Noninteractive one-shot                                                |
-| `-C, --cd <DIR>`          | required when cwd is not the target | Working root                          |
-| `--sandbox <mode>`        | omit    | User-named only. `read-only`, `workspace-write`, `danger-full-access`  |
-| `-m, --model <model>`     | CLI     | Use that model. Only if the user named one                             |
-| `--worktree`              | off     | Boolean. No name. Managed Git worktree                                 |
-| `--wall-clock <duration>` | `15m`   | Parent wait before kill. Not a Codex flag                              |
-
-No flags mean `codex exec -C <abs-dir>` and omit `--sandbox`. Bare `codex`
-is the TUI.
+Derive product CLI argv from the request. Unspecified: `codex exec -C
+<abs-dir>`, omit `--sandbox`, parent wait `15m`. Bare `codex` is the TUI.
+"exec" / "one-shot" → `exec`. "interactive" / "TUI" → bare `codex`.
+"sandbox read-only" / named sandbox → `--sandbox <mode>` only when the
+user named one.
+"use <model>" → `-m`. Unspecified model stays CLI default.
+"worktree" → `--worktree`. Boolean. No name.
+"review" → `codex review`.
+A missing needed directory or conflicting wording is `BLOCKED`.
 
 ## Iron laws
 
@@ -38,7 +36,7 @@ is the TUI.
 
 Confirm `codex` is on PATH. If missing, follow First-run in
 `./references/cli-surface.md`. Record workspace, prompt, mode, session,
-worktree, sandbox, and `--wall-clock`. Check auth with `codex login status`.
+worktree, sandbox, and wall-clock. Check auth with `codex login status`.
 Do not print secrets. Missing login is `BLOCKED`. Record:
 `cmd | workspace | mode | session | worktree | gated | verified | terminal | wall-clock`.
 
@@ -55,7 +53,7 @@ absent, or the run is `BLOCKED` / `AWAITING_USER`.
 
 ## 3. Build the command
 
-Construct argv from the Flags table. Quote the prompt. Pass `-C` when cwd
+Construct argv from the derived options. Quote the prompt. Pass `-C` when cwd
 is not the target. No gated flag without a named waiver. If the user asked
 to install, run the TUI, review, stream JSON, resume, log in, or manage
 MCP or plugins, follow that recipe in `./references/cli-surface.md`.
@@ -65,8 +63,8 @@ Done when argv is recorded.
 ## 4. Run
 
 Follow the matching recipe in `./references/orchestration.md` for one-shot,
-streaming, worktrees, parallelism, or failures. Wait for exit or
-`--wall-clock`. Do not kill a still-working process.
+streaming, worktrees, parallelism, or failures. Wait for exit or the
+recorded wall-clock. Do not kill a still-working process.
 
 Done when the process exits or a named failure recipe applies.
 
