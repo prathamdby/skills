@@ -122,7 +122,7 @@ swing: trials disagree — run the tournament.
 all-fail: unwinnable in this pool; no winner. New pool only if rounds
 remain (return to Generate).
 
-## `--track`
+## Track
 
 Score the prefix so far against "would the current state already complete
 the task?" Independently per checkpoint. A rising curve is keep; a flat
@@ -145,11 +145,3 @@ attempts). Do not name a host CLI or product.
 A worker brief contains only: task, criteria, ground-truth note, write
 scope, and "return the attempt + how to reproduce the check." No sibling
 ids. No ranking instructions.
-
-## Defaults
-
-`--candidates` defaults to `3`. N is that budget; do not infer it from
-task hardness. `--evals` defaults to `2` to bound in-harness cost; raise
-it when ties survive. `--pivots` defaults to `2`; clamp to `[1, N]` when
-N>3. `--max-rounds` defaults to `0` (one generate + one select). Raise it
-to resample the swing winner or replace an all-fail pool.

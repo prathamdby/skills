@@ -2,7 +2,7 @@
 
 Syntax follows local `claude --help`. If a flag is rejected, re-run
 `claude --help` and use what the binary prints. Do not invent flags this
-help does not list. Default argv, permission mode, and `--wall-clock`
+help does not list. Default argv, permission mode, and the parent wall-clock
 stay in `SKILL.md`.
 
 `claude help` (no dashes) is `BLOCKED`. It starts a session.
@@ -76,8 +76,8 @@ Wrong cwd is `BLOCKED`.
 ## `--print` output
 
 `text` (default): final assistant text on stdout. Nothing until the
-process exits. Silence is not a hang. Wait using `--wall-clock` in
-`SKILL.md`.
+process exits. Silence is not a hang. Wait using the wall-clock recorded
+per `SKILL.md`.
 
 `json`: one object on stdout. Do not assume field names. If that object
 contains a session identifier, record it for `--resume`. A non-zero exit

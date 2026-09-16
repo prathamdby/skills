@@ -9,7 +9,7 @@
 
 **Never write a skill file without explicit user confirmation.**
 
-1. Propose a plan (name, location, flags, structure)
+1. Propose a plan (name, location, options, structure)
 2. Wait for user to say "yes" or request changes
 3. Only then write the `SKILL.md` file
 
@@ -21,7 +21,7 @@ This applies to every skill, no exceptions.
 
 1. Add the skill to the quickstart invocation list.
 2. Add a failure mode entry in `## Why These Skills Exist` if applicable.
-3. Add a row to the `## Reference` table with name, link, description, and flags.
+3. Add a row to the `## Reference` table with name, link, and description.
 
 Do not commit the skill without the README update.
 
@@ -95,20 +95,16 @@ the body.
 - Do not restate the description as a "When to use this skill" section in the
   body. That is duplication of a line the agent already holds.
 
-## Flags Are Preferred
+## Natural language options
 
-If a skill has variants (diff scope, message style, target branch, etc.), expose
-them as flags in the user's invocation message:
+If a skill has variants (diff scope, message style, target branch, etc.), derive
+them from the user's request. Do not expose a skill-invocation `--flag` table.
 
-- `--flag <value>` for arguments
-- `--flag` for booleans
-- Always document flags in a table in the skill body
-- Always declare defaults explicitly
-
-### Flag Naming
-
-- Use kebab-case: `--base-branch`, not `--baseBranch`
-- Be explicit: `--ticket`, not `--t`
+- Show short example phrases and the option each selects
+- Always declare defaults when the request is silent
+- `BLOCKED` when wording is ambiguous, conflicting, or missing a needed value
+- Keep product CLI argv in prose when the skill wraps a binary; that argv is
+  emitted after derivation, not the user's config surface
 
 ## Content Principles
 
@@ -126,6 +122,6 @@ them as flags in the user's invocation message:
 - Reach for a leading word before a paragraph: a pretrained concept (`slop`,
   `handoff`, `tracer bullets`) anchors behavior in one token
 - Keep each meaning in one place. The same fact in two files is duplication,
-  the leaf frontmatter owns its own triggers and flags, not a central catalog
+  the leaf frontmatter owns its own triggers and options, not a central catalog
 - Hunt no-ops: delete any sentence the agent would already obey by default
 - Every instruction must be actionable. No vague advice, no filler.

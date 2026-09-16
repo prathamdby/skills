@@ -15,7 +15,7 @@ Input: absolute anchor, slug, URL, update boolean.
    `git -C <path> remote get-url origin`. A manifest-listed invalid clone or
    origin mismatch returns `blocked:invalid-clone` or
    `blocked:origin-mismatch` without moving or deleting it.
-4. Reuse a valid clone without `--update`. With `--update`, run
+4. Reuse a valid clone when update is false. When update is true, run
    `git -C <path> pull --ff-only`; failure returns
    `blocked:non-fast-forward` or the exact transport error.
 5. If a manifest-free path is not a valid clone, move it to

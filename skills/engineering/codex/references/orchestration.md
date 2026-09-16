@@ -1,8 +1,8 @@
 # Orchestration
 
 Follow the recipe for the branch in use. Default is Safe one-shot. Sandbox
-and gated flags stay in `./sandbox.md`. `--wall-clock` stays in `SKILL.md`
-and is never passed to `codex`.
+and gated flags stay in `./sandbox.md`. The parent wall-clock stays in
+`SKILL.md` and is never passed to `codex`.
 
 Pass `-C` with the absolute target when cwd might differ. Quote the prompt
 so spaces and quotes stay literal.
@@ -103,9 +103,9 @@ exit. Restrict event liveness to `--json`.
 | `unexpected argument '--full-auto'` | Stop. `--full-auto` is rejected. Do not retry it. |
 | `unexpected argument '--search'` or `'--ask-for-approval'` after `exec` | Stop. Those flags go before `exec`. Follow Flag order in `./cli-surface.md`. |
 | Non-zero exit after a started run | Capture stderr. Inspect the tree. Report `BLOCKED`. Do not retry with a gated flag. |
-| Default exec, no output, still running | Normal. Wait for exit or `--wall-clock`. Do not kill. |
+| Default exec, no output, still running | Normal. Wait for exit or the wall-clock. Do not kill. |
 | `--json`, new lines or CPU or tree changing | Still working. Do not kill. |
-| `--wall-clock` exceeded, process still running | Kill that pid only. Cleanup. `BLOCKED`. |
+| Wall-clock exceeded, process still running | Kill that pid only. Cleanup. `BLOCKED`. |
 | Interactive TUI when `exec` was intended | Stop. Rerun with `codex exec`. |
 | `codex queue` or TUI `codex resume` picker | `BLOCKED`. Ask for `exec resume` and an id. |
 

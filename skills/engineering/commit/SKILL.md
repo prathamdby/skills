@@ -7,35 +7,32 @@ description: >
 
 # Commit
 
-## Flags
+## Options
 
-| Flag               | Default | Effect                                                         |
-| ------------------ | ------- | -------------------------------------------------------------- |
-| `--staged`         | yes     | Commit the current index                                       |
-| `--unstaged`       | no      | Stage and commit tracked worktree changes; index must be empty |
-| `--conventional`   | yes     | `type: description`                                            |
-| `--simple`         | no      | Plain one-line subject                                         |
-| `--verify`         | off     | Run hooks; otherwise every commit uses `-n`                    |
-| `--allow-trailers` | off     | Keep user-requested identity trailers; skip strip              |
-
-Scope flags conflict with each other; style flags conflict with each other.
-Report `BLOCKED` instead of choosing. No flags mean staged, conventional, `-n`,
-trailers denied. A natural-language trailer request is the same opt-in; record it.
+Derive scope, style, hooks, and trailers from the request. Unspecified:
+staged, conventional, hooks off, trailers denied.
+"commit the unstaged work" → unstaged. Index must be empty or `BLOCKED`.
+"plain subject" / "simple message" → simple.
+"run hooks" / "do not skip hooks" → hooks on.
+"keep Co-authored-by" / "allow trailers" / named identity trailers →
+trailers allowed. Record that opt-in.
+Naming both scopes or both styles is `BLOCKED`. Do not guess a missing
+needed value.
 
 ## Iron laws
 
 1. Clean-room: every message line is proved by a selected diff hunk. Session,
    ticket, plan, branch, and reviewer facts stay out. Never start from a
    review-follow-up draft; draft only from the locked diff.
-2. Hooks: without `--verify`, use `-n`; with it, never bypass hooks. A failed
+2. Hooks: hooks off means `-n`; hooks on never bypasses hooks. A failed
    hook does not change the selected policy.
 3. Command: use one subject `-m` and at most one body `-m`. Never use HEREDOC,
    `-F`, `-a`, an editor, or one `-m` per bullet.
 4. Style: load the chosen section of `./REFERENCE.md` before drafting.
 5. Trailers: do not draft or pass `Co-authored-by` / `Signed-off-by` /
    `Made-with`, or freeform harness footers such as `Made with Cursor`, unless
-   `--allow-trailers` or an explicit user trailer request is recorded. Default
-   deny means `-m` args are subject/body only.
+   an explicit user trailer request is recorded. Default deny means `-m` args
+   are subject/body only.
 
 ## 1. Lock the commit snapshot
 
@@ -46,7 +43,7 @@ report `NO_CHANGES`, naming unstaged tracked and untracked layers without
 switching scope.
 
 Record
-`scope | selected diff hash | paths | message | trailers=deny|allow | command | commit | terminal`.
+`scope | style | hooks=off|on | trailers=deny|allow | selected diff hash | paths | message | command | commit | terminal`.
 Done when the exact bytes intended for the commit are fixed.
 
 ## 2. Draft and trace
@@ -71,7 +68,7 @@ Step 1. For unstaged scope, stage only the locked tracked paths now and verify
 the cached diff matches the locked snapshot.
 
 Use `git commit -n -m "<subject>"`; conventional style may add one body `-m`.
-Omit `-n` only with `--verify`. Pass subject and body as separate argv values
+Omit `-n` only when hooks are on. Pass subject and body as separate argv values
 through the tool API; when using a shell, assign and quote variables so `"`,
 backticks, `$`, backslashes, and newlines remain literal.
 
@@ -86,9 +83,9 @@ one-or-two `-m` shape, and preservation of out-of-scope work. A mismatch is
 `BLOCKED`; report the created SHA and exact difference.
 
 Then apply Trailer hygiene in `./REFERENCE.md`. After every denied-trailer
-commit, and on allow-trailers when `%B` has an unrequested banned key or
-freeform harness line, open a Python or Node.js REPL and read `HEAD` `%B`.
-Strip only those unrequested lines. Keep requested trailers under allow.
+commit, and when trailers are allowed but `%B` has an unrequested banned key
+or freeform harness line, open a Python or Node.js REPL and read `HEAD` `%B`.
+Strip only those unrequested lines. Keep requested trailers when allowed.
 Hooks often re-add trailers after `-m`. A shell one-liner is not the strip.
 Still dirty or amend unsafe is `BLOCKED`. Report whether a trailer amend ran.
 

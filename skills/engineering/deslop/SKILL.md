@@ -7,19 +7,14 @@ description: >
 
 # Deslop
 
-## Flags
+## Options
 
-| Flag              | Default | Effect                     |
-| ----------------- | ------- | -------------------------- |
-| `--staged`        | yes     | `git diff --cached`        |
-| `--unstaged`      | no      | `git diff`                 |
-| `--base <branch>` | no      | `git diff <branch>...HEAD` |
-
-The scope flags are mutually exclusive. More than one, a missing base branch,
-or prose that conflicts with a flag is `BLOCKED`; ask which scope to use. Prose
-that names staged, unstaged, or a base branch selects that scope exactly as its
-flag; naming several is `BLOCKED`. Otherwise default to staged and never switch
-because another diff is non-empty.
+Derive one scope from the request. Unspecified: staged
+(`git diff --cached`).
+"unstaged" / "worktree" → `git diff`.
+"against <branch>" / "since <branch>" → `git diff <branch>...HEAD`.
+Naming several scopes, a missing base branch, or conflicting wording is
+`BLOCKED`. Never switch because another diff is non-empty.
 
 ## 1. Lock scope
 
@@ -30,8 +25,8 @@ the SHA-256 of the scope name plus complete diff as its fingerprint. Record:
 
 If the diff is empty, report `NO_CHANGES` and mention other non-empty scopes
 from `git diff` without touching them. Before editing staged scope, block the
-whole run if any target file also has unstaged changes. `--base` covers commits
-only; block if a scoped path has staged or unstaged work.
+whole run if any target file also has unstaged changes. Base scope covers
+commits only; block if a scoped path has staged or unstaged work.
 
 Done when the exact editable scope and original index state are recorded.
 
@@ -60,8 +55,8 @@ kept instances and use the smallest direct form that matches nearby code.
 Preserve logic, timing, errors, side effects, public APIs, and useful
 abstractions.
 
-`--unstaged` and `--base` never stage. For `--staged`, stage only edited target
-files after confirming they had no pre-existing unstaged hunks.
+Unstaged and base never stage. For staged, stage only edited target files after
+confirming they had no pre-existing unstaged hunks.
 
 Done when each kept instance is changed; for unstaged/base the index matches
 the Step 1 snapshot, and for staged only clean target-file updates entered it.

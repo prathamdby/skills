@@ -7,21 +7,17 @@ description: >
 
 # Handoff
 
-## Flags
+## Options
 
-| Flag or argument  | Default     | Effect                                         |
-| ----------------- | ----------- | ---------------------------------------------- |
-| `--resume <path>` | off         | Validate a saved handoff and continue its work |
-| `--path <path>`   | anchor path | Save a new handoff at this path                |
-| positional focus  | none        | Prioritize this focus during create or resume  |
+Derive create versus resume, output path, and focus from the request.
+Unspecified: Create at
+`<anchor>/handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`.
+"resume <path>" → Resume that file. "save to <path>" → Create there.
+Resume and a save path together is `BLOCKED`. A named path without a usable
+value is `BLOCKED`. Resolve paths to absolute before use. A named focus in
+the request is the live focus.
 
 Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
-Default saves use
-`<anchor>/handoffs/handoff-<YYYY-MM-DD-HHmmss>.md`.
-Resolve `--path` and `--resume` to absolute paths before use.
-
-`--resume` and `--path` conflict. Stop if both appear or either lacks a value.
-Without `--resume`, use Create.
 
 ## Create
 
@@ -33,16 +29,16 @@ Without `--resume`, use Create.
    blockers, and durable decisions. Mark superseded material.
    Done when each retained fact helps the next agent act.
 3. Read `./REFERENCE.md`. Draft in memory, point to absolute artifact paths,
-   and never paste full diffs, plans, logs, or terminal output. Put a positional
+   and never paste full diffs, plans, logs, or terminal output. Put a live
    focus first. Include any active mode or workflow ledger.
 4. Redact credentials, tokens, passwords, private keys, authenticated URLs,
    email addresses, and environment values. Scan twice, enforce the 12 KB bound,
    write to a sibling temporary file, then rename atomically. Scan the final
    file once more.
    Done when required sections, bounds, and all three scans pass.
-5. Report the path, what was captured, and
-   `/handoff --resume <absolute-path>`.
-   Success is the existing file plus the reported resume command.
+5. Report the path, what was captured, and the resume request
+   `resume the handoff at <absolute-path>`.
+   Success is the existing file plus the reported resume request.
 
 ## Resume
 
@@ -56,7 +52,7 @@ Without `--resume`, use Create.
    opening referenced artifacts, load the Redaction section of `./REFERENCE.md`
    and never repeat sensitive values.
    Done when stale facts cannot drive work.
-3. Apply a positional focus over the saved focus. Select the highest-priority
+3. Apply a live focus over the saved focus. Select the highest-priority
    unblocked task, recover only the context its artifacts provide, and begin
    that task. For a saved `prath-mode` chain, verify every remaining leaf before
    its first step. For `orchestrate`, treat the saved ledger as a pointer, then

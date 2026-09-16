@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 # Orchestrate
 
-The positional argument is the task. There are no flags. The main agent scopes,
+The request is the task. The main agent scopes,
 briefs, verifies, integrates, and reports. Subagents research and edit.
 
 ## Persistence

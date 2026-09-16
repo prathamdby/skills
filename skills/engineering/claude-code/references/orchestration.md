@@ -1,7 +1,7 @@
 # Orchestration
 
 Follow the recipe for the branch in use. Default is Safe one-shot.
-Gated flags stay in `./permissions.md`. `--wall-clock` stays in
+Gated flags stay in `./permissions.md`. The parent wall-clock stays in
 `SKILL.md` and is never passed to `claude`.
 
 Run from the target directory. Quote the prompt so spaces and quotes
@@ -131,9 +131,9 @@ exit. Restrict event liveness to `stream-json`.
 | Auth / login error                             | `BLOCKED` unless the user asked to log in. Follow First-run in `./cli-surface.md`.          |
 | Permission prompt under `--print`              | Follow Print-mode prompts in `./permissions.md`. Do not add a gated skip.                   |
 | Non-zero exit after a started run              | Capture stderr. Inspect the tree. Report `BLOCKED`. Do not retry with a gated skip.         |
-| `text` / `json`, no output, still running      | Normal. Wait for exit or `--wall-clock`. Do not kill.                                       |
+| `text` / `json`, no output, still running      | Normal. Wait for exit or the wall-clock. Do not kill.                                       |
 | `stream-json`, new events or CPU or tree changing | Still working. Do not kill.                                                              |
-| `--wall-clock` exceeded, process still running | Kill that pid only. Cleanup. `BLOCKED`.                                                     |
+| Wall-clock exceeded, process still running     | Kill that pid only. Cleanup. `BLOCKED`.                                                     |
 | Interactive TUI when `--print` was intended    | Stop. Rerun with `--print`.                                                                 |
 | `claude help` started a session                | Stop. Use `claude --help`. Report `BLOCKED`.                                                |
 | Cwd is not the target directory                | Stop. `BLOCKED`. Do not invent a flag that retargets cwd.                                   |
