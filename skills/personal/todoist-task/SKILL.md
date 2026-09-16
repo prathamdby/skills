@@ -9,16 +9,16 @@ description: >
 
 ## Contract
 
-Create tasks that remain clear without their originating conversation. Preserve
-meaning, technical literals, links, and stated constraints, except secrets that
-redaction replaces. Do not invent requirements, metadata, or completion criteria.
+Create tasks that stay clear without their originating conversation. Preserve
+meaning, technical literals, links, and stated constraints. Redact secrets. Keep
+descriptions concise and actionable, not technical specifications or plan
+trackers. Do not invent requirements, metadata, or completion criteria.
 
 Derive the project, parent, due date, priority, and whether to create or preview
 from the user's natural-language request. Default to Inbox, no due date, `p4`,
 and no parent when the user supplies none.
 
-Record:
-`request | title | project | parent | due | priority | missing | duplicate | created | verified | terminal`
+Record `request | title | project | parent | due | priority | missing | duplicate | created | verified | terminal`.
 
 Terminals are `CREATED`, `PREVIEW`, `NEEDS_CONTEXT`, `DUPLICATE`, and `BLOCKED`.
 
@@ -36,33 +36,33 @@ requested it. Resolve a parent from its URL, ID, or unique title. Subtasks recei
 no due date unless the user supplies one or asks to inherit the parent's date.
 
 Done when every supplied metadata field has one resolved value.
-
 ## 2. Require specificity
 
-Apply the future-reader test: could the user identify and execute this task six
-months later without the conversation that created it?
+Apply the future-reader test: could the user identify and execute this task six months later without the conversation that created it?
 
-Find unnamed references such as "the two tools", "the old implementation", "the
-current branch", "the issue", or "the updated prompt". A project identifies the
-company, not its tools, repositories, branches, issues, files, or designs.
+Resolve unnamed references that block identification or execution. For repository
+work, a repository link and any essential source link normally suffice. Do not require
+or add file names, line references, branches, implementation steps, checklists, or
+completion criteria unless supplied or needed to resolve genuine ambiguity.
 
-If identifiers are missing, ask one concise question listing all missing items.
-Do not create the task in that turn. Resume after the answer without requesting
-another confirmation. URLs, IDs, and unique names resolve references. If the
-user accepts vague wording, record that choice.
+If essential context is missing, ask one concise question listing the missing
+items. Do not create the task in that turn. Resume after the answer without
+requesting another confirmation. URLs, IDs, and unique names resolve references.
+Record accepted vague wording.
 
 Done when the task passes the test or the user accepts the named ambiguity.
 
 ## 3. Format
 
-Write the title as `Action verb + specific deliverable + necessary qualifier`.
-Use sentence case and no trailing period. Aim for 4 to 10 words, but let
-specificity override the length limit. Preserve exact technical names.
+Write the title as `Action verb + specific deliverable + necessary qualifier`, in
+sentence case with no trailing period. Aim for 4 to 10 words, but let specificity
+override the length limit. Preserve exact technical names.
 
-Write the description in natural language. Begin with a short sentence that
-explains the intended result or relevant context. Use bullets for distinct
-requirements. End with any testing, delivery, or follow-up instructions supplied
-by the user.
+Write the description in natural language. Begin with a short sentence explaining
+the intended result or context. For repository work, prefer a simple whole-task
+description with the repository link and any essential source link. Use bullets only
+for distinct user-supplied requirements. Do not turn it into a checklist or add
+unrequested detail.
 
 Do not impose headings such as `Objective`, `Requirements`, or `Done when`. Use
 headings only when a long task contains separate areas of work. Clarify the
