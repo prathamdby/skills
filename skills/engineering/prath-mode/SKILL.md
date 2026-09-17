@@ -35,10 +35,11 @@ Playbooks under `playbooks/` are predetermined routes only.
 
 Match one immediate action playbook before a chain. Review-shaped asks stay on
 `review-plan` (never prepend to `ship`). Orientation or reply-only →
-`inspect-pr`; fix, push, or handle feedback → `finish-pr`. `fix-pr` loads
-`gh` for GitHub I/O; `/gh` and `inspect-pr` never continue into `fix-pr`.
-`deslop` is required in `ship`, optional in `save-work`. Implementation is
-parent work, not a leaf. Resolve mixed staged/unstaged paths before `deslop`.
+`inspect-pr`; fix, push, or handle feedback → `finish-pr`. Playbook
+`inspect-pr` never continues into `finish-pr`. Leaf `gh` never continues into
+leaf `fix-pr`; `fix-pr` loads `gh` for GitHub I/O. `deslop` is required in
+`ship`, optional in `save-work`. Implementation is parent work, not a leaf.
+Resolve mixed staged/unstaged paths before `deslop`.
 
 ## 1. Match
 

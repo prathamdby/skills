@@ -58,14 +58,15 @@ assert "README ./skills/ links exist" "$missing" "0"
 # ---------------------------------------------------------------------------
 PLAYBOOK_DIR="skills/engineering/prath-mode/playbooks"
 if [ ! -d "$PLAYBOOK_DIR" ] || [ -z "$(find "$PLAYBOOK_DIR" -maxdepth 1 -type f -name '*.md' 2>/dev/null)" ]; then
-  PASS=$((PASS + 1))
-  echo "ok playbooks coverage skipped (absent)"
+  FAIL=$((FAIL + 1))
+  echo "not ok prath-mode playbook coverage: playbooks directory absent or empty"
 else
   coverage_rc="$(
     python3 - <<'PY' || true
 from pathlib import Path
 import re
 import sys
+from collections import Counter
 
 root = Path(".")
 playbook_dir = root / "skills/engineering/prath-mode/playbooks"
@@ -76,7 +77,7 @@ leaves = sorted(
 )
 leaf_set = set(leaves)
 
-def parse_frontmatter(text: str) -> dict:
+def parse_frontmatter(text: str):
     if not text.startswith("---\n"):
         raise ValueError("missing frontmatter")
     end = text.find("\n---\n", 4)
@@ -101,6 +102,11 @@ def parse_frontmatter(text: str) -> dict:
             meta[key] = raw
     return meta, text[body_start:]
 
+def resolve_leaf(name: str) -> bool:
+    eng = (playbook_dir / ".." / ".." / name / "SKILL.md").resolve()
+    personal = (playbook_dir / ".." / ".." / ".." / "personal" / name / "SKILL.md").resolve()
+    return eng.is_file() or personal.is_file()
+
 primaries = []
 errors = []
 for path in sorted(playbook_dir.glob("*.md")):
@@ -112,6 +118,12 @@ for path in sorted(playbook_dir.glob("*.md")):
     kind = meta.get("kind")
     primary = meta.get("primary")
     participants = meta.get("participants") or []
+    pb_id = meta.get("id")
+    complete_when = meta.get("complete_when")
+    if pb_id != path.stem:
+        errors.append(f"{path}: id {pb_id!r} must equal filename stem {path.stem!r}")
+    if not complete_when or not str(complete_when).strip():
+        errors.append(f"{path}: complete_when must be present and non-empty")
     if kind not in ("action", "chain"):
         errors.append(f"{path}: kind must be action|chain, got {kind!r}")
     if kind == "action":
@@ -127,18 +139,24 @@ for path in sorted(playbook_dir.glob("*.md")):
     for name in participants:
         if name not in leaf_set:
             errors.append(f"{path}: unknown participant {name!r}")
-    for m in re.finditer(r"(?m)^\s*\d+\.\s+(leaf:([a-z0-9-]+)|parent:implementation)\b", body):
-        if m.group(1).startswith("leaf:"):
-            name = m.group(2)
-            if name not in leaf_set:
-                errors.append(f"{path}: unknown leaf:{name}")
-            # Resolve from playbook file directory
-            eng = playbook_dir / ".." / ".." / name / "SKILL.md"
-            personal = playbook_dir / ".." / ".." / ".." / "personal" / name / "SKILL.md"
-            if not eng.resolve().is_file() and not personal.resolve().is_file():
-                errors.append(f"{path}: leaf:{name} path missing from playbooks/")
+    step_leaves = []
+    for m in re.finditer(r"(?m)^\s*\d+\.\s+leaf:([a-z0-9-]+)\b", body):
+        step_leaves.append(m.group(1))
+    for name in re.findall(r"leaf:([a-z0-9-]+)", body):
+        if name not in leaf_set:
+            errors.append(f"{path}: unknown leaf:{name}")
+        elif not resolve_leaf(name):
+            errors.append(f"{path}: leaf:{name} path missing from playbooks/")
+    if kind == "chain":
+        step_set = set(step_leaves)
+        part_set = set(participants)
+        if not step_set:
+            errors.append(f"{path}: chain must include at least one leaf: step")
+        elif step_set != part_set:
+            errors.append(
+                f"{path}: participants {sorted(part_set)} must equal leaf steps {sorted(step_set)}"
+            )
 
-from collections import Counter
 counts = Counter(primaries)
 for name, n in sorted(counts.items()):
     if n != 1:
