@@ -82,8 +82,8 @@ difference. Auth, rate-limit, fetch, push, and platform errors are also
 
 Confirm the ledger body has `## Why the change`, `## Special things to note`,
 and `## Change outline`; Why is one sentence; Special is 1-3 bullets or
-`- None.`; and it has no `## Summary`, `## Details`, or `## Breaking`. Any
-skeleton mismatch is `BLOCKED` with a field-level difference.
+`- None.`; and it has no `## Summary`, `## Details`, `## Breaking`, or
+`## Visuals`. Any skeleton mismatch is `BLOCKED` with a field-level difference.
 
 Then apply Body hygiene in `./REFERENCE.md`: the body must equal the ledger
 body (single trailing newline only). If harness footers or other text were
