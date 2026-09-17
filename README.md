@@ -32,7 +32,7 @@ codex plugin add skills@pratham-skills
 
 ## Quickstart
 
-- `/prath-mode` routes work to one skill or a delivery chain.
+- `/prath-mode` matches a goal to a playbook under `prath-mode/playbooks/` and runs that route’s leaves.
 - `/upfront-design` gates product review, system design, program design, and vertical slices on user approval before code, then checks each landed milestone when given the approved design.
 - `/peer-review` checks an implementation plan before work starts.
 - `/deslop` removes needless complexity from a selected diff.
@@ -53,7 +53,7 @@ codex plugin add skills@pratham-skills
 
 | Common failure                                                                                                              | Skill                                                            | Contract                                                                                                                                                                     |
 | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The agent picks the wrong workflow or repeats work owned by another skill.                                                  | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Routes each immediate action to one owner and tracks chain completion.                                                                                                       |
+| The agent picks the wrong workflow or repeats work owned by another skill.                                                  | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Matches one playbook, copies its steps into the todo list, and invokes only the named leaves.                                                                                |
 | The agent starts coding from a one-line request; the PR needs rework and review drags.                                      | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Triages size, writes each approved design phase to a file outside the repo, records only hard-to-reverse decisions as ADRs, and checks landed milestones against the design. |
 | A plan misses a requirement or carries a risky assumption into implementation.                                              | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhausts every material finding, ranks them, and issues a fixed verdict. It edits only with explicit authority.                                                              |
 | A plan review stops after the first risk and leaves other blockers unlisted.                                                | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Surfaces every material finding with no count cap, then maps the full ranked list to the verdict.                                                                            |
@@ -83,7 +83,7 @@ codex plugin add skills@pratham-skills
 
 | Skill                                                            | Description                                                                                                    |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Route one action or a complete workflow chain.                                                                 |
+| [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Match a goal to a playbook and run its leaf sequence.                                              |
 | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Agree product review, system design, program design, and vertical slices before code; check landed milestones. |
 | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhaustively review a plan or proposed change and issue a fixed verdict.                                       |
 | [`deslop`](./skills/engineering/deslop/SKILL.md)                 | Remove code slop from one git diff without changing behavior.                                                  |

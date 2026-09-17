@@ -25,12 +25,27 @@ This applies to every skill, no exceptions.
 
 Do not commit the skill without the README update.
 
+## Meta-Rule: Keep prath-mode playbooks in sync
+
+**When adding, renaming, or removing a skill (except `prath-mode`), update
+`skills/engineering/prath-mode/` before committing.**
+
+1. **Add:** create `playbooks/<id>.md` with `kind: action` and
+   `primary: <skill-basename>`; add one matcher bullet in `prath-mode/SKILL.md`.
+2. **Rename:** rewrite that skill's `primary` playbook, every `leaf:<old>` and
+   `participants` entry, and the matcher bullet.
+3. **Remove:** delete its `primary` playbook; drop it from every chain
+   `participants` and `leaf:` step (rewrite or delete the chain if empty);
+   remove the matcher bullet.
+
+Do not commit a skill change that leaves playbook coverage or leaf paths broken.
+
 ## Meta-Rule: Self-Check Before Committing
 
 **Before committing any skill addition or update, verify every rule below by
 reading the files. Run `scripts/skill-guards.test.sh` for marketplace set
-equality and README `./skills/` link existence. You remain the check for the
-other rules.**
+equality, README `./skills/` link existence, and prath-mode playbook coverage.
+You remain the check for the other rules.**
 
 For every skill you touched:
 
@@ -46,8 +61,11 @@ For every skill you touched:
    `<...>` placeholders.
 6. **Claude marketplace**, `plugins[0].skills` lists every `skills/*/*/SKILL.md`
    directory, sorted, no extras.
+7. **prath-mode playbooks**, every non-`prath-mode` skill basename is `primary`
+   of exactly one `playbooks/*.md`; every `leaf:` and `participants` entry
+   resolves to a skill on disk.
 
-Fix every failure before committing. Do not commit until all six pass.
+Fix every failure before committing. Do not commit until all seven pass.
 
 ---
 
@@ -57,7 +75,8 @@ Fix every failure before committing. Do not commit until all six pass.
 - Top-level categories are `personal/` and `engineering/` unless a third is clearly needed
 - Never use `.agents/skills/` for this repo
 - Each skill is a directory containing `SKILL.md` at minimum
-- Optional: `REFERENCE.md`, `references/`, `assets/`
+- Optional: `REFERENCE.md`, `references/`, `assets/`, and for router skills
+  `playbooks/` (one route file per matched outcome)
 
 ## Disclose by branch, not by gate
 
