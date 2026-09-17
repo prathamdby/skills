@@ -1,6 +1,6 @@
 # Make PR reference
 
-## Body scale
+## Body structure
 
 Load during Step 2 after the locked diff is non-empty. Measure only that
 diff:
@@ -11,96 +11,110 @@ diff:
 | `churn` | sum of added and deleted lines from `git diff --numstat <target>...HEAD` |
 | `areas` | count of distinct top-level path segments among those files              |
 
-Pick **exactly one** tier with this order (first match wins):
+Pick **exactly one** depth with this order (first match wins):
 
-1. **L** when `files` > 12, or `churn` > 400, or (`areas` ≥ 4 and `files` ≥ 8).
-2. **S** when `files` ≤ 3 and `churn` ≤ 80.
-3. **M** for every other non-empty diff.
+1. **deep** when `files` > 12, or `churn` > 400, or (`areas` ≥ 4 and `files` ≥ 8).
+2. **shallow** when `files` ≤ 3 and `churn` ≤ 80.
+3. **standard** for every other non-empty diff.
 
-| Tier | Summary bullets | Extra sections                                                                                                                    | Depth                                                                                                                                          |
-| ---- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| S    | 2 or more       | Add `## Details` when a theme needs more than one line. Add Body visuals for every theme with a proved shape.                     | Name what changed for the user of the code. Include the proved shape. Do not skip a call chain, module, or contract the hunks show.            |
-| M    | 4 or more       | Add `## Details` when two or more themes need more than one line each. Add Body visuals for every theme with a proved shape.      | Name key files and symbols the diff proves. State the behavior change in plain words. Add every view that makes the shape obvious at a glance. |
-| L    | 6 or more       | `## Details` required. Add `## Breaking` only when the diff proves a break. Add Body visuals for every theme with a proved shape. | Explain modules, contracts, and call-path deltas the hunks show. Use several views when one view leaves a boundary unclear.                    |
+Record `depth` in the ledger next to title/body so Step 4 can restate it.
 
-Rules for every tier:
+### Skeleton
 
-- Cluster related hunks into themes. Never one bullet per commit.
-- The bullet counts are floors, not caps. Cover every theme. Do not drop
-  a theme to stay short. Do not pad empty themes.
-- Default body always starts with `## Summary` and its bullets.
-- Open extra sections when the tier allows them **and** the locked
-  diff supplies evidence for that section.
-- Prefer detailed proved prose plus visuals. Do not cut a file, symbol,
-  call, or boundary to keep the body short.
-- Include no test, rollout, motive, or ticket claim the diff cannot prove.
-- Never draft harness footers (`Made with Cursor`, identity trailers, peers).
-- Record the chosen tier in the ledger next to title/body so Step 4 can
-  restate it.
+Every body uses this shape (optional header first):
 
-A theme has a **proved shape** when the locked diff matches at least
-one row in Pick the views. Match only names, calls, files, props,
-states, and boundaries in that diff. Do not match on a color, type
-token, spacing value, label, datum, or viewport the hunks omit.
+1. Link header only when the user pasted one or more URLs in the make-pr
+   request. One line of `[label](url)` joined by ` | `, using those exact
+   URLs. Labels may be the host or a user-supplied label. Never invent
+   tickets or plans. Pasted URLs do not authorize ticket or motive claims
+   below.
+2. `## Why the change` then exactly one sentence.
+3. `## Special things to note` then 1-3 bullets, or a single `- None.`
+4. `## Change outline` then captions and views only.
+
+No other `##` headings. No `## Summary`, `## Details`, `## Breaking`, or
+`## Visuals`.
+
+### Why the change
+
+Exactly one sentence naming the proved behavior change after merge: what
+callers or users of the code can do or observe differently. Ground it only
+in the locked diff. An explicit title ticket does not authorize ticket
+claims here. Do not write product motive, opportunity, or problem framing
+the hunks do not prove.
+
+### Special things to note
+
+Only proved reviewer hazards: breaks, migrations, compatibility
+constraints, deliberate omissions, or surprising API or shape shifts
+visible in the hunks, or restating explicit user wording from the make-pr
+request. Cap at three bullets. If none apply, write `- None.`
 
 ### Draft procedure
 
-1. Measure `files`, `churn`, and `areas` from the locked diff.
-2. Select the tier with the first-match order above.
-3. Cluster hunks into themes.
-4. Write `## Summary` bullets at that tier's depth and at least that
-   floor. Keep writing while a theme remains.
-5. Add allowed extra sections when evidence exists.
-6. For every tier, including S, add Body visuals for every theme with a
-   proved shape. Emit every matching view from Body visuals. Place each
-   view next to the prose it supports. Use several views when one view
-   leaves a boundary, call, or layout unclear.
-7. Apply Body style below to every body sentence and bullet. Fence
-   contents keep the view's syntax.
-8. Map every title phrase, body line, and visual label to proving paths
-   and hunks. Rewrite untraced copy.
+1. Measure `files`, `churn`, and `areas`. Select depth.
+2. Cluster hunks into themes. Never one theme per commit.
+3. Emit the optional link header when the request pasted URLs.
+4. Write Why (one proved sentence). Rewrite if a second sentence or
+   unproved motive appears.
+5. Write Special from proved hazards, else `- None.`
+6. Draft Change outline per the next section.
+7. Apply Body style to Why, Special, and captions. Fence interiors keep
+   the view's syntax.
+8. Map every title phrase, body line, caption, and visual label to
+   proving paths and hunks. Rewrite untraced copy.
 
-Done when format, tier, Body style, Body visuals, and clean-room trace
-all pass.
-
-## Body visuals
-
-Load during Step 2 after you cluster the themes. For every tier,
-including S, add Body visuals for every theme with a proved shape.
-
-A visual is a fenced sketch next to the detailed prose it supports.
-Write enough prose that a stranger can name the change without opening
-the diff. Then add the views that make that change obvious at a glance.
-Keep only calls, files, props, states, and boundaries the locked diff
-proves. Place each visual beside its theme. Do not add a `## Visuals`
-section. Use every view a theme proves. Do not skip a useful view to
-keep the body short.
+Done when skeleton, depth, Body style, Change outline, and clean-room
+trace all pass.
 
 Rules:
 
-- A fence may include only names, calls, files, props, states, and
-  boundaries the locked diff proves. Delete any color, type token,
-  spacing value, label, datum, or viewport the hunks omit. Include no
-  motive, test, or rollout claim.
-- Body style applies to the prose around a visual. Fence contents keep
-  the view's syntax and may be as long as the proved shape requires.
-- Prefer Mermaid, `diff`, and component-tree fences. GitHub renders
-  those in a PR body. Add other table views beside them when they name
-  a second boundary.
-- If Mermaid or a component tree cannot carry a proved layout or
-  state, emit another publishable view from this table. Use a `diff`,
-  a second Mermaid diagram, or a fuller component tree. Do not write
-  an `html` fence. Do not link an HTML file. make-pr blocks untracked
-  files and never commits, so a new artifact cannot publish.
+- Cover every theme that needs a view or a Special bullet. Do not pad.
+- Prefer proved captions plus views over vague prose.
+- Include no test, rollout, unproved motive, or unproved ticket claim.
+- Never draft harness footers (`Made with Cursor`, identity trailers,
+  peers).
+
+## Change outline
+
+Load during Step 2 after themes exist. This section is the only
+implementation surface. Each included item is an optional short caption
+plus one fenced view. Place the caption next to its fence.
+
+### Depth
+
+| Depth    | Captions                                                                 | Views                                                                                          |
+| -------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| shallow  | At most one short caption per view; omit the caption when the fence is clear | Prefer 1-2 views total; stop when the proved shape is clear                               |
+| standard | One short caption per view when the fence alone is ambiguous             | Include each distinct proved shape category that helps; no duplicate shapes                    |
+| deep     | Caption required when a view spans a module boundary or contract         | Multiple views OK when one leaves a boundary unclear; still omit unused categories             |
+
+### Selection
+
+Include only views that help a reviewer understand this PR. Omit
+categories that did not change. Prefer one clear view over several
+overlapping ones. Use a second view only when the first leaves a
+boundary, call, or layout unclear. Prefer `diff` when an existing shape
+changes. Prefer a full or language block when most of the shape is new,
+omitted names hide order, or a copyable target is needed. Order views so
+the story is easiest to follow (contract or data first, or files first,
+as the diff suggests). Do not emit every matching row by default.
+
+### Fence rules
+
+A fence may include only names, calls, files, props, states, types,
+columns, routes, and boundaries the locked diff proves. Delete any
+color, spacing, viewport, label, or datum the hunks omit. Include no
+test, rollout, or unproved motive. Publishable fences only: `text`,
+`diff`, language fences (`ts`, `tsx`, `sql`, `json`, and peers), and
+`mermaid`. Do not write an `html` fence. Do not link an HTML file.
+make-pr blocks untracked files and never commits, so a new artifact
+cannot publish.
 
 ### Pick the views
 
-For each theme, collect every proved shape in the table. Emit a view
-for each collected shape. If an existing shape has a delta, emit the
-`diff` sketch of that shape and emit the current-shape view when both
-help a glance. If Mermaid or a component tree cannot carry a proved
-layout or state, still emit another publishable row. Do not stop at
-the first row.
+For each theme, consider every proved shape in the table. Include a view
+only when selection above says it helps.
 
 | Theme shape                                                                        | View                             |
 | ---------------------------------------------------------------------------------- | -------------------------------- |
@@ -109,8 +123,14 @@ the first row.
 | UI structure with state or module bounds                                           | Component tree                   |
 | File responsibility or a broad refactor                                            | Shallow file tree                |
 | Interaction, control, or data flow                                                 | Mermaid                          |
+| Schema, SQL table or column, or relationship change                                | `sql` or `diff` of that shape    |
+| HTTP or RPC endpoint request/response or route contract change                     | `diff` or language fence of the contract |
+| Key data structure, type, or interface central to the change                       | Language fence or `diff` of the type |
 | Existing shape with a delta                                                        | `diff` sketch of that same shape |
 | Most of the shape is new, omitted names hide order, or a copyable target is needed | Full block                       |
+
+Match only names, calls, files, props, states, types, columns, routes,
+and boundaries in the locked diff.
 
 ### Views
 
@@ -198,6 +218,40 @@ stateDiagram-v2
     Invalidated --> [*]
 ```
 
+**Schema.** Put table, column, or relationship deltas in `sql` or
+`diff`. Keep only names and constraints the hunks prove.
+
+```diff
+ CREATE TABLE sessions (
+   id TEXT PRIMARY KEY,
+-  prompt TEXT NOT NULL
++  prompt TEXT NOT NULL,
++  receipt_id TEXT REFERENCES receipts(id)
+ );
+```
+
+**Endpoint contract.** Put route, request, or response shape changes in
+`diff` or a language fence. Keep only fields and status codes the hunks
+prove.
+
+```diff
+ POST /v1/sessions
+   body: { prompt: string }
+-  200: { id: string }
++  200: { id: string, receiptId: string }
+```
+
+**Key type.** Put a central type or interface in a language fence or
+`diff`. Keep the real field names the hunks prove.
+
+```ts
+type Session = {
+  id: string;
+  prompt: string;
+  receiptId: string;
+};
+```
+
 **Diff sketch.** Match the `diff` fence to the theme's shape. Emit one
 fence per changed shape. Keep unchanged neighbors that fix ownership
 or order.
@@ -265,51 +319,56 @@ function parseCommand(input: string): Command {
 
 ## Body style
 
-Apply ASD-STE100 and Google developer documentation style to body prose
-(not to path or symbol literals):
+Write as one human talking to another: simple, coherent, and concise.
+Apply this to Why, Special, and Change outline captions (not to path or
+symbol literals, and not inside fences).
 
-- Use one plain word for one act. Do not rotate synonyms (prefer start over
-  begin, commence, or initiate).
-- Write active voice. Name the actor: "The skill measures the diff."
-- Use simple tenses: infinitive, imperative, simple present, simple past,
-  or simple future. Prefer simple present or imperative. Avoid progressive
-  and perfect when simple present suffices. Use present tense for current
-  behavior. Keep -ing only for technical nouns, adjectives, or
-  prepositions (`opening`, `remaining`, `during`). Rewrite other -ing
-  verbs as imperative or simple present: "The handler starts the job."
-  not "The skill is handling the job." Prefer "The skill runs the
-  checks." over "The skill is running the checks."
-- Write complete proved detail. Do not cut a file, symbol, or shape to
-  shorten a line. Split a sentence that carries two thoughts. A long
-  bullet that names one proved change is fine.
 - Keep one topic per sentence and one idea per bullet.
+- Write active voice. Name the actor when it matters.
 - Use a list when three or more parallel points appear.
-- Address the reviewer or a future reader as you. Use imperative for any
-  instruction (you is implied). Use third person for what the code does.
-- Do not write we, let's, please, simply, easy, quickly, slang, or tl;dr.
-  Do not use exclamation marks.
-- Put a condition before its instruction: "If X, do Y."
-- Use sentence-case headings (`## Summary`, `## Details`, `## Breaking`).
-  Use serial commas.
-- Keep articles (a, the) when they make grammar clear. Use American
-  spelling.
-- Keep necessary technical nouns (API names, flags, path segments). Put
-  code, flags, and paths in code font. Define a rare term once in the same
-  bullet if a stranger would misread it.
+- Address the reviewer as you for instructions. Use third person for
+  what the code does.
+- Keep articles when they make grammar clear. Use American spelling.
+- Keep necessary technical nouns. Put code, flags, and paths in code
+  font.
+- Use sentence-case headings (`## Why the change`, `## Special things to
+  note`, `## Change outline`). Use serial commas.
 - Do not soften claims with empty hedges. If the diff does not prove a
   claim, delete the claim.
-- Body states what changed and why the locked diff proves it. Add the
-  detailed proved prose and Body visuals a stranger needs to read the
-  shape at a glance. A Body visuals fence may name the proved shape.
 
-Title lines: Pope/Beams imperative, no trailing period. Default title uses
-sentence case and stays at most 60 characters. Conventional title follows
-commit conventional rules (lowercase except names and technical terms, 50
-characters, no scope, imperative, no period).
+### Avoid AI tells
 
-Provenance (principles only; do not copy the STE dictionary):
-https://www.asd-ste100.org/STE_faq.html
-https://developers.google.com/style
+Keep these bans. Human tone does not license AI cadence.
+
+- Avoid em dashes entirely. Use periods or commas only. Do not use
+  parentheses, en dashes, or hyphen-as-dash substitutes for the same
+  role.
+- Do not write "not just X, but Y" or "X, not Y" contrast templates.
+  State the point directly.
+- Use one plain word for one act. Do not rotate synonyms.
+- Do not force a rule of three. Use the natural count.
+- Avoid AI vocabulary such as additionally, crucial, delve, enhance,
+  fostering, pivotal, showcase, tapestry, testament, underscore, and
+  vibrant.
+- Replace "serves as", "stands as", "boasts", and "features" with "is"
+  or "has" when that is the meaning.
+- Use colons only before a list or example. Rewrite mid-sentence colon
+  connectors as direct sentences.
+- Do not write we, let's, please, simply, easy, quickly, slang, or
+  tl;dr. Do not use exclamation marks.
+- Replace "in order to" with "to", "due to the fact that" with
+  "because", and delete "it is important to note that".
+- Prefer plain words: use over utilize or leverage, help over
+  facilitate, many over numerous, if over in the event that.
+- Use straight quotes. Do not bold every proper noun. No decorative
+  emojis.
+
+Title lines: Pope/Beams imperative, no trailing period. Default title
+uses sentence case and stays at most 60 characters. Conventional title
+follows commit conventional rules (lowercase except names and technical
+terms, 50 characters, no scope, imperative, no period).
+
+Provenance for titles only:
 https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 https://cbea.ms/git-commit/
 
@@ -341,4 +400,5 @@ When dirty:
 3. Report whether a body strip ran.
 
 Never draft banned footers in Step 2. Never treat a harness footer as part of
-the summary.
+the body. A user-pasted link header that belongs in the ledger body is not a
+harness footer; keep it.
