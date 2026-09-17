@@ -38,19 +38,20 @@ no due date unless the user supplies one or asks to inherit the parent's date.
 Done when every supplied metadata field has one resolved value.
 ## 2. Require specificity
 
-Apply the future-reader test: could the user identify and execute this task six months later without the conversation that created it?
+Apply the six-month test: without this conversation, can the user tell what the
+reminder concerns, what prompted it, and what they intended to do? Use supplied
+context first. A repository name or link identifies the work but does not explain it.
 
-Resolve unnamed references that block identification or execution. For repository
-work, a repository link and any essential source link normally suffice. Do not require
-or add file names, line references, branches, implementation steps, checklists, or
-completion criteria unless supplied or needed to resolve genuine ambiguity.
+Ask 1 to 3 plain questions about missing context in one message. For "Implement
+Discord backend connection", ask which app, what it should do, and what prompted
+the task. Skip answered questions; do not ask for implementation choices.
 
-If essential context is missing, ask one concise question listing the missing
-items. Do not create the task in that turn. Resume after the answer without
-requesting another confirmation. URLs, IDs, and unique names resolve references.
-Record accepted vague wording.
+Wait for answers before creating. If an essential gap remains, ask one focused
+follow-up; otherwise resume without another confirmation. Never invent context
+or create an information-free task even if the user accepts vague wording.
+Leave unresolved tasks at `NEEDS_CONTEXT`; do not keep expanding the interview.
 
-Done when the task passes the test or the user accepts the named ambiguity.
+Done when the reminder passes the test. Simple errands need no invented backstory.
 
 ## 3. Format
 
@@ -58,16 +59,15 @@ Write the title as `Action verb + specific deliverable + necessary qualifier`, i
 sentence case with no trailing period. Aim for 4 to 10 words, but let specificity
 override the length limit. Preserve exact technical names.
 
-Write the description in natural language. Begin with a short sentence explaining
-the intended result or context. For repository work, prefer a simple whole-task
-description with the repository link and any essential source link. Use bullets only
-for distinct user-supplied requirements. Do not turn it into a checklist or add
-unrequested detail.
+Write 1 to 3 natural sentences with the relevant incident, observation, or decision,
+the intended outcome, and useful names or links. Repeating the title as "Implement
+the Discord connection in the backend" fails. Omit the description only when the
+title alone passes the six-month test.
 
-Do not impose headings such as `Objective`, `Requirements`, or `Done when`. Use
-headings only when a long task contains separate areas of work. Clarify the
-wording without making it formal, repetitive, or impersonal. Do not repeat
-metadata or add work the user did not request.
+Compress technical discussion into a reminder. Preserve exact identifiers and
+essential user constraints, but do not turn supplied detail into architecture,
+implementation steps, a checklist, or acceptance criteria. Link an existing plan
+instead of copying it. Omit formal headings, repeated metadata, and unrequested work.
 
 Before create or preview, redact credentials, tokens, passwords, private keys,
 authenticated URLs, email addresses, and environment values from the title and
