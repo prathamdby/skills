@@ -9,16 +9,16 @@ description: >
 
 ## Contract
 
-Create tasks that stay clear without their originating conversation. Preserve
-meaning, technical literals, links, and stated constraints. Redact secrets. Keep
-descriptions concise and actionable, not technical specifications or plan
-trackers. Do not invent requirements, metadata, or completion criteria.
+Create tasks that remain clear without their originating conversation. Preserve
+meaning, technical literals, links, and stated constraints. Do not invent
+requirements, metadata, or completion criteria.
 
 Derive the project, parent, due date, priority, and whether to create or preview
 from the user's natural-language request. Default to Inbox, no due date, `p4`,
 and no parent when the user supplies none.
 
-Record `request | title | project | parent | due | priority | missing | duplicate | created | verified | terminal`.
+Record:
+`request | title | project | parent | due | priority | missing | duplicate | created | verified | terminal`
 
 Terminals are `CREATED`, `PREVIEW`, `NEEDS_CONTEXT`, `DUPLICATE`, and `BLOCKED`.
 
@@ -36,52 +36,47 @@ requested it. Resolve a parent from its URL, ID, or unique title. Subtasks recei
 no due date unless the user supplies one or asks to inherit the parent's date.
 
 Done when every supplied metadata field has one resolved value.
+
 ## 2. Require specificity
 
-Apply the six-month test: without this conversation, can the user tell what the
-reminder concerns, what prompted it, and what they intended to do? Use supplied
-context first. A repository name or link identifies the work but does not explain it.
+Apply the future-reader test: could the user identify and execute this task six
+months later without the conversation that created it?
 
-Ask 1 to 3 plain questions about missing context in one message. For "Implement
-Discord backend connection", ask which app, what it should do, and what prompted
-the task. Skip answered questions; do not ask for implementation choices.
+Find unnamed references such as "the two tools", "the old implementation", "the
+current branch", "the issue", or "the updated prompt". A project identifies the
+company, not its tools, repositories, branches, issues, files, or designs.
 
-Wait for answers before creating. If an essential gap remains, ask one focused
-follow-up; otherwise resume without another confirmation. Never invent context
-or create an information-free task even if the user accepts vague wording.
-Leave unresolved tasks at `NEEDS_CONTEXT`; do not keep expanding the interview.
+If identifiers are missing, ask one concise question listing all missing items.
+Do not create the task in that turn. Resume after the answer without requesting
+another confirmation. URLs, IDs, and unique names resolve references. If the
+user accepts vague wording, record that choice.
 
-Done when the reminder passes the test. Simple errands need no invented backstory.
+Done when the task passes the test or the user accepts the named ambiguity.
 
 ## 3. Format
 
-Write the title as `Action verb + specific deliverable + necessary qualifier`, in
-sentence case with no trailing period. Aim for 4 to 10 words, but let specificity
-override the length limit. Preserve exact technical names.
+Write the title as `Action verb + specific deliverable + necessary qualifier`.
+Use sentence case and no trailing period. Aim for 4 to 10 words, but let
+specificity override the length limit. Preserve exact technical names.
 
-Write 1 to 3 natural sentences with the relevant incident, observation, or decision,
-the intended outcome, and useful names or links. Repeating the title as "Implement
-the Discord connection in the backend" fails. Omit the description only when the
-title alone passes the six-month test.
+Write the description in natural language. Begin with a short sentence that
+explains the intended result or relevant context. Use bullets for distinct
+requirements. End with any testing, delivery, or follow-up instructions supplied
+by the user. Hyperlink every link and keep descriptions cleanly formatted.
 
-Compress technical discussion into a reminder. Preserve exact identifiers and
-essential user constraints, but do not turn supplied detail into architecture,
-implementation steps, a checklist, or acceptance criteria. Link an existing plan
-instead of copying it. Omit formal headings, repeated metadata, and unrequested work.
+Do not impose headings such as `Objective`, `Requirements`, or `Done when`. Use
+headings only when a long task contains separate areas of work. Clarify the
+wording without making it formal, repetitive, or impersonal. Do not repeat
+metadata or add work the user did not request.
 
-Before create or preview, redact credentials, tokens, passwords, private keys,
-authenticated URLs, email addresses, and environment values from the title and
-description. Replace each with a placeholder such as `[REDACTED: token]`.
-
-Done when the title identifies the work, the description reads naturally without
-the original conversation, and redaction has run.
+Done when the title identifies the work and the description reads naturally
+without depending on the original conversation.
 
 ## 4. Check and create
 
-Resolve the project and parent through read-only calls. Normalize a title by
-trimming ends, collapsing internal whitespace to one space, and casefolding.
-Search for an active task with the same project, parent, and normalized title.
-If found, report `DUPLICATE` and do not create another.
+Resolve the project and parent through read-only calls. Search for an active task
+with the same normalized title and parent. If found, report `DUPLICATE` and do
+not create another.
 
 If the user requested a preview, present the exact title, description, and
 metadata, then stop with `PREVIEW`. Otherwise create the recorded task once. In
@@ -92,9 +87,8 @@ Done when creation returns an ID or every failure is identified.
 ## 5. Verify
 
 Fetch each created task and compare its title, description, project, parent, due
-date, and priority with the recorded payload. A mismatch against that payload is
-authorized: update the field once toward the recorded value. If it still differs,
-report `BLOCKED` with the ID and exact difference.
+date, and priority with the recorded payload. Correct an authorized mismatch
+once. If it remains, report `BLOCKED` with the ID and exact difference.
 
 Report the verified title, project, parent when present, and due date.
 Done when every reported success matches Todoist.
