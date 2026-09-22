@@ -36,7 +36,8 @@
         "./skills/engineering/prath-mode",
         "./skills/engineering/recon",
         "./skills/engineering/upfront-design",
-        "./skills/personal/todoist-task"
+        "./skills/personal/todoist-task",
+        "./skills/personal/use-skill"
       ]
     }
   ]
