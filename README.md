@@ -42,6 +42,7 @@ codex plugin add skills@pratham-skills
 - `/gh` orients on a PR, review threads, or red CI, or posts one reply.
 - `/recon` maps the current repository and refreshes only changed areas later.
 - `/box` clones and searches an external git repository locally.
+- `/use-skill` fetches and runs a remote skill from one or more GitHub links.
 - `/todoist-task` asks a few questions about missing context, then creates reminders that still make sense six months later.
 - `/handoff` saves resumable session state or continues from it.
 - `/orchestrate` coordinates cheaper subagents while the main agent verifies.
@@ -72,6 +73,7 @@ codex plugin add skills@pratham-skills
 | Agents skip the `.ts` inspect scripts on Node 22 and dump GraphQL instead of probing bun, nub, tsx, or type-stripping Node. | [`gh`](./skills/engineering/gh/SKILL.md)                         | `scripts/run` tries bun, nub, tsx, then Node (native TS or `--experimental-strip-types`, including nvm); GraphQL inspect is blocked until that list is exhausted.            |
 | Every session re-reads the same repository from scratch.                                                                    | [`recon`](./skills/engineering/recon/SKILL.md)                   | Stores a bounded evidence map and patches it from committed git drift.                                                                                                       |
 | The agent guesses what an external repository contains.                                                                     | [`box`](./skills/engineering/box/SKILL.md)                       | Clones into a skill-owned sandbox, searches local source, and returns cited findings.                                                                                        |
+| The model needs a skill it does not have installed.                                                                           | [`use-skill`](./skills/personal/use-skill/SKILL.md)              | Bulk-fetches the full skill directory via `gh api` and executes it as if natively present.                                                             |
 | A Todoist task loses the reason for the work or becomes a technical specification. | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Asks 1 to 3 questions about missing context, waits for answers, and saves a concise reminder with duplicate checks and verification. |
 | A resumed session trusts stale paths, tasks, branches, or PR state.                                                         | [`handoff`](./skills/engineering/handoff/SKILL.md)               | Saves a bounded, redacted handoff and validates every artifact before resuming work.                                                                                         |
 | The main model spends its context on mechanical work or trusts delegate summaries.                                          | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md)       | Delegates disjoint chunks, verifies evidence and integration, and keeps the parent read-only.                                                                                |
@@ -93,6 +95,7 @@ codex plugin add skills@pratham-skills
 | [`gh`](./skills/engineering/gh/SKILL.md)                         | Orient on PR state, review threads, or CI, or post one reply.                                                  |
 | [`recon`](./skills/engineering/recon/SKILL.md)                   | Build or refresh a persistent map of the current repo.                                                         |
 | [`box`](./skills/engineering/box/SKILL.md)                       | Clone, update, list, search, or persist an external repo.                                                      |
+| [`use-skill`](./skills/personal/use-skill/SKILL.md)           | Run a remote skill on demand from GitHub links.                                                                |
 | [`todoist-task`](./skills/personal/todoist-task/SKILL.md)        | Clarify missing context before creating or previewing concise Todoist reminders. |
 | [`handoff`](./skills/engineering/handoff/SKILL.md)               | Save or resume bounded session state.                                                                          |
 | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md)       | Coordinate in-harness subagents as a read-only parent.                                                         |

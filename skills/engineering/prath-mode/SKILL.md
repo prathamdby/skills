@@ -29,6 +29,7 @@ Playbooks under `playbooks/` are predetermined routes only.
 - `claude-code` — Claude Code CLI (`playbooks/claude-code.md`)
 - `codex` — Codex CLI (`playbooks/codex.md`)
 - `todoist` — Todoist task (`playbooks/todoist.md`)
+- `use-skill` — run the skill at this link (`playbooks/use-skill.md`)
 - `ship` — implement → deslop → commit → make-pr (`playbooks/ship.md`)
 - `design-then-ship` — design, milestones, then ship (`playbooks/design-then-ship.md`)
 - `save-work` — optional deslop → commit (`playbooks/save-work.md`)
