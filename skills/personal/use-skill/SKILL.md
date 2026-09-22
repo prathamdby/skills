@@ -34,7 +34,7 @@ Done when every blob under dir returned content or a terminal is set.
 
 ## 3. Verify
 
-The set must include the entry file (`SKILL.md`, or the specifically linked file) carrying skill frontmatter (`name`) and a procedure; otherwise `BLOCKED`. A dir with no skill files is `NO_CHANGES`.
+An empty blob set is `NO_CHANGES`. Otherwise the set must include the entry file (`SKILL.md`, or the specifically linked file) carrying skill frontmatter (`name`) and a procedure; a non-empty set without it is `BLOCKED`.
 
 Done when the entry file is verified or a terminal is set.
 

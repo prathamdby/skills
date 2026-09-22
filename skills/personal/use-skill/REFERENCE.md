@@ -13,12 +13,14 @@ Endpoint and decoding detail for Step 2. Load this before fetching.
 
 A missing `REF` uses the repo default branch: `gh api repos/OWNER/REPO --jq .default_branch`.
 
+Shorthand file check: match `PATH` exactly against the tree listing before filtering. A `blob` hit means a file link and resolves to its parent; otherwise `PATH` is the dir.
+
 ## Bulk fetch
 
 List the recursive tree once, then fetch every blob under `DIR`:
 
 ```text
-gh api 'repos/OWNER/REPO/git/trees/REF?recursive=1' --jq '.tree[] | select(.type=="blob" and (.path | startswith("DIR/"))) | .path'
+gh api 'repos/OWNER/REPO/git/trees/REF?recursive=1' --jq '.tree[] | select(.type=="blob" and (.path | startswith("DIR/"))) | "\(.path) \(.sha)"'
 ```
 
 Fetch each listed path through the contents endpoint:
@@ -35,7 +37,7 @@ Each payload is JSON with base64 in `.content` (strip newlines, then `base64 -d`
 gh api repos/OWNER/REPO/git/blobs/SHA
 ```
 
-where `SHA` comes from the `.sha` of the tree entry.
+where `SHA` comes from the `.sha` of the tree entry. Decode its `.content` from base64 the same way (strip newlines, then `base64 -d`).
 
 ## Error map
 
@@ -44,4 +46,5 @@ where `SHA` comes from the `.sha` of the tree entry.
 | Missing dir (404 on tree or contents) | `BLOCKED` |
 | Rate-limit (`403` with `retry-after` / `x-ratelimit-remaining: 0`) | `BLOCKED` with the retry time |
 | Auth failure | `BLOCKED` |
-| Directory with no skill files | `NO_CHANGES` |
+| Empty blob set | `NO_CHANGES` |
+| Non-empty set missing the entry file | `BLOCKED` |
