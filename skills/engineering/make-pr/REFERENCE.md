@@ -58,9 +58,9 @@ request. Cap at three bullets. If none apply, write `- None.`
 4. Write Why (one proved sentence). Rewrite if a second sentence or unproved motive appears.
 5. Write Special from proved hazards, else `- None.`
 6. Draft Change outline per the next section.
-7. Append `Closes #N`, one line per explicitly named issue, after one blank line; omit the footer when no issue was named.
+7. Append `Closes #N`, one line per explicitly named issue with the footer N set exactly equal to the request N set, after one blank line; omit the footer when no issue was named. Pasted issue URLs yield N from the `/issues/<N>` digits only.
 8. Apply Body style to Why, Special, and captions. Fence interiors keep the view's syntax.
-9. Map every title phrase, body line, caption, and visual label to proving paths and hunks, except footer lines the explicit issue authorizes. Rewrite untraced copy.
+9. Map every title phrase, body line, caption, and visual label to proving paths and hunks, except footer lines the explicit issue authorizes. Rewrite untraced copy; a footer N outside the request N set is `BLOCKED`.
 
 Done when skeleton, depth, Body style, Change outline, and clean-room trace all pass.
 
