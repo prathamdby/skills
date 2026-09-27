@@ -31,9 +31,9 @@ Every body uses this shape (optional header first):
 2. `## Why the change` then exactly one sentence.
 3. `## Special things to note` then 1-3 bullets, or a single `- None.`
 4. `## Change outline` then captions and views only.
+5. `Closes #N` footer, one line per explicitly named issue, only when the request names issues. One blank line before the first line. No `##` heading.
 
-No other `##` headings. No `## Summary`, `## Details`, `## Breaking`, or
-`## Visuals`.
+No other `##` headings. No `## Summary`, `## Details`, `## Breaking`, or `## Visuals`.
 
 ### Why the change
 
@@ -55,17 +55,14 @@ request. Cap at three bullets. If none apply, write `- None.`
 1. Measure `files`, `churn`, and `areas`. Select depth.
 2. Cluster hunks into themes. Never one theme per commit.
 3. Emit the optional link header when the request pasted URLs.
-4. Write Why (one proved sentence). Rewrite if a second sentence or
-   unproved motive appears.
+4. Write Why (one proved sentence). Rewrite if a second sentence or unproved motive appears.
 5. Write Special from proved hazards, else `- None.`
 6. Draft Change outline per the next section.
-7. Apply Body style to Why, Special, and captions. Fence interiors keep
-   the view's syntax.
-8. Map every title phrase, body line, caption, and visual label to
-   proving paths and hunks. Rewrite untraced copy.
+7. Append `Closes #N`, one line per explicitly named issue, after one blank line; omit the footer when no issue was named.
+8. Apply Body style to Why, Special, and captions. Fence interiors keep the view's syntax.
+9. Map every title phrase, body line, caption, and visual label to proving paths and hunks, except footer lines the explicit issue authorizes. Rewrite untraced copy.
 
-Done when skeleton, depth, Body style, Change outline, and clean-room
-trace all pass.
+Done when skeleton, depth, Body style, Change outline, and clean-room trace all pass.
 
 Rules:
 
