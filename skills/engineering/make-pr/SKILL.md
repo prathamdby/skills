@@ -9,14 +9,12 @@ description: >
 
 ## Options
 
-Derive base, ticket, and title style from the request. Unspecified: target
-`main`, no ticket, default title.
+Derive base, ticket, issue, and title style from the request. Unspecified:
+target `main`, no ticket, no issue, default title.
 "target develop" / "base release-1" → that branch.
-"ticket PROJ-123" / "prefix [PROJ-123]" → prepend `[PROJ-123] ` exactly as
-supplied. Never infer a ticket from branch names, commits, issues, or
-conversation.
-"conventional title" → conventional title rules.
-A named target or ticket without a usable value is `BLOCKED`.
+"ticket PROJ-123" / "prefix [PROJ-123]" → prepend `[PROJ-123] ` exactly as supplied. Never infer a ticket or issue from branch names, commits, or conversation.
+"issue 123" / "fixes #123" / "closes #123" → `Closes #N` footer, one line per issue; pasted issue URL → N from its `/issues/<N>` digits only, `/pull/` never authorizes. Bare `#123` alone is `BLOCKED`.
+"conventional title" → conventional title rules. A named target, ticket, or issue without a usable value is `BLOCKED`.
 
 ## 1. Preflight
 
@@ -46,16 +44,9 @@ who has only this diff and the explicit ticket ID.
   explicit ticket prefix is exempt from the ticket-ID rejection.
 - Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
   ticket claims in the body and does not count toward the subject limit.
-- Body: draft per Body structure, Change outline, and Body style in
-  `./REFERENCE.md`. Cluster related hunks into themes, never commits. Emit
-  Why (one proved sentence), Special (proved hazards or `- None.`), then
-  Change outline with the smallest useful views. Optional link header only
-  for user-pasted URLs. Include no test, rollout, unproved motive, unproved
-  ticket claim, or harness footer.
+- Body: draft per Body structure, Change outline, and Body style in `./REFERENCE.md`. Cluster related hunks into themes, never commits. Emit Why (one proved sentence), Special (proved hazards or `- None.`), Change outline with the smallest useful views, then `Closes #N` footer one line per explicit issue. Optional link header only for user-pasted URLs. No test, rollout, unproved motive, unproved ticket claim, or harness footer.
 
-Map every title phrase, body line, caption, and visual label to proving paths
-and hunks. Rewrite untraced copy. Done when format, depth, Body style, Change
-outline, and clean-room trace pass.
+Map every title phrase, body line, caption, and visual label to proving paths and hunks, except `Closes #N` lines the explicit issue authorizes. Rewrite untraced copy. Done when format, depth, Body style, Change outline, and clean-room trace pass.
 
 ## 3. Publish
 
@@ -64,12 +55,7 @@ committed branch to the resolved remote with a normal upstream push when
 missing or ahead. Never force push. After fetch, local HEAD and upstream must
 match before PR mutation. Block on ambiguity or push failure.
 
-Create a PR when none exists. Otherwise update the existing title and body
-while changing no other field; preserve draft state, reviewers, labels,
-assignees, linked issues, and projects. Use target and current branch
-explicitly. Record mutation as `none`, `pushed`, `pr-created`, or `pr-updated`
-after each successful action.
-
+Create a PR when none exists. Otherwise update the existing title and body while changing no other field; preserve draft state, reviewers, labels, assignees, and projects. Preserving linked issues excludes `Closes #N` lines the explicit issue authorizes. Use target and current branch explicitly. Record mutation as `none`, `pushed`, `pr-created`, or `pr-updated` after each successful action.
 Done when the platform returns a PR URL or a captured mutation error.
 
 ## 4. Verify and report
@@ -80,10 +66,7 @@ the PR mutation once after read-back; then report `BLOCKED` with a field-level
 difference. Auth, rate-limit, fetch, push, and platform errors are also
 `BLOCKED`.
 
-Confirm the ledger body has `## Why the change`, `## Special things to note`,
-and `## Change outline`; Why is one sentence; Special is 1-3 bullets or
-`- None.`; and it has no `## Summary`, `## Details`, `## Breaking`, or
-`## Visuals`. Any skeleton mismatch is `BLOCKED` with a field-level difference.
+Confirm the ledger body has `## Why the change`, `## Special things to note`, and `## Change outline`; Why is one sentence; Special is 1-3 bullets or `- None.`; footer is `Closes #N`, one line per explicit issue with the N set exactly equal to the request N set, absent otherwise; and it has no `## Summary`, `## Details`, `## Breaking`, or `## Visuals`. Any skeleton or N mismatch is `BLOCKED` with a field-level difference.
 
 Then apply Body hygiene in `./REFERENCE.md`: the body must equal the ledger
 body (single trailing newline only). If harness footers or other text were
