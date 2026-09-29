@@ -15,6 +15,7 @@ Playbooks under `playbooks/` are predetermined routes only.
 ## Playbooks
 
 - `design` — design before code; check a milestone (`playbooks/design.md`)
+- `autoplan` — plan alone with no interruptions (`playbooks/autoplan.md`)
 - `review-plan` — review a plan or proposal (`playbooks/review-plan.md`)
 - `deslop` — remove slop (`playbooks/deslop.md`)
 - `commit` — commit only (`playbooks/commit.md`)
