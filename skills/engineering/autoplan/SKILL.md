@@ -30,8 +30,9 @@ Stop with `BLOCKED` before evidence when any hold: the intent names no
 groundable change (no verb, object, or area that maps to a target); the
 intent is non-repo and no lens applies (meeting, process, or prose with no
 codebase target); the request asks to build rather than plan (plan the
-Name the missing piece and one example intent that would proceed. Emit no
-lenses, layer map, milestones, or handoff on a refusal.
+work instead of starting it). Name the missing piece and one example
+intent that would proceed. Emit no lenses, layer map, milestones, or
+handoff on a refusal.
 
 ## 0. Triage
 
@@ -65,7 +66,8 @@ stated trigger else state one skip line: data/migration on schema,
 backfill, persisted-artifact, or runtime/toolchain change; compat/versioning on an
 external consumer or stored payload; security/secrets on auth, secrets,
 PII, or new untrusted or secret-bearing inputs; perf/cost on a hot path or
-cost-bearing call; ops on services, deploys, or paging. Deep runs every lens. For each active lens,
+cost-bearing call; operability/observability on services, deploys, or
+paging. Deep runs every lens. For each active lens,
 score every probe in its `REFERENCE.md` section before writing the plan,
 turning each hit into a cited risk or plan step. A probe hits when the plan
 changes a named surface, breaks a named guarantee or invariant, or widens
