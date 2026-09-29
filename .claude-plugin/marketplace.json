@@ -21,6 +21,7 @@
       "keywords": ["skills", "git", "review", "workflows"],
       "category": "development",
       "skills": [
+        "./skills/engineering/autoplan",
         "./skills/engineering/box",
         "./skills/engineering/claude-code",
         "./skills/engineering/codex",

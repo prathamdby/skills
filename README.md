@@ -34,6 +34,7 @@ codex plugin add skills@pratham-skills
 
 - `/prath-mode` matches a goal to a playbook under `prath-mode/playbooks/` and runs that route’s leaves.
 - `/upfront-design` gates product review, system design, program design, and vertical slices on user approval before code, then checks each landed milestone when given the approved design.
+- `/autoplan` plans alone with no interruptions and delivers a senior-grade implementation plan in one pass.
 - `/peer-review` checks an implementation plan before work starts.
 - `/deslop` removes needless complexity from a selected diff.
 - `/commit` creates a clean-room commit from staged or tracked unstaged work.
@@ -55,6 +56,7 @@ codex plugin add skills@pratham-skills
 | Common failure                                                                                                              | Skill                                                            | Contract                                                                                                                                                                     |
 | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The agent picks the wrong workflow or repeats work owned by another skill.                                                  | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Matches one playbook, copies its steps into the todo list, and invokes only the named leaves.                                                                                |
+| The agent interrogates before planning, or ships a happy-path-only plan that ignores debt, rollback, and longevity. | [`autoplan`](./skills/engineering/autoplan/SKILL.md) | Plans alone in one pass across triaged lenses, grounding every behavior in a path and symbol or an explicit assumption. |
 | The agent starts coding from a one-line request; the PR needs rework and review drags.                                      | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Triages size, writes each approved design phase to a file outside the repo, records only hard-to-reverse decisions as ADRs, and checks landed milestones against the design. |
 | A plan misses a requirement or carries a risky assumption into implementation.                                              | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhausts every material finding, ranks them, and issues a fixed verdict. It edits only with explicit authority.                                                              |
 | A plan review stops after the first risk and leaves other blockers unlisted.                                                | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Surfaces every material finding with no count cap, then maps the full ranked list to the verdict.                                                                            |
@@ -87,6 +89,7 @@ codex plugin add skills@pratham-skills
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Match a goal to a playbook and run its leaf sequence.                                              |
 | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Agree product review, system design, program design, and vertical slices before code; check landed milestones. |
+| [`autoplan`](./skills/engineering/autoplan/SKILL.md)                   | Plan alone with no interruptions; deliver a senior-grade plan in one pass.                                      |
 | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhaustively review a plan or proposed change and issue a fixed verdict.                                       |
 | [`deslop`](./skills/engineering/deslop/SKILL.md)                 | Remove code slop from one git diff without changing behavior.                                                  |
 | [`commit`](./skills/engineering/commit/SKILL.md)                 | Commit a locked snapshot with hunk-traced copy.                                                                |
