@@ -55,7 +55,8 @@ reverts, duplicated modules). A dirty worktree is overlay note under
 Assumptions only, never a cite; committed state decides existence claims.
 Every material claim needs a path, test, or ADR cite, else the `(Assumption:
 <what is missing>)` mark; a null search result cites as `no matches in
-<paths>`. Done when each later claim has a cite or the mark.
+<paths>`. Cite repo examples for inherited conventions; do not rely on assumed
+model defaults. Done when each later claim has a cite or the mark.
 
 ## 2. Lenses
 
@@ -77,19 +78,22 @@ risk points at a step.
 
 ## 3. Plan
 
-Write Assumptions (including option conflicts), Shape (one bold sentence plus
-the pattern it follows), Layer map (paths marked NEW or CHANGED with a role
-each; prose contracts cite file plus step instead of a symbol), Sequence per
-phase, File-plus-symbol grounding (every behavior maps to a named path and
-symbol, a file-plus-contract-step where no code symbols exist, or an
-explicit Assumption), Risks worst-first with cites (rank by probability
-times impact where measurable, else by judgment stated as judgment),
-Milestones (small changes land as one PR; otherwise each one PR cutting
-layers, each with a command-or-manual-step and symbols landed), Explicit
-non-goals, and a Handoff pointer naming the caller's next route (default
-`/peer-review`, then `ship`; substitute when nothing is built yet, e.g. a
-meeting, refusal, or docs-only plan names `/peer-review` or stops). Done
-with `PLANNED` when every behavior is grounded or assumed, every risk is
-owned by a step, and every milestone is verifiable.
+Specify new decisions, changed boundary contracts, constraints, and deviations
+from cited patterns; do not restate inherited implementations or write bodies.
+For standard/deep, write Assumptions (including option conflicts), Shape (one
+bold sentence plus its pattern), Layer map (paths marked NEW or CHANGED with
+roles), Sequence per phase, File-plus-symbol grounding (each behavior names a
+path and symbol, a file-plus-contract-step for prose, or an Assumption), Risks
+worst-first with cites (probability times impact, else stated judgment),
+Milestones, Explicit non-goals, and Handoff. Sketch keeps Shape plus Risks.
+For standard/deep, small changes land as one PR; otherwise milestones are PRs
+cutting layers. Start with the thinnest end-to-end slice exposing changed
+contracts and checks before expanding logic. Name landed symbols, expected
+outcomes including relevant failures, and commands with assertions or manual
+steps demonstrating those outcomes; a successful exit alone is not proof.
+Handoff names the caller's next route (default `/peer-review`, then `ship`;
+when nothing is built yet, e.g. a docs-only plan, `/peer-review` or stop).
+Done with `PLANNED` when every behavior is grounded or assumed, every risk
+is owned by a step, and every milestone is reviewable with outcome-linked checks.
 
 Terminal values: `PLANNED`, `DIRECT`, `BLOCKED`.

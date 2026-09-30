@@ -55,23 +55,23 @@ when the approved section is written.
 
 ## 3. Program design
 
-For each boundary write its thesis, the pattern it follows, a usage snippet
-with real signatures, call sites grouped by boundary, a file tree with a role
-per file, a call-site tree marking added calls, and a call graph from the entry
-point. Write no bodies. When the layout is uncertain, draft two shapes, pick
-one, and record the reason. Pause. Done when every Success outcome maps to
-named symbols and the section is written.
+For each boundary, cite a repo pattern or mark an assumption; write changed
+contracts, constraints, usage with real signatures, and file roles, not bodies.
+When layout is uncertain, compare two shapes, pick one, and record why.
+When multiple boundaries or changed dispatch/order leave wiring unclear, use
+Wiring views in `./REFERENCE.md`; otherwise omit extra trees and graphs.
+Pause. Done when every Success outcome maps to named symbols and an expected
+result, and the approved section is written.
 
 ## 4. Vertical slices
 
-Order milestones so each is one PR that cuts through every layer, stub to mock
-to wire to logic to error handling, names its automated commands and manual
-steps, and lists the Phase 3 symbols it lands. The checkbox is the done signal;
-only the user marks a milestone deferred or skipped. Prefactoring comes first;
-wide refactors run as expand then contract, so a symbol may appear in two
-milestones. Multi-repo work names the order across repos. Pause. Done when
-every Phase 3 symbol is in a milestone, every milestone has a command or step,
-and the section is written with one open box per milestone.
+After needed prefactoring, start with the thinnest end-to-end slice exposing
+contracts and checks. Each milestone is one reviewable PR cutting layers, with
+Phase 3 symbols, expected outcomes including relevant failures, and assertions
+or manual results proving them. Only the user defers or skips milestones;
+wide refactors expand then contract, so symbols may appear in two milestones.
+Multi-repo work names repo order. Pause. Done when every Phase 3 symbol is in
+a milestone, each has outcome-linked commands or steps, and one open checkbox.
 
 ## 5. Finalize
 
@@ -87,14 +87,14 @@ Vertical slices, and Decisions exist and every offer is written or declined.
 
 ## Check
 
-Take the first open milestone that is not deferred or skipped. Show each
-automated command and run it only after the user approves that exact string;
-tick each that passes. Compare promised symbols by name and signature. If any
-manual box is open, report steps and stop with `AWAITING_USER`. When every box
-is ticked and symbols match, tick the milestone; on mismatch add
-`promised X; landed Y; reason` and leave it open. Use `./REFERENCE.md`; never
-edit product files. Done with `CHECKED` when the milestone is ticked or all
-milestones are complete; with `AWAITING_USER` when manual steps await or a
-deviation names the still-open milestone.
+Take the first open, non-deferred/non-skipped milestone. If expected outcomes
+are absent, apply Legacy outcomes in `./REFERENCE.md` before checking.
+Show each command; run only after the user approves that exact string.
+Tick checks only with evidence of expected outcomes, not exit status alone.
+Compare symbol names and signatures. Open manual boxes → report steps and
+`AWAITING_USER`. Tick the milestone only when every box passes and symbols
+match; otherwise record `promised X; landed Y; reason`, leave open.
+Use Check report in `./REFERENCE.md`; never edit product files. Done with
+`CHECKED` when ticked or all complete; otherwise `AWAITING_USER`.
 
 Terminal values: `DIRECT` (no-op success for routers), `AWAITING_USER`, `DESIGNED`, `CHECKED`, `BLOCKED`.

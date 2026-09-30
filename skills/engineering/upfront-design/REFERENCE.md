@@ -1,7 +1,7 @@
 # Upfront design reference
 
 Load the section for the step being entered. Rules live in `SKILL.md`; this
-file holds templates.
+file holds templates and conditional wiring views.
 
 ## Design document template
 
@@ -72,15 +72,11 @@ sequenceDiagram
 
 ### <Boundary thesis as one sentence>
 
-<Paragraph: which pattern it follows and how callers use it.>
+Inherited pattern: <repo path and symbol, or an explicit assumption>.
+<Changed contract, constraints, and intentional deviations.>
 
 ```<lang>
 <usage snippet with real signatures and types>
-```
-
-```text
-<boundary>
-  <caller> -> <Service.method(args)>
 ```
 
 ```diff
@@ -89,28 +85,23 @@ sequenceDiagram
    <existing file>   # unchanged
 ```
 
-```diff
- <caller dir>/
-   <changed file>    # + <Service.method(args)>
-```
-
-```text
-<entry>
-  -> <callee>
-    -> <callee>
-```
-
+Outcomes: <Success outcome → symbol/contract → expected result, including
+relevant failures>.
+<Additional wiring view only if the Wiring views trigger applies.>
 <Paragraph: second shape considered and why it lost, or omit.>
 
 ## Vertical slices
 
 - [ ] M1 <title>: <behavior delivered>
-  - Path: <layers touched, in stub, mock, wire, logic, error handling order>
+  - Path: <layers touched; begin with the thinnest end-to-end slice exposing
+    contracts and checks, then expand logic and failure handling>
   - Symbols: <Phase 3 names landed here>
+  - Expected outcomes: <observable success and relevant failure behavior>
   - Automated verification:
-    - [ ] `<exact command>` <caveat when the path or package matters>
+    - [ ] `<exact command>` <assertion/check → expected outcome it proves;
+      caveat when the path or package matters>
   - Manual verification:
-    - [ ] <step, then the observable result>
+    - [ ] <step → expected outcome and observable result>
   - Deviations: none, or promised X; landed Y; reason
 - [ ] M2 <title>: <behavior delivered> deferred (<reason or ticket>)
 
@@ -118,6 +109,16 @@ sequenceDiagram
 
 - <decision>: ADR at <absolute path>, or recorded here only
 ````
+
+## Wiring views
+
+Choose the smallest view that shows the unclear interaction; do not render
+every view for every boundary.
+
+- Caller map: group real call sites by boundary and mark added calls.
+- Call graph: trace the affected path from its entry point, naming real symbols.
+- Sequence: show ordering, dispatch, or asynchronous handoffs that signatures
+  cannot express.
 
 ## ADR template
 
@@ -149,12 +150,21 @@ Load in Check only.
 ```text
 milestone: M<n> <title>
 automated:
-  `<command>` | pass | fail (exit <code>)
+  `<command>` | expected <outcome> | evidence <assertion/result> | pass | fail (exit <code>)
 manual:
-  <step> | confirmed | unconfirmed
+  <step> | expected <outcome> | observed <result> | confirmed | unconfirmed
 symbols:
   <promised name and signature> | landed | missing | changed: <detail>
-result: ticked | awaiting manual | deviation
+outcomes:
+  <approved Success/milestone outcome> | proved <evidence> | missing | contradicted
+result: ticked | awaiting manual | awaiting outcome | deviation
 next: <first still-open M<n>> | all milestones complete
 deferred: <M<n> and unlanded symbols, or none>
 ```
+
+## Legacy outcomes
+
+When expected outcomes are absent, derive them from approved Success and
+milestone text without changing those requirements. If an outcome cannot be
+derived or is ambiguous, name it, leave the milestone open, and stop with
+`AWAITING_USER` for clarification.
