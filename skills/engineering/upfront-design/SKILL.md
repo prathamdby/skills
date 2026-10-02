@@ -58,10 +58,10 @@ when the approved section is written.
 For each boundary, cite a repo pattern or mark an assumption; write changed
 contracts, constraints, usage with real signatures, and file roles, not bodies.
 When layout is uncertain, compare two shapes, pick one, and record why.
-When multiple boundaries or changed dispatch/order leave wiring unclear, use
-Wiring views in `./REFERENCE.md`; otherwise omit extra trees and graphs.
-Pause. Done when every Success outcome maps to named symbols and an expected
-result, and the approved section is written.
+When multiple boundaries, changed dispatch/order, or async ordering (even at
+one boundary) leave wiring unclear, use Wiring views in `./REFERENCE.md`;
+otherwise omit extra trees and graphs. Pause. Done when every Success outcome
+maps to symbols and a result, and the section is written.
 
 ## 4. Vertical slices
 
@@ -92,9 +92,9 @@ are absent, apply Legacy outcomes in `./REFERENCE.md` before checking.
 Show each command; run only after the user approves that exact string.
 Tick checks only with evidence of expected outcomes, not exit status alone.
 Compare symbol names and signatures. Open manual boxes → report steps and
-`AWAITING_USER`. Tick the milestone only when every box passes and symbols
-match; otherwise record `promised X; landed Y; reason`, leave open.
-Use Check report in `./REFERENCE.md`; never edit product files. Done with
-`CHECKED` when ticked or all complete; otherwise `AWAITING_USER`.
+`AWAITING_USER`. Tick the milestone only when every box passes, symbols match,
+and each approved outcome is proved; otherwise record `promised X; landed Y;
+reason`, leave open. Use Check report in `./REFERENCE.md`; never edit product
+files. Done: `CHECKED` if ticked or all complete, else `AWAITING_USER`.
 
 Terminal values: `DIRECT` (no-op success for routers), `AWAITING_USER`, `DESIGNED`, `CHECKED`, `BLOCKED`.
