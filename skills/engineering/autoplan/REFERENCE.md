@@ -7,7 +7,9 @@ the plan; convert each hit into a cited risk or plan step, else move on.
 
 New endpoints, changed signatures, removed fields, error-shape drift,
 versioning of the contract, client call-site migration, mock and fixture
-updates, generated-client staleness, undocumented behavior callers rely on.
+updates, generated-client staleness, undocumented behavior callers rely on,
+inherited conventions without repo evidence, changed boundary outcomes and
+failure cases without assertions or observable manual results.
 
 ## Failure/rollback
 
@@ -20,7 +22,8 @@ after failed rollout, alert thresholds crossed mid-migration, on-call burden.
 Duplicated modules this change touches, TODO density in the area, recent
 reverts nearby, abstraction about to be outgrown, test gaps the change
 widens, docs that rot on landing, reversibility cost, deletion plan for
-superseded code.
+superseded code, duplicated implementation detail in the plan, milestones too
+large to review before expanding the implementation.
 
 ## Data/migration
 
