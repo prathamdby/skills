@@ -25,6 +25,20 @@ This applies to every skill, no exceptions.
 
 Do not commit the skill without the README update.
 
+## Meta-Rule: Describe skills by intent
+
+**README skill entries describe the whole skill, not the latest change.**
+
+1. Before changing a skill's README entries, reread its full `SKILL.md`.
+2. Keep Quickstart and Reference descriptions focused on purpose and scope.
+   Leave procedural steps, options, flags, scripts, limits, and recent fixes
+   in the skill files.
+3. Keep `## Why these skills exist` focused on the underlying failure modes.
+   Consolidate related rows instead of adding a row for each guardrail or fix.
+4. For an existing skill, edit README only when its purpose, scope, invocation,
+   or coverage is no longer accurate. A procedural refinement alone does not
+   require a README edit.
+
 ## Meta-Rule: Keep prath-mode playbooks in sync
 
 **When adding, renaming, or removing a skill (except `prath-mode`), update

@@ -2,7 +2,8 @@
 
 Load Hunt recipes per GitHub hunt recipes (scripts never replace recipe 3 or 6).
 Load Commit clean-room only while Step 5 has a diff to commit.
-Load Reply contracts only after the finding set is stable.
+Load Reply contracts only after the initial findings are triaged and Step 5
+is complete.
 
 ## Commit clean-room
 
@@ -90,7 +91,7 @@ Set `NO_COLOR=1`. Substitute owner, repo, number, and head SHA from the ledger.
      head SHA. Page until complete.
    - Normalize each terminal non-success required or blocking check as a
      finding (name, conclusion, URL, head SHA). Skip pure pending or
-     in-progress runs; re-hunt after they finish if they remain blocking.
+     in-progress runs; leave later CI results for a new invocation.
    - Paginate annotations for each run. Add only actionable annotations tied
      to the PR head. Prefer one finding per distinct failure claim; keep
      both the check-run finding and its annotations when they differ.

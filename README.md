@@ -2,9 +2,9 @@
 
 [![skills.sh](https://skills.sh/b/prathamdby/skills)](https://skills.sh/prathamdby/skills)
 
-A small set of coding-agent workflows for planning, git work, code review,
-delegation, and session continuity. Each skill has a narrow job, explicit stop
-conditions, and options derived from the user's request.
+A small set of agent workflows for software delivery, research, delegation,
+task management, and session continuity. Each skill has a narrow job, explicit
+stop conditions, and options derived from the user's request.
 
 ## Install
 
@@ -32,79 +32,70 @@ codex plugin add skills@pratham-skills
 
 ## Quickstart
 
-- `/prath-mode` matches a goal to a playbook under `prath-mode/playbooks/` and runs that route’s leaves.
-- `/upfront-design` gates product review, system design, compact boundary contracts, and vertical slices on user approval before code, then checks landed symbols and behavioral outcomes.
-- `/autoplan` plans alone with no interruptions, cites inherited repo patterns, and specifies changed contracts and outcome-linked checks in one pass.
-- `/peer-review` checks an implementation plan before work starts.
-- `/deslop` removes needless complexity from a selected diff.
-- `/commit` creates a clean-room commit from staged or tracked unstaged work.
-- `/make-pr` pushes committed work and creates or updates its pull request.
-- `/fix-pr` hunts, triages, fixes, and replies to pull-request feedback and CI.
-- `/gh` orients on a PR, review threads, or red CI, or posts one reply.
-- `/recon` maps the current repository and refreshes only changed areas later.
-- `/box` clones and searches an external git repository locally.
-- `/use-skill` fetches and runs a remote skill from one or more GitHub links.
-- `/todoist-task` asks a few questions about missing context, then creates reminders that still make sense six months later.
-- `/handoff` saves resumable session state or continues from it.
-- `/orchestrate` coordinates cheaper subagents while the main agent verifies.
-- `/cursor-agent` drives the local Cursor Agent CLI for first-run install, interactive, one-shot, persist, worktree, MCP, plugin, worker, or Bedrock runs.
-- `/claude-code` drives the local Claude Code CLI for first-run, interactive, one-shot print, resume, worktree, MCP, or plugin runs.
-- `/codex` drives the local Codex CLI for first-run, interactive, one-shot exec, review, resume, worktree, MCP, or plugin runs.
+- `/prath-mode` routes a goal to the right skill or multi-step workflow.
+- `/upfront-design` develops an approved design and delivery plan, then checks implementation against it.
+- `/autoplan` turns a repository change request into an evidence-backed implementation plan without interruptions.
+- `/peer-review` assesses whether a plan, design, or proposed change is ready to build.
+- `/deslop` removes unnecessary complexity from a git diff without changing behavior.
+- `/commit` saves scoped git changes with a message grounded in the committed diff.
+- `/make-pr` publishes committed branch changes and creates or updates their pull request.
+- `/fix-pr` handles PR feedback and failing CI through triage, fixes, and evidence-backed replies.
+- `/gh` inspects PR state and discussions, diagnoses CI failures, and posts replies.
+- `/recon` builds and maintains an evidence-backed map of the current codebase.
+- `/box` manages local clones of external repositories and answers questions from their source.
+- `/use-skill` runs remote skills from GitHub links without installing them.
+- `/todoist-task` creates or previews Todoist tasks that make sense without the original conversation.
+- `/handoff` saves session context and validates it when resuming work.
+- `/orchestrate` coordinates delegated work while keeping the main agent responsible for verification.
+- `/cursor-agent` runs and manages the local Cursor Agent CLI and verifies its results.
+- `/claude-code` runs and manages the local Claude Code CLI and verifies its results.
+- `/codex` runs and manages the local Codex CLI and verifies its results.
 
 ## Why these skills exist
 
-| Common failure                                                                                                              | Skill                                                            | Contract                                                                                                                                                                     |
-| --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The agent picks the wrong workflow or repeats work owned by another skill.                                                  | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Matches one playbook, copies its steps into the todo list, and invokes only the named leaves.                                                                                |
-| The agent interrogates before planning, repeats implementation detail, or leaves behavior unverified. | [`autoplan`](./skills/engineering/autoplan/SKILL.md) | Plans alone across triaged lenses, cites inherited patterns, specifies deviations, and links milestone checks to expected outcomes. |
-| The agent starts coding from a one-line request or treats matching signatures as proof of behavior. | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Approves compact boundary designs before code, records qualifying ADRs, and checks both symbols and behavioral evidence against the approved design. |
-| A plan misses a requirement or carries a risky assumption into implementation.                                              | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhausts every material finding, ranks them, and issues a fixed verdict. It edits only with explicit authority.                                                              |
-| A plan review stops after the first risk and leaves other blockers unlisted.                                                | [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Surfaces every material finding with no count cap, then maps the full ranked list to the verdict.                                                                            |
-| Generated code adds guards, wrappers, comments, or indirection that the codebase does not need.                             | [`deslop`](./skills/engineering/deslop/SKILL.md)                 | Classifies the selected diff against six categories, preserves staging intent, and verifies behavior-sensitive edits.                                                        |
-| Commit messages leak ticket or review context and do not match the committed hunks.                                         | [`commit`](./skills/engineering/commit/SKILL.md)                 | Locks the snapshot, traces every message line to a hunk, applies the selected hook policy, and verifies the commit.                                                          |
-| PR creation misses local commits, duplicates an existing PR, or describes work absent from the diff.                        | [`make-pr`](./skills/engineering/make-pr/SKILL.md)               | Blocks on a dirty or diverged branch, publishes committed work, reuses the open PR, and verifies its fields.                                                                 |
-| A PR body is a flat changelog or invents motive or ticket claims the diff cannot prove.                                     | [`make-pr`](./skills/engineering/make-pr/SKILL.md)               | Writes Why, Special, and Change outline from the locked diff only, with Special as `- None.` when no proved hazards exist.                                                   |
-| A PR body leaves a shape change as prose when a sketch would make the delta clear.                                          | [`make-pr`](./skills/engineering/make-pr/SKILL.md)               | Adds the smallest proved views in Change outline, including schema, contract, and type sketches when the hunks show them.                                                    |
-| A harness appends marketing footers such as `Made with Cursor` to the PR body.                                              | [`make-pr`](./skills/engineering/make-pr/SKILL.md)               | Requires the published body to equal the ledger body and strips injected footers once before success.                                                                        |
-| Review work starts from the first visible comment and misses later pages, nested replies, or invalid suggestions.           | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Exhausts every feedback surface before editing, requires evidence for each verdict, and re-hunts until stable.                                                               |
-| Required CI or check runs on the PR head are left red while only human comments are fixed.                                  | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Hunts terminal non-success required or blocking checks and annotations with the other surfaces, then triages and fixes them.                                                 |
-| A fix-pr commit subject narrates review follow-up instead of the locked hunks.                                              | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Discards pre-drafted subjects, requires a hunk-proved subject recipe, and blocks ban-list or conversation-only messages before push.                                         |
-| A fix-pr commit picks up identity or harness trailers from hooks or agent defaults.                                         | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Denies `Co-authored-by` / `Signed-off-by` / `Made-with` and freeform harness footers by default and runs commit Trailer hygiene before push.                                 |
-| Agents burn 3–5 `gh` calls and dump CI logs into context when inspecting a PR.                                              | [`gh`](./skills/engineering/gh/SKILL.md)                         | One script per I/O loop; bounded snippets; logs on disk; raw `gh` only after gotchas.                                                                                        |
-| A fix-pr hunt runs `gh` scripts without loading the gh skill, then invents raw `gh` to reply.                               | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Requires the gh skill before any GitHub I/O and posts replies through `pr-reply.ts`.                                                                                         |
-| Agents skip the `.ts` inspect scripts on Node 22 and dump GraphQL instead of probing bun, nub, tsx, or type-stripping Node. | [`gh`](./skills/engineering/gh/SKILL.md)                         | `scripts/run` tries bun, nub, tsx, then Node (native TS or `--experimental-strip-types`, including nvm); GraphQL inspect is blocked until that list is exhausted.            |
-| Every session re-reads the same repository from scratch.                                                                    | [`recon`](./skills/engineering/recon/SKILL.md)                   | Stores a bounded evidence map and patches it from committed git drift.                                                                                                       |
-| The agent guesses what an external repository contains.                                                                     | [`box`](./skills/engineering/box/SKILL.md)                       | Clones into a skill-owned sandbox, searches local source, and returns cited findings.                                                                                        |
-| The model needs a skill it does not have installed.                                                                           | [`use-skill`](./skills/personal/use-skill/SKILL.md)              | Bulk-fetches the full skill directory via `gh api` and executes it as if natively present.                                                             |
-| A Todoist task loses the reason for the work or becomes a technical specification. | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Asks 1 to 3 questions about missing context, waits for answers, and saves a concise reminder with duplicate checks and verification. |
-| A resumed session trusts stale paths, tasks, branches, or PR state.                                                         | [`handoff`](./skills/engineering/handoff/SKILL.md)               | Saves a bounded, redacted handoff and validates every artifact before resuming work.                                                                                         |
-| The main model spends its context on mechanical work or trusts delegate summaries.                                          | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md)       | Delegates disjoint chunks, verifies evidence and integration, and keeps the parent read-only.                                                                                |
-| The agent invents an unsupported `--mode` value, treats `--print` as read-only, or bypasses workspace trust with `--yolo`.  | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md)     | Runs current local `cursor-agent` syntax, gates `--trust`, and verifies the working tree.                                                                                    |
-| The agent treats `claude -p` as skip-all-permissions, or pastes `--workspace` / `--trust` / `--yolo` onto `claude`.         | [`claude-code`](./skills/engineering/claude-code/SKILL.md)       | Runs current local `claude` syntax, keeps `--print` under permission mode, and verifies the working tree.                                                                    |
-| The agent runs `codex` as a PTY TUI, `--full-auto`, or `--sandbox workspace-write` as auto-approve.                         | [`codex`](./skills/engineering/codex/SKILL.md)                   | Runs `codex exec -C`, treats sandbox as not approval, and verifies the working tree.                                                                                         |
+| Common failure | Skill | How it helps |
+| --- | --- | --- |
+| The agent picks the wrong workflow or repeats work owned by another skill. | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md) | Routes work through the appropriate skills and delivery workflows. |
+| Coding starts before the problem, design, and delivery plan are agreed. | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Guides collaborative design and checks implementation against approved milestones. |
+| Planning stalls on repeated questions or lacks a grounded path to implementation. | [`autoplan`](./skills/engineering/autoplan/SKILL.md) | Produces an evidence-backed implementation plan autonomously. |
+| A plan misses requirements or carries risky assumptions into implementation. | [`peer-review`](./skills/engineering/peer-review/SKILL.md) | Evaluates the proposed work and identifies material blockers before building. |
+| Generated edits make code harder to maintain without adding behavior. | [`deslop`](./skills/engineering/deslop/SKILL.md) | Removes unnecessary complexity while preserving behavior. |
+| Commit messages describe the conversation instead of the changes being saved. | [`commit`](./skills/engineering/commit/SKILL.md) | Creates scoped commits with messages grounded in the committed changes. |
+| A branch is published with a duplicate PR or a description that does not match its changes. | [`make-pr`](./skills/engineering/make-pr/SKILL.md) | Publishes committed work and keeps the PR description grounded in the branch diff. |
+| PR feedback or failing CI is missed, dismissed without evidence, or left unresolved. | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md) | Checks feedback and CI, verifies justified fixes, and replies with evidence. |
+| PR discussions and CI failures are hard to inspect or reply to reliably. | [`gh`](./skills/engineering/gh/SKILL.md) | Provides focused GitHub inspection, diagnosis, and replies. |
+| Each session rediscovers the repository or relies on an outdated map. | [`recon`](./skills/engineering/recon/SKILL.md) | Maintains a reusable codebase map grounded in repository evidence. |
+| The agent guesses what an external repository contains. | [`box`](./skills/engineering/box/SKILL.md) | Answers questions from managed local clones of the actual source. |
+| The agent needs a remote skill without adding it to the installed collection. | [`use-skill`](./skills/personal/use-skill/SKILL.md) | Fetches and runs GitHub-hosted skills on demand. |
+| Tasks lose their meaning when separated from the conversation that created them. | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Creates clear Todoist tasks with the requested context and metadata. |
+| Work resumes with lost context or stale assumptions about artifacts and progress. | [`handoff`](./skills/engineering/handoff/SKILL.md) | Saves actionable session context and validates it before continuing. |
+| Delegated work overlaps or is accepted without checking the result. | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md) | Coordinates subagents with clear ownership and verified outcomes. |
+| Cursor Agent runs use incorrect commands or workspace permissions. | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Runs and manages the local CLI while respecting permissions and verifying results. |
+| Claude Code runs confuse execution modes and permissions. | [`claude-code`](./skills/engineering/claude-code/SKILL.md) | Runs and manages the local CLI while respecting permissions and verifying results. |
+| Codex runs confuse execution modes and sandbox behavior. | [`codex`](./skills/engineering/codex/SKILL.md) | Runs and manages the local CLI while respecting permissions and verifying results. |
 
 ## Reference
 
-| Skill                                                            | Description                                                                                                    |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [`prath-mode`](./skills/engineering/prath-mode/SKILL.md)         | Match a goal to a playbook and run its leaf sequence.                                              |
-| [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Agree phased design before code; keep boundary views compact and verify landed behavior. |
-| [`autoplan`](./skills/engineering/autoplan/SKILL.md) | Plan alone in one pass; cite inherited patterns and specify changed contracts and outcome-linked checks. |
-| [`peer-review`](./skills/engineering/peer-review/SKILL.md)       | Exhaustively review a plan or proposed change and issue a fixed verdict.                                       |
-| [`deslop`](./skills/engineering/deslop/SKILL.md)                 | Remove code slop from one git diff without changing behavior.                                                  |
-| [`commit`](./skills/engineering/commit/SKILL.md)                 | Commit a locked snapshot with hunk-traced copy.                                                                |
-| [`make-pr`](./skills/engineering/make-pr/SKILL.md)               | Publish a branch and create or update its PR with a Why / Special / Change outline body and trailer hygiene.   |
-| [`fix-pr`](./skills/engineering/fix-pr/SKILL.md)                 | Resolve open PR feedback and CI, then reply with evidence.                                                     |
-| [`gh`](./skills/engineering/gh/SKILL.md)                         | Orient on PR state, review threads, or CI, or post one reply.                                                  |
-| [`recon`](./skills/engineering/recon/SKILL.md)                   | Build or refresh a persistent map of the current repo.                                                         |
-| [`box`](./skills/engineering/box/SKILL.md)                       | Clone, update, list, search, or persist an external repo.                                                      |
-| [`use-skill`](./skills/personal/use-skill/SKILL.md)           | Run a remote skill on demand from GitHub links.                                                                |
-| [`todoist-task`](./skills/personal/todoist-task/SKILL.md)        | Clarify missing context before creating or previewing concise Todoist reminders. |
-| [`handoff`](./skills/engineering/handoff/SKILL.md)               | Save or resume bounded session state.                                                                          |
-| [`orchestrate`](./skills/engineering/orchestrate/SKILL.md)       | Coordinate in-harness subagents as a read-only parent.                                                         |
-| [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md)     | Drive the Cursor Agent CLI for one-shot and related runs.                                                      |
-| [`claude-code`](./skills/engineering/claude-code/SKILL.md)       | Drive the Claude Code CLI for one-shot and related runs.                                                       |
-| [`codex`](./skills/engineering/codex/SKILL.md)                   | Drive the Codex CLI for one-shot exec and related runs.                                                        |
+| Skill | Description |
+| --- | --- |
+| [`prath-mode`](./skills/engineering/prath-mode/SKILL.md) | Route goals to skills and multi-step workflows. |
+| [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Develop, resume, and check approved designs and delivery plans. |
+| [`autoplan`](./skills/engineering/autoplan/SKILL.md) | Produce an evidence-backed implementation plan without interruptions. |
+| [`peer-review`](./skills/engineering/peer-review/SKILL.md) | Assess plans, designs, and proposed changes for readiness to build. |
+| [`deslop`](./skills/engineering/deslop/SKILL.md) | Simplify a git diff without changing behavior. |
+| [`commit`](./skills/engineering/commit/SKILL.md) | Save scoped changes with diff-grounded commit messages. |
+| [`make-pr`](./skills/engineering/make-pr/SKILL.md) | Publish committed work and create or update its pull request. |
+| [`fix-pr`](./skills/engineering/fix-pr/SKILL.md) | Triage and resolve PR feedback and failing CI, then reply with evidence. |
+| [`gh`](./skills/engineering/gh/SKILL.md) | Inspect PRs and discussions, diagnose CI failures, and post replies. |
+| [`recon`](./skills/engineering/recon/SKILL.md) | Build and refresh an evidence-backed codebase map. |
+| [`box`](./skills/engineering/box/SKILL.md) | Manage and research external repositories from local source. |
+| [`use-skill`](./skills/personal/use-skill/SKILL.md) | Run GitHub-hosted skills on demand without installing them. |
+| [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Create or preview clear, self-contained Todoist tasks. |
+| [`handoff`](./skills/engineering/handoff/SKILL.md) | Preserve session context and resume work from validated state. |
+| [`orchestrate`](./skills/engineering/orchestrate/SKILL.md) | Coordinate delegated work with verified ownership and results. |
+| [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Run, manage, and verify local Cursor Agent CLI work. |
+| [`claude-code`](./skills/engineering/claude-code/SKILL.md) | Run, manage, and verify local Claude Code CLI work. |
+| [`codex`](./skills/engineering/codex/SKILL.md) | Run, manage, and verify local Codex CLI work. |
 
 ## Development
 
