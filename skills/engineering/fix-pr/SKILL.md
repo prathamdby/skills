@@ -1,9 +1,9 @@
 ---
 name: fix-pr
 description: >
-  fix-pr when exhaustively handling open pull-request feedback, including nested
-  discussions, CI, invalid suggestions, arrivals, fixes, and replies. Loads gh
-  for hunt and reply I/O.
+  fix-pr when exhaustively handling open pull-request feedback in one pass,
+  including nested discussions, CI, invalid suggestions, fixes, and replies.
+  Loads gh for hunt and reply I/O.
 ---
 
 # Fix PR feedback
@@ -39,16 +39,19 @@ Surfaces:
 5. actionable PR conversation comments
 6. PR CI on the head SHA: terminal non-success required/blocking checks and annotations
 
-Every hunt reconciles review-comment chains unless every root is proved present.
+The hunt reconciles review-comment chains unless every root is proved present.
 Load recipe 3 in `./REFERENCE.md` (REST reconcile); script exit is not proof
 roots are present. Skip 4–5 only when `--complete` JSON moreReviews,
 moreComments, and moreConvo are false. Recipe 6 always SHA-pins required or
 blocking checks and annotations; `ci-failures` is drilldown only. Load remaining
 recipes only after `run` exits. Record counts and page markers. No triage or
-edit before all six passes finish. Normalize one finding per claim (source,
-target, author, path/line, rule ID, body). Deduplicate identical keys from
+edit before all six surfaces are complete. Normalize one finding per claim
+(source, target, author, path/line, rule ID, body). Deduplicate identical keys from
 `./REFERENCE.md`; preserve native reply targets. Done when pagination is
 exhausted and every finding is in the ledger.
+
+Run this hunt once per invocation. Do not re-hunt after edits, commits, pushes,
+or replies. Handle later feedback and CI changes in a new invocation.
 
 ## 3. Triage every finding
 
@@ -78,22 +81,14 @@ and verify remote SHA; never force. When push is off, fixed findings become
 Apply Trailer hygiene in `../commit/REFERENCE.md` if needed. Done when there is
 no diff, or one verified clean-room commit is pushed.
 
-## 6. Re-hunt until stable
-
-Repeat all six passes after code or remote mutations; triage arrivals and
-repeat Steps 4–6. After actionable set changes, require two consecutive hunts
-with matching sets. Done when no finding is new or untriaged and stable hunts
-finish.
-
-## 7. Reply and report
+## 6. Reply and report
 
 When replies are on, skip targets whose replies satisfy the verdict, draft
 remaining replies using `./REFERENCE.md`, then apply
 `./references/unslop-reply-drafts.md`. Preserve bot prefixes. Consolidate
 shared targets. Post replies through loaded gh skill (`pr-reply.ts`); do not
-invent raw `gh`. Re-hunt after replies; new findings return to Step 3. Before
-retrying a failed reply, refetch its target; retry once. Second failure is
-`BLOCKED`. Do not resolve threads unless asked. Report
+invent raw `gh`. Before retrying a failed reply, refetch only its target; retry
+once. Second failure is `BLOCKED`. Do not resolve threads unless asked. Report
 `source | finding | verdict | action | evidence`, PR URL, commit/push state,
 hunt counts, and unreplied items. Terminals: `SUCCESS`, `NO_CODE_CHANGE`,
 `AWAITING_PUSH`, `BLOCKED`. Never `SUCCESS` with unreplied targets. After
