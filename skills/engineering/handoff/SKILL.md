@@ -16,8 +16,12 @@ A named live focus overrides the saved one.
 
 Redact tokens/cookies, keys, passwords/connection credentials, private or
 authenticated URLs, emails/PII, certificates, and environment values.
-Preserve variable names, command shapes, exit codes,
-and artifact pointers, not sensitive values. No full diffs/plans/logs/transcripts.
+Use `[REDACTED: token]`, `[REDACTED: password]`, `[REDACTED: private-key]`,
+`[REDACTED: pii]`, or `[REDACTED: url]` for those values.
+Environment values become `NAME=[REDACTED]`. Preserve variable names, command
+shapes, exit codes, and artifact pointers, not sensitive values.
+Never weaken redaction to make a command copyable.
+No full diffs/plans/logs/transcripts.
 The bound is 12 KB, eight open tasks, twelve artifacts; one to five bullets
 per section, omitting empty optional sections.
 

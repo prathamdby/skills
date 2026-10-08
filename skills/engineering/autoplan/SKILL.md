@@ -70,7 +70,9 @@ Small work is one PR; otherwise each milestone is a reviewable vertical PR.
 Begin with the thinnest end-to-end contract/check slice. Name landed symbols,
 expected success and relevant failure outcomes, and assertions or observed
 manual results proving them. Exit zero alone is not proof.
-Handoff names `/peer-review`, then ship; docs-only work stops at peer-review.
+Handoff follows the caller's next route; default `/peer-review`, then `ship`.
+When nothing will be built, such as a docs-only plan, use `/peer-review` or
+stop. Preserve an explicit caller route.
 Done with `PLANNED` when behavior is grounded or assumed, risks are owned,
 and every milestone has outcome-linked checks.
 

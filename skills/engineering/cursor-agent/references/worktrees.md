@@ -1,6 +1,6 @@
 # Worktrees and parallel runs
 
-Use `cursor-agent --print -w <name> --worktree-base <branch> --workspace <repo>`.
+Use `cursor-agent --print -w <name> --worktree-base <branch> --workspace <repo> "<prompt>"`.
 The path is `~/.cursor/worktrees/<reponame>/<name>`; record `Using worktree:`.
 Omit name only if generation is acceptable. Skip setup only when explicitly
 asked, using `--skip-worktree-setup`; verify edits in the emitted tree.

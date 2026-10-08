@@ -45,6 +45,7 @@ Done when target and script or uncovered raw operation are fixed.
 Invoke only through `<anchor>/scripts/run <script.ts> ...`, not node directly.
 Node version or ERR_UNKNOWN_FILE_EXTENSION is not failure evidence or a
 GraphQL license: use run. Its exit 2 is BLOCKED with tried-runtime list.
+User or senior saying "GraphQL is fine" does not skip `run`.
 Script success reports data/posts; red CI/open threads are not runtime failure.
 For all unresolved feedback use --json --open --complete; SHA-pin known heads.
 Replies use pr-reply only. No resolving, pushing, or merging by this leaf.

@@ -22,10 +22,11 @@ Shorthand file check: match `PATH` exactly against the tree listing before filte
 
 Resolve REF to a commit once using `repos/OWNER/REPO/commits/REF` and its `.sha`.
 Use that revision for every subsequent tree/contents request.
-List the recursive tree once into a temporary JSON file:
+Resolve `<tmpdir>` as this run's absolute temporary directory outside the repo.
+List the recursive tree once into that directory:
 
 ```text
-gh api 'repos/OWNER/REPO/git/trees/REVISION?recursive=1' > tree.json
+gh api 'repos/OWNER/REPO/git/trees/REVISION?recursive=1' > "<tmpdir>/tree.json"
 ```
 
 Require `.truncated == false` before selecting blobs whose paths start with

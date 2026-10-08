@@ -15,6 +15,7 @@ later sections only after the user authorizes that revision.
 
 Resolve this skill's absolute anchor. Store new designs at
 `<anchor>/designs/<basename>-<slug>-<YYYY-MM-DD-HHmmss>.md`, outside repos.
+`<basename>` is the first repo's root directory name.
 After a path exists, persist approved phases and the ledger through sibling
 temporary files and atomic rename before advancing. Record
 `request | size | design | phase | approvals | ADR offers | terminal`.
@@ -40,8 +41,9 @@ the next starts. Resume at the first missing or explicitly revised phase.
    not overrides. Done when approved content is persisted.
 3. **Program:** changed boundary contracts, constraints, real signatures,
    usage, and roles, not bodies. Cite patterns or assumptions; compare two
-   uncertain layouts and choose one. For multiple boundaries, changed dispatch,
-   or unclear async order, apply Wiring views in `references/design.md`.
+   uncertain layouts, choose one, and record why the other lost.
+   For multiple boundaries, changed dispatch, or unclear async order,
+   apply Wiring views in `references/design.md`.
    Done when each Success maps to symbols/results and approval is persisted.
 4. **Slices:** after prefactoring, start with a thin end-to-end contract/check.
    One reviewable vertical PR per milestone; name symbols, expected success

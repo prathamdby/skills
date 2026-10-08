@@ -45,7 +45,8 @@ Open one playbook and copy its steps into todos verbatim. Two matching actions/
 chains → one clarification; no match → one outcome question, then design if large.
 From playbooks resolve leaves as `../../<name>/SKILL.md` or
 `../../../personal/<name>/SKILL.md`; check all before starting and each again
-before its turn. Missing → name paths, stop, offer the skills installer.
+before its turn. Missing → name paths, stop, offer
+`npx skills@latest add prathamdby/skills`.
 Done when route, completion condition, and installed owners are fixed.
 
 ## 2. Execute and resume

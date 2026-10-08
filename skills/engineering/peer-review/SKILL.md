@@ -54,4 +54,6 @@ Edit only when the user requested updating or confirms after the report.
 Apply only the reported Fix; broad rework needs a newly approved design.
 Reread the diff and report paths. Done when authorized changes match that Fix.
 
-Terminals: `BLOCKED`, `REVIEWED`, `AWAITING_CONFIRMATION`, `UPDATED`.
+Terminals: `BLOCKED` (missing target), `REVIEWED` (analysis-only),
+`AWAITING_CONFIRMATION` (update awaits approval), `UPDATED` (verified
+authorized edit).

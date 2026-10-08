@@ -67,4 +67,4 @@ Report finding/verdict/action/evidence, URL, commit/push, hunt counts, and
 unreplied targets. Done when all authorized replies match their verdicts.
 
 Terminals: SUCCESS, NO_CODE_CHANGE, AWAITING_PUSH, BLOCKED. Never SUCCESS
-with unreplied required targets. Resume restarts Synchronize; no merge-conflict fixes.
+with unreplied targets. Resume restarts Synchronize; no merge-conflict fixes.

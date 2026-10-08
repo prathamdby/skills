@@ -4,10 +4,16 @@ Read gh's skill first. Scripts supply discussions and CI drilldown, not
 proof that every REST root or blocking check is covered. Apply raw-gh
 gotchas through the gh skill before uncovered API calls. Set NO_COLOR=1.
 
-1. Page GraphQL unresolved reviewThreads, including outdated, until no next
-   page; collected count must match totalCount when supplied.
-2. Page every thread's comments to exhaustion, retaining root databaseId,
-   thread/comment IDs, author, path/line, body, URL, and replies.
+Reuse successful `pr-threads --json --open --complete` output for surfaces
+1–2 when its completeness markers are false; do not repeat its GraphQL.
+Consult recipes 1–2 only after `run` fails or a cap marker is set, to identify
+missing coverage. Follow gh's BLOCKED handling, never reimplement its GraphQL.
+
+1. Required script coverage: unresolved GraphQL reviewThreads, including
+   outdated, through the last page; match totalCount when supplied.
+2. Required script coverage: every thread's comments through the last page,
+   retaining root databaseId, thread/comment IDs, author, path/line, body, URL,
+   and replies.
 3. Reconcile all `repos/<owner>/<repo>/pulls/<N>/comments` with --paginate;
    rebuild in_reply_to_id chains and add roots absent from GraphQL. Always run
    this REST reconciliation; script success does not prove all roots are present.
