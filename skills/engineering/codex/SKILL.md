@@ -1,86 +1,58 @@
 ---
 name: codex
 description: >
-  codex when launching the local Codex CLI (`codex`) for a first-run
-  install, interactive TUI, one-shot exec, stream, worktree, review,
-  resume, login, MCP, or plugin command.
+  codex to run the local Codex CLI or manage its installation, login, MCP, and plugins.
 ---
 
-# Codex CLI
+# Codex
 
-Default run is `codex exec -C <abs-dir> "<prompt>"`. Omit `--sandbox`.
-`--sandbox workspace-write` is not auto-approve. Closest read-only match
-is `--sandbox read-only`, which only constrains model-generated shell.
-Review is `codex review`, a branch, not a plan flag.
+## Options and boundaries
 
-## Options
+Default: `codex exec -C <abs-dir> "<prompt>"`; sandbox and model omitted;
+parent wait 15m. Bare `codex` is an asked-for TUI.
+"Use <model>" adds `-m`. A named sandbox adds `--sandbox <mode>`.
+"Worktree" adds boolean `--worktree`, never a name or invented path.
+"Review" selects `codex review`. Missing values or conflicts are `BLOCKED`.
 
-Derive product CLI argv from the request. Unspecified: `codex exec -C
-<abs-dir>`, omit `--sandbox`, parent wait `15m`. Bare `codex` is the TUI.
-"exec" / "one-shot" → `exec`. "interactive" / "TUI" → bare `codex`.
-"sandbox read-only" / named sandbox → `--sandbox <mode>` only when the
-user named one.
-"use <model>" → `-m`. Unspecified model stays CLI default.
-"worktree" → `--worktree`. Boolean. No name.
-"review" → `codex review`.
-A missing needed directory or conflicting wording is `BLOCKED`.
-
-## Iron laws
-
-1. Default is `codex exec`. Bare `codex` is the TUI. `--sandbox workspace-write` is not auto-approve.
-2. `--full-auto` is `BLOCKED`. `--search` or `--ask-for-approval` after `exec` is `BLOCKED`.
-3. Gated flags need a named user waiver: `--dangerously-bypass-approvals-and-sandbox`, `--dangerously-bypass-hook-trust`, `--sandbox danger-full-access`, `--approve-for-me`, `--ask-for-approval never`, `--ignore-rules`. If `--sandbox` is rejected or a bypass is requested, follow `./references/sandbox.md`.
-4. `--skip-git-repo-check` only when the user names it. Do not `git init` in `/tmp` to dodge the default check.
+Sandbox read-only constrains model-generated shell, not the whole process.
+Workspace-write is not auto-approve. `--full-auto` is rejected.
+`--search` and `--ask-for-approval` are global, before `exec`.
+Skip-git-repo-check needs an explicit request; do not initialize a repo to
+evade the check. Named waivers are required for bypass-approvals-and-sandbox,
+bypass-hook-trust, danger-full-access, approve-for-me, approval never, yolo,
+and ignore-rules. Before a waiver or on sandbox failure, apply
+`references/sandbox.md`; failure does not authorize a bypass.
 
 ## 1. Resolve
 
-Confirm `codex` is on PATH. If missing, follow First-run in
-`./references/cli-surface.md`. Record workspace, prompt, mode, session,
-worktree, sandbox, and wall-clock. Check auth with `codex login status`.
-Do not print secrets. Missing login is `BLOCKED`. Record:
-`cmd | workspace | mode | session | worktree | gated | verified | terminal | wall-clock`.
+Fix workspace, prompt, mode, session, worktree, sandbox, and wait.
+Check binary and `codex login status` without exposing secrets.
+Missing binary → follow `references/install.md`; missing auth → `BLOCKED`
+unless login was requested. Omit sandbox unless the user named it.
+Record `cmd | workspace | mode | session | worktree | waiver | wait | evidence | terminal`.
+Done when target, binary, auth, and authorized options are fixed.
 
-Done when binary, workspace, mode, auth state, and wall-clock are recorded.
+## 2. Run
 
-## 2. Authorize
+Build argv, quote the prompt literally, and use `-C` for the target.
+Default text is quiet until exit; silence is not a hang. Wait until exit or
+the recorded deadline; kill only this run's PID at that deadline.
+Nonzero exit: capture stderr, inspect the tree, report `BLOCKED`.
 
-Do not add `--sandbox` unless the user named one. Do not add a gated flag
-without a named waiver. If `--sandbox` is rejected or a bypass is requested,
-follow `./references/sandbox.md`.
+For JSONL/last-message output, follow `references/streaming.md`.
+For resume/fork, follow `references/sessions.md`.
+For worktrees/parallel runs, follow `references/worktrees.md`.
+For review, TUI, login, MCP, or plugins, follow `references/management.md`.
+On a rejected flag, use scoped `codex --help` or `codex exec --help`.
+Done when the process exits or a named failure/authorization gate is reported.
 
-Done when sandbox is omitted or authorized, gated flags are recorded or
-absent, or the run is `BLOCKED` / `AWAITING_USER`.
+## 3. Verify and report
 
-## 3. Build the command
+Inspect status and diff; CLI text is unverified. Run the narrowest covering
+tests for edited executable code. Check every child worktree; read-only
+sandbox is not a tree-unchanged guarantee. Remove only clean worktrees this
+run created and the user did not ask to keep; preserve login, MCP, plugins.
+Report command, mode, session/worktree, waiver, wait, and outcome evidence.
+Done when every requested outcome is observed or a blocker is evidenced.
 
-Construct argv from the derived options. Quote the prompt. Pass `-C` when cwd
-is not the target. No gated flag without a named waiver. If the user asked
-to install, run the TUI, review, stream JSON, resume, log in, or manage
-MCP or plugins, follow that recipe in `./references/cli-surface.md`.
-
-Done when argv is recorded.
-
-## 4. Run
-
-Follow the matching recipe in `./references/orchestration.md` for one-shot,
-streaming, worktrees, parallelism, or failures. Wait for exit or the
-recorded wall-clock. Do not kill a still-working process.
-
-Done when the process exits or a named failure recipe applies.
-
-## 5. Verify
-
-Treat CLI text as unverified. Inspect `git status` and the diff. Run the
-narrowest covering tests for edited executable code. `--sandbox read-only`
-only constrains model-generated shell. It is not a tree-unchanged
-guarantee. For parallel or worktree runs, verify each tree from
-Parallelism in `./references/orchestration.md`.
-
-Done when each requested outcome is observed or `BLOCKED` with evidence.
-
-## 6. Report
-
-Lead with terminal state. Restate cmd, mode, session, worktree, gated
-waiver, wall-clock, and verification evidence.
-
-Terminal values are `SUCCESS`, `BLOCKED`, `NO_CHANGES`, and `AWAITING_USER`.
+Terminals: `SUCCESS`, `NO_CHANGES`, `BLOCKED`, `AWAITING_USER`.

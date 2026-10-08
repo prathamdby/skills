@@ -1,6 +1,9 @@
 # use-skill reference
 
-Endpoint and decoding detail for Step 2. Load this before fetching.
+Endpoint and decoding detail for Resolve and fetch. Load this before fetching.
+Run in a known repo or use literal owner/repo endpoints; quote paths with `?`.
+GET reads use query strings, not -f/-F (which selects POST without -X GET).
+Redirect large responses to run-owned files; never pipe gh to head.
 
 ## Link resolution
 
@@ -17,16 +20,20 @@ Shorthand file check: match `PATH` exactly against the tree listing before filte
 
 ## Bulk fetch
 
-List the recursive tree once, then fetch every blob under `DIR`:
+Resolve REF to a commit once using `repos/OWNER/REPO/commits/REF` and its `.sha`.
+Use that revision for every subsequent tree/contents request.
+List the recursive tree once into a temporary JSON file:
 
 ```text
-gh api 'repos/OWNER/REPO/git/trees/REF?recursive=1' --jq '.tree[] | select(.type=="blob" and (.path | startswith("DIR/"))) | "\(.path) \(.sha)"'
+gh api 'repos/OWNER/REPO/git/trees/REVISION?recursive=1' > tree.json
 ```
 
-Fetch each listed path through the contents endpoint:
+Require `.truncated == false` before selecting blobs whose paths start with
+the resolved directory plus `/`. A truncated tree is BLOCKED, not an empty set.
+Fetch every selected path through the contents endpoint:
 
 ```text
-gh api 'repos/OWNER/REPO/contents/PATH?ref=REF'
+gh api 'repos/OWNER/REPO/contents/PATH?ref=REVISION'
 ```
 
 Pass `ref` as a query string: the `--field ref=REF` form 404s on some `gh` builds even for existing paths.

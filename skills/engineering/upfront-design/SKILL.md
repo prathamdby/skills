@@ -1,100 +1,67 @@
 ---
 name: upfront-design
 description: >
-  upfront-design when a request is large enough that product behavior, system
-  architecture, program design, and implementation order should be agreed with
-  the user before code, or when given an existing design to resume or check.
+  upfront-design to agree phased designs before coding, resume drafts, or verify approved milestones.
 ---
 
 # Upfront design
 
-The request is the work, or the path of an existing design: a
-file with `request` and `status` frontmatter and a `# Design:` title. `draft`
-resumes at the first missing section, or at a phase the user names, deleting
-later sections; `approved` checks the next open milestone; any other status
-is `BLOCKED: unknown design status`. Anything else starts a new design.
+## Route and persistence
 
-Resolve `<anchor>` as the absolute directory containing this `SKILL.md`. Write
-new designs to `<anchor>/designs/<basename>-<slug>-<YYYY-MM-DD-HHmmss>.md`,
-with `<basename>` the root directory name of the first repo, never inside it.
+A design has request/status frontmatter and a `# Design:` title.
+New request → design; draft → first missing section; approved → check next
+open milestone; another status → `BLOCKED`. A named revision phase removes
+later sections only after the user authorizes that revision.
 
-After a design path exists, record after every step at `<design path>.ledger`
-through a temp sibling and atomic rename; delete it on any terminal except
-`AWAITING_USER`:
-`request | size | design path | phase | approved phases | adr offers | terminal`.
-Write each approved phase to the document the same way before the next phase
-starts. Each phase pauses with `AWAITING_USER` until approved or revised.
+Resolve this skill's absolute anchor. Store new designs at
+`<anchor>/designs/<basename>-<slug>-<YYYY-MM-DD-HHmmss>.md`, outside repos.
+After a path exists, persist approved phases and the ledger through sibling
+temporary files and atomic rename before advancing. Record
+`request | size | design | phase | approvals | ADR offers | terminal`.
+Keep the ledger at `<design>.ledger` on `AWAITING_USER`; remove on other terminals.
 
-## 0. Triage
+Small means one module, no contract/data/public-signature change, and a
+one-sentence outcome. Return `DIRECT` plus that sentence without a file/ledger.
+Otherwise find ADR trees (`docs/adr/`, `adr/`, `doc/adr/`, `docs/decisions/`);
+absence is silent. Create the document using `references/design.md`.
+Done when route, size, path/frontmatter, and relevant ADRs are fixed.
 
-A request is small when all hold: it changes one module or package, it adds or
-changes no contract, data model, or public signature, and its desired behavior
-is one sentence. Small stops with `DIRECT` plus that sentence and no pause; do
-not write a design-path ledger. Otherwise create the design file from
-`./REFERENCE.md`, locate an ADR tree (`docs/adr/`, `adr/`, `doc/adr/`,
-`docs/decisions/`), and note ADRs touching this area; if none exists, proceed
-silently. Done when size is recorded and, for non-small work, the file has
-frontmatter.
+## Design phases
 
-## 1. Product review
+Each phase pauses with `AWAITING_USER`; write its approved content before
+the next starts. Resume at the first missing or explicitly revised phase.
 
-Write Problem to solve with concrete user pain, Success with measurable
-signals, and Proposed solution with a bold one-line shape, a mockup, and a
-delivery paragraph. Use supplied mockups; when the work has a user-facing
-surface and none was supplied, draft a text wireframe or state table labelled
-as a draft. Ask the whole open-question frontier in one numbered round with a
-recommended answer per question. Pause. Done when the approved section is written.
-
-## 2. System design
-
-State the shape in one bold sentence and the pattern it follows. Add a layer
-map of paths marked NEW or CHANGED with a role each, data sources and
-constraints with their cost reason, and a sequence diagram with a band per
-phase. Flag ADR conflicts by number instead of overriding them. Pause. Done
-when the approved section is written.
-
-## 3. Program design
-
-For each boundary, cite a repo pattern or mark an assumption; write changed
-contracts, constraints, usage with real signatures, and file roles, not bodies.
-When layout is uncertain, compare two shapes, pick one, and record why.
-When multiple boundaries, changed dispatch/order, or async ordering (even at
-one boundary) leave wiring unclear, use Wiring views in `./REFERENCE.md`;
-otherwise omit extra trees and graphs. Pause. Done when every Success outcome
-maps to symbols and a result, and the section is written.
-
-## 4. Vertical slices
-
-After needed prefactoring, start with the thinnest end-to-end slice exposing
-contracts and checks. Each milestone is one reviewable PR cutting layers, with
-Phase 3 symbols, expected outcomes including relevant failures, and assertions
-or manual results proving them. Only the user defers or skips milestones;
-wide refactors expand then contract, so symbols may appear in two milestones.
-Multi-repo work names repo order. Pause. Done when every Phase 3 symbol is in
-a milestone, each has outcome-linked commands or steps, and one open checkbox.
-
-## 5. Finalize
-
-Set `status: approved`. For each decision recorded in Phases 2 and 3, offer an
-ADR only when all three hold: hard to reverse, surprising without context,
-chosen over a real alternative. On confirmation write it with the ADR template
-in `./REFERENCE.md` into the tree found in Step 0, or `docs/adr/` created
-lazily, in the repo that owns the decided component. Report the design path,
-ADR paths, and next steps (`/peer-review`, then pass the design after each
-milestone; to revise, set `status: draft`, name the phase, pass the path).
-Done with `DESIGNED` when Product review, System design, Program design,
-Vertical slices, and Decisions exist and every offer is written or declined.
+1. **Product:** concrete pain, measurable Success, bold one-line solution,
+   supplied mockup or draft text wireframe/state table for user-facing work,
+   delivery paragraph. Ask the entire question frontier in one numbered round,
+   recommending an answer per question. Done when approved content is persisted.
+2. **System:** bold shape + cited pattern, NEW/CHANGED layer roles, sources
+   and constraints with cost reasons, phase-banded sequence. Name ADR conflicts,
+   not overrides. Done when approved content is persisted.
+3. **Program:** changed boundary contracts, constraints, real signatures,
+   usage, and roles, not bodies. Cite patterns or assumptions; compare two
+   uncertain layouts and choose one. For multiple boundaries, changed dispatch,
+   or unclear async order, apply Wiring views in `references/design.md`.
+   Done when each Success maps to symbols/results and approval is persisted.
+4. **Slices:** after prefactoring, start with a thin end-to-end contract/check.
+   One reviewable vertical PR per milestone; name symbols, expected success
+   and relevant failures, assertions/manual proof, repo order, and one open
+   checkbox. Only the user defers/skips; wide refactors expand then contract.
+   Done when every symbol is assigned and approved milestones are persisted.
+5. **Finalize:** set approved. Offer ADRs only for decisions hard to reverse,
+   surprising without context, and chosen over a real alternative. On approval
+   use `references/decisions.md`. Done with `DESIGNED` when all five document
+   sections exist and each ADR offer is written or declined. Report design/ADR
+   paths, peer-review, and milestone check route.
 
 ## Check
 
-Take the first open, non-deferred/non-skipped milestone. If expected outcomes
-are absent, apply Legacy outcomes in `./REFERENCE.md` before checking.
-Show each command; run only after the user approves that exact string.
-Tick checks only with evidence of expected outcomes, not exit status alone.
-Compare symbol names and signatures. Open manual boxes → report steps and
-`AWAITING_USER`. Tick the milestone only when every box passes, symbols match,
-and each approved outcome is proved; otherwise record `promised X; landed Y;
-reason`, leave open. Use Check report in `./REFERENCE.md`; never edit product
-files. Done: `CHECKED` if ticked or all complete, else `AWAITING_USER`.
+For an approved design, follow `references/check.md` for the first open,
+non-deferred/non-skipped milestone. Show exact commands and obtain approval
+before running them. Tick only with outcome proof and matching symbols,
+not a successful exit. Open manual boxes or ambiguous legacy outcomes pause.
+Never edit product files to make a check pass. Done with `CHECKED` if ticked
+or all complete, otherwise `AWAITING_USER`.
 
-Terminal values: `DIRECT` (no-op success for routers), `AWAITING_USER`, `DESIGNED`, `CHECKED`, `BLOCKED`.
+Terminals: `DIRECT` (router no-op success), `AWAITING_USER`, `DESIGNED`,
+`CHECKED`, `BLOCKED`. Revise via draft status and a named phase.

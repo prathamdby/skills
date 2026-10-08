@@ -1,74 +1,63 @@
 ---
 name: prath-mode
-description: >
-  prath-mode when routing goal-shaped work to a playbook that sequences
-  prathamdby/skills leaves, including multi-step delivery chains.
+description: Route a goal to a skill or delivery chain.
 disable-model-invocation: true
 ---
 
 # Prath mode
 
-The leaf owns its triggers, options, procedure, and terminal states. Read it
-before acting. Never recreate a missing leaf or copy its procedure here.
-Playbooks under `playbooks/` are predetermined routes only.
+Leaves own invocation, options, procedures, and terminals. Read the selected
+leaf; playbooks own predetermined order, not copies of leaf behavior.
 
-## Playbooks
+## Matchers
 
-- `design` — design before code; check a milestone (`playbooks/design.md`)
-- `autoplan` — plan alone with no interruptions (`playbooks/autoplan.md`)
-- `review-plan` — review a plan or proposal (`playbooks/review-plan.md`)
-- `deslop` — remove slop (`playbooks/deslop.md`)
-- `commit` — commit only (`playbooks/commit.md`)
-- `open-pr` — create or update a PR (`playbooks/open-pr.md`)
-- `finish-pr` — address PR feedback (`playbooks/finish-pr.md`)
-- `inspect-pr` — inspect PR/CI or one reply (`playbooks/inspect-pr.md`)
-- `understand-repo` — map current repo (`playbooks/understand-repo.md`)
-- `research-external` — clone/search external repo (`playbooks/research-external.md`)
-- `orchestrate` — coordinate subagents (`playbooks/orchestrate.md`)
-- `session` — save or resume session (`playbooks/session.md`)
-- `cursor-agent` — Cursor Agent CLI (`playbooks/cursor-agent.md`)
-- `claude-code` — Claude Code CLI (`playbooks/claude-code.md`)
-- `codex` — Codex CLI (`playbooks/codex.md`)
-- `todoist` — Todoist task (`playbooks/todoist.md`)
-- `use-skill` — run the skill at this link (`playbooks/use-skill.md`)
-- `ship` — implement → deslop → commit → make-pr (`playbooks/ship.md`)
-- `design-then-ship` — design, milestones, then ship (`playbooks/design-then-ship.md`)
-- `save-work` — optional deslop → commit (`playbooks/save-work.md`)
+- `design`: phased design or milestone check, `playbooks/design.md`
+- `autoplan`: autonomous plan, `playbooks/autoplan.md`
+- `review-plan`: proposal review, `playbooks/review-plan.md`
+- `deslop`: diff cleanup, `playbooks/deslop.md`
+- `commit`: commit only, `playbooks/commit.md`
+- `open-pr`: publish/update PR, `playbooks/open-pr.md`
+- `finish-pr`: feedback fixes, `playbooks/finish-pr.md`
+- `inspect-pr`: PR/CI inspection or reply, `playbooks/inspect-pr.md`
+- `understand-repo`: map/read saved map, `playbooks/understand-repo.md`
+- `research-external`: local external source, `playbooks/research-external.md`
+- `orchestrate`: delegated work, `playbooks/orchestrate.md`
+- `session`: handoff/resume, `playbooks/session.md`
+- `cursor-agent`: Cursor CLI, `playbooks/cursor-agent.md`
+- `claude-code`: Claude CLI, `playbooks/claude-code.md`
+- `codex`: Codex CLI, `playbooks/codex.md`
+- `todoist`: task creation/preview, `playbooks/todoist.md`
+- `use-skill`: remote skill execution, `playbooks/use-skill.md`
+- `ship`: implement/deslop/commit/PR, `playbooks/ship.md`
+- `design-then-ship`: design and delivery, `playbooks/design-then-ship.md`
+- `save-work`: optional cleanup/commit, `playbooks/save-work.md`
 
-Match one immediate action playbook before a chain. Review-shaped asks stay on
-`review-plan` (never prepend to `ship`). Orientation or reply-only →
-`inspect-pr`; fix, push, or handle feedback → `finish-pr`. Playbook
-`inspect-pr` never continues into `finish-pr`. Leaf `gh` never continues into
-leaf `fix-pr`; `fix-pr` loads `gh` for GitHub I/O. `deslop` is required in
-`ship`, optional in `save-work`. Implementation is parent work, not a leaf.
-Resolve mixed staged/unstaged paths before `deslop`.
+An immediate action outranks a chain. Review does not prepend to ship.
+Inspection/reply stays inspect-pr; fixing feedback selects finish-pr.
+Neither inspect-pr nor gh escalates into fix-pr; fix-pr owns its gh call.
+Deslop is required in ship, optional in save-work; resolve mixed index/worktree
+paths before it. Parent owns implementation.
 
-## 1. Match
+## 1. Match and verify
 
-Record: `route | current owner | completed owners | design path | diff/tests | terminal`
+Record `route | owner | completed | design | diff/tests | terminal`.
+Open one playbook and copy its steps into todos verbatim. Two matching actions/
+chains → one clarification; no match → one outcome question, then design if large.
+From playbooks resolve leaves as `../../<name>/SKILL.md` or
+`../../../personal/<name>/SKILL.md`; check all before starting and each again
+before its turn. Missing → name paths, stop, offer the skills installer.
+Done when route, completion condition, and installed owners are fixed.
 
-Open the matched `playbooks/<id>.md` and copy its steps into the todo list
-verbatim. On conflict between two actions or two chains, ask one question.
-If nothing matches, ask one intended-outcome question; if still large, use
-`design`. `DIRECT` from `upfront-design` is no-op success; `DESIGNED` and
-`CHECKED` are success and the chain continues on either. Done when one
-playbook and its `complete_when` are recorded.
+## 2. Execute and resume
 
-## 2. Verify installation
+Read each current leaf in full; run it to a terminal. A reported terminal ends
+an action route, but does not necessarily succeed. Advance a chain only on the
+leaf's evidenced success/no-op. Blocked/waiting/awaiting-push pauses regardless
+of a playbook's terminal-observed completion wording.
 
-From `playbooks/`, resolve `leaf:<name>` as `../../<name>/SKILL.md` or
-`../../../personal/<name>/SKILL.md`. Verify every leaf in the matched
-playbook before the chain starts and before its turn. Missing → report names
-and paths, then stop with `npx skills@latest add prathamdby/skills`.
-
-Done when all required paths exist or the missing-skill report is sent.
-
-## 3. Invoke and resume
-
-Read the current leaf in full and run it to a terminal state. Advance only
-after success or no-op; pause on blocked or waiting. After interruption,
-verify the last owner's artifacts before continuing. Before `make-pr`,
-require a clean tree. For `parent:implementation`, record planned-work diff
-and test evidence in the ledger.
-
-Done when `complete_when` holds or the current leaf reported why it paused.
+For upfront-design, DIRECT is no-op; DESIGNED/CHECKED are success;
+AWAITING_USER/BLOCKED never advance. Parent implementation records planned
+diff and test evidence. Before make-pr require a clean tree.
+On interruption revalidate the last owner's artifacts before continuing.
+Done when the route's successful completion condition holds or a pause is
+reported with its owner; reporting a blocker is not successful delivery.

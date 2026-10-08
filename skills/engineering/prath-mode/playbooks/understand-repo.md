@@ -3,7 +3,7 @@ id: understand-repo
 kind: action
 primary: recon
 participants: []
-complete_when: recon memory and report verified
+complete_when: recon saved report read or current map verified; missing report is reported without rebuilding
 ---
 
 # understand-repo

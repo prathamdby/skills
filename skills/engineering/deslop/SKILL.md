@@ -1,76 +1,51 @@
 ---
 name: deslop
 description: >
-  deslop when removing AI-generated bloat, needless defenses, foreign patterns,
-  or avoidable complexity from a git diff without changing behavior.
+  deslop to remove diff bloat and foreign patterns without changing behavior.
 ---
 
 # Deslop
 
-## Options
+## Scope
 
-Derive one scope from the request. Unspecified: staged
-(`git diff --cached`).
-"unstaged" / "worktree" → `git diff`.
-"against <branch>" / "since <branch>" → `git diff <branch>...HEAD`.
-Naming several scopes, a missing base branch, or conflicting wording is
-`BLOCKED`. Never switch because another diff is non-empty.
+Default staged (`git diff --cached`). Unstaged/worktree → git diff;
+against/since <branch> → committed triple-dot diff. Conflicting scopes,
+missing base, or ambiguous values block. An empty scope never switches.
 
-## 1. Lock scope
+## 1. Lock
 
-Capture status, the selected diff, its lexicographically sorted file list, and
-the SHA-256 of the scope name plus complete diff as its fingerprint. Record:
+Capture status, selected diff, sorted paths, original index, and SHA-256 of
+scope name plus complete diff. Record
+`scope/hash | file | checked hunks | kept instances | verification | terminal`.
+Empty → NO_CHANGES, naming other layers without touching them. Staged targets
+with unstaged hunks block the whole run; committed-base targets with staged/
+unstaged work also block. Done when editable bytes and staging boundaries are fixed.
 
-`scope/fingerprint | current file | checked | kept instances | verification | terminal`
+## 2. Classify
 
-If the diff is empty, report `NO_CHANGES` and mention other non-empty scopes
-from `git diff` without touching them. Before editing staged scope, block the
-whole run if any target file also has unstaged changes. Base scope covers
-commits only; block if a scoped path has staged or unstaged work.
+Read every changed file and at most two same-directory norm-setting neighbors
+per module. Apply all six categories in `REFERENCE.md` to every hunk.
+Record path/lines, primary category, local evidence, smallest atomic edit;
+secondary only for another edit. Update sorted-file progress after each file.
+On resume rehash; restart changed current work and retain completed entries
+only for unchanged hunks. Done when every hunk has six-category coverage;
+no instances → CLEAN.
 
-Done when the exact editable scope and original index state are recorded.
+## 3. Edit
 
-## 2. Inspect and classify
+Apply all reference guardrails; drop uncertain instances. Use the smallest
+locally established form, preserving logic, timing, errors, side effects,
+validation, API, and useful abstraction.
+Unstaged/base never stage. Staged stages only edited targets proven to have
+had no pre-existing unstaged work. Done when each kept instance is gone and
+the original index is preserved except authorized staged-target updates.
 
-Read each changed file and at most two adjacent files per module that establish
-local norms; module means the changed file's directory and adjacent means files
-in that directory. Classify every changed hunk against the six categories in
-`./REFERENCE.md`. An instance is contiguous lines handled by one atomic edit.
-Record path, lines, primary category, local evidence, and smallest safe edit.
-For overlap, choose the category requiring the smallest edit; use a secondary
-only for another edit. Do not stop after the first category.
+## 4. Verify
 
-For large diffs, process the sorted order and update the ledger after each file.
-After any turn interruption before terminal state, recompute the fingerprint;
-restart a changed current file and preserve completed entries only when their
-hunks are unchanged.
+Recheck selected diff/status, no new slop or moved out-of-scope layers.
+Executable/type/control/error/validation/API edits require the narrowest
+covering test; missing/failing required tests block. Docs/comments/whitespace
+may use diff audit alone. Report scope, files, category counts, staging
+preservation, audit, tests. Done when each edit and staging invariant is proved.
 
-Done when every scoped hunk has six-category coverage. Zero instances is
-`CLEAN`.
-
-## 3. Filter and edit
-
-Apply every guardrail in `./REFERENCE.md`. Drop uncertain instances. Edit only
-kept instances and use the smallest direct form that matches nearby code.
-Preserve logic, timing, errors, side effects, public APIs, and useful
-abstractions.
-
-Unstaged and base never stage. For staged, stage only edited target files after
-confirming they had no pre-existing unstaged hunks.
-
-Done when each kept instance is changed; for unstaged/base the index matches
-the Step 1 snapshot, and for staged only clean target-file updates entered it.
-
-## 4. Verify and report
-
-Re-run the selected diff and status. Confirm each kept instance is gone, no
-out-of-scope hunk moved layers, and the post-edit diff has no new slop. Any edit
-to executable code, types, control flow, error handling, validation, or an API
-runs the narrowest covering test for its file, symbol, or package. Only
-comments, docs, and whitespace may use the diff audit alone. Missing or failed
-required tests are `BLOCKED`.
-
-Report scope, files, category counts, preserved staging state, diff audit, and
-tests. Terminal values are `SUCCESS`, `CLEAN`, `NO_CHANGES`, and `BLOCKED`.
-
-Do not commit or expand beyond the selected diff.
+Terminals: SUCCESS, CLEAN, NO_CHANGES, BLOCKED. No commits or scope expansion.

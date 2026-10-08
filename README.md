@@ -41,7 +41,7 @@ codex plugin add skills@pratham-skills
 - `/make-pr` publishes committed branch changes and creates or updates their pull request.
 - `/fix-pr` handles PR feedback and failing CI through triage, fixes, and evidence-backed replies.
 - `/gh` inspects PR state and discussions, diagnoses CI failures, and posts replies.
-- `/recon` builds and maintains an evidence-backed map of the current codebase.
+- `/recon` reads a saved map without refreshing it, or maps and refreshes the current codebase.
 - `/box` manages local clones of external repositories and answers questions from their source.
 - `/use-skill` runs remote skills from GitHub links without installing them.
 - `/todoist-task` creates or previews Todoist tasks that make sense without the original conversation.
@@ -64,7 +64,7 @@ codex plugin add skills@pratham-skills
 | A branch is published with a duplicate PR or a description that does not match its changes. | [`make-pr`](./skills/engineering/make-pr/SKILL.md) | Publishes committed work and keeps the PR description grounded in the branch diff. |
 | PR feedback or failing CI is missed, dismissed without evidence, or left unresolved. | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md) | Checks feedback and CI, verifies justified fixes, and replies with evidence. |
 | PR discussions and CI failures are hard to inspect or reply to reliably. | [`gh`](./skills/engineering/gh/SKILL.md) | Provides focused GitHub inspection, diagnosis, and replies. |
-| Each session rediscovers the repository or relies on an outdated map. | [`recon`](./skills/engineering/recon/SKILL.md) | Maintains a reusable codebase map grounded in repository evidence. |
+| Each session rediscovers the repository or relies on an outdated map. | [`recon`](./skills/engineering/recon/SKILL.md) | Reads saved maps without changing them and maintains evidence-backed snapshots. |
 | The agent guesses what an external repository contains. | [`box`](./skills/engineering/box/SKILL.md) | Answers questions from managed local clones of the actual source. |
 | The agent needs a remote skill without adding it to the installed collection. | [`use-skill`](./skills/personal/use-skill/SKILL.md) | Fetches and runs GitHub-hosted skills on demand. |
 | Tasks lose their meaning when separated from the conversation that created them. | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Creates clear Todoist tasks with the requested context and metadata. |
@@ -87,7 +87,7 @@ codex plugin add skills@pratham-skills
 | [`make-pr`](./skills/engineering/make-pr/SKILL.md) | Publish committed work and create or update its pull request. |
 | [`fix-pr`](./skills/engineering/fix-pr/SKILL.md) | Triage and resolve PR feedback and failing CI, then reply with evidence. |
 | [`gh`](./skills/engineering/gh/SKILL.md) | Inspect PRs and discussions, diagnose CI failures, and post replies. |
-| [`recon`](./skills/engineering/recon/SKILL.md) | Build and refresh an evidence-backed codebase map. |
+| [`recon`](./skills/engineering/recon/SKILL.md) | Read saved maps or build and refresh evidence-backed snapshots. |
 | [`box`](./skills/engineering/box/SKILL.md) | Manage and research external repositories from local source. |
 | [`use-skill`](./skills/personal/use-skill/SKILL.md) | Run GitHub-hosted skills on demand without installing them. |
 | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Create or preview clear, self-contained Todoist tasks. |

@@ -1,83 +1,68 @@
 ---
 name: make-pr
 description: >
-  make-pr when publishing committed branch changes as a new pull request or
-  updating the existing pull request for that branch.
+  make-pr to publish committed changes and create or update their pull request.
 ---
 
 # Make PR
 
 ## Options
 
-Derive base, ticket, issue, and title style from the request. Unspecified:
-target `main`, no ticket, no issue, default title.
-"target develop" / "base release-1" → that branch.
-"ticket PROJ-123" / "prefix [PROJ-123]" → prepend `[PROJ-123] ` exactly as supplied. Never infer a ticket or issue from branch names, commits, or conversation.
-"issue 123" / "fixes #123" / "closes #123" → `Closes #N` footer, one line per issue; pasted issue URL → N from its `/issues/<N>` digits only, `/pull/` never authorizes. Bare `#123` alone is `BLOCKED`.
-"conventional title" → conventional title rules. A named target, ticket, or issue without a usable value is `BLOCKED`.
+Default: base main, no ticket/issue, imperative sentence-case title, non-draft
+creation. "Target <branch>" selects base; "draft PR" selects draft creation.
+Updates preserve existing draft state unless the user explicitly requests
+conversion. "Ticket <id>" / "prefix [<id>]" supplies only that exact prefix.
+"Issue N" / "fixes #N" / "closes #N" authorizes one `Closes #N` per issue.
+Issue URLs yield N only from `/issues/N`; pull URLs do not. Bare #N, missing
+values, or conflicting options block. Infer no ticket/issue from other context.
+"Conventional title" loads formatting and rejection rules in
+`../commit/REFERENCE.md`; verify that dependency exists first.
 
 ## 1. Preflight
 
-Resolve current branch, target ref, working-tree status, upstream state, and an
-open PR for the branch; ignore closed PRs and block if several are open. Resolve
-the push remote from configured upstream, otherwise `origin`, and fetch it
-before comparing. Block on detached HEAD, current branch equal to target,
-missing target, fetch failure, behind or diverged upstream, any uncommitted or
-untracked file, or an open PR whose base differs from target.
+Resolve branch, target, status, upstream, and open PR. Use configured push
+remote or origin; fetch before comparison. Block on detached HEAD, target
+equal to current branch, missing target, fetch failure, behind/diverged
+upstream, dirty/untracked files, several open PRs, or a different existing base.
+Ignore closed PRs. Record
+`branch/base | remote | diff hash | PR | draft | title/body/depth | mutation | terminal`.
+Done when clean branch, fixed base, and create/update are known.
 
-Record:
-`branch/target | diff hash | remote state | open PR | title/body/depth | mutation | terminal`.
+## 2. Draft from the locked diff
 
-Done when the branch is clean, the base is fixed, and create versus update is
-known.
+Read and hash only `git diff <target>...HEAD`; empty → `NO_CHANGES`.
+Default title is imperative sentence case, at most 60 characters, no type or
+period. Conventional keeps commit's 50-character limit. An explicit ticket
+prefix is exempt from length and ticket rejection, not proof of ticket claims.
 
-## 2. Lock diff and write copy
-
-Read `git diff <target>...HEAD` only and hash it with
-`git hash-object --stdin`. If empty, report `NO_CHANGES`. Draft as a stranger
-who has only this diff and the explicit ticket ID.
-
-- Default title: imperative sentence case, no type prefix, no trailing period,
-  summary at most 60 characters.
-- Conventional title: load its section and shared rejection check from
-  `../commit/REFERENCE.md`; keep the 50-character subject limit. Only an
-  explicit ticket prefix is exempt from the ticket-ID rejection.
-- Ticket: prepend `[<id>] ` exactly as supplied; the prefix does not authorize
-  ticket claims in the body and does not count toward the subject limit.
-- Body: draft per Body structure, Change outline, and Body style in `./REFERENCE.md`. Cluster related hunks into themes, never commits. Emit Why (one proved sentence), Special (proved hazards or `- None.`), Change outline with the smallest useful views, then `Closes #N` footer one line per explicit issue. Optional link header only for user-pasted URLs. No test, rollout, unproved motive, unproved ticket claim, or harness footer.
-
-Map every title phrase, body line, caption, and visual label to proving paths and hunks, except `Closes #N` lines the explicit issue authorizes. Rewrite untraced copy. Done when format, depth, Body style, Change outline, and clean-room trace pass.
+For a nonempty diff, apply body, depth, and style rules in `REFERENCE.md`.
+Use `references/views.md` only for a theme needing a fenced view.
+Trace every title phrase, body line, caption, and visual label to hunks;
+only explicitly authorized Closes footers are exempt.
+Done when format, depth, exact issue set, and clean-room trace pass.
 
 ## 3. Publish
 
-Recheck status and diff hash. If either changed, return to Step 1. Publish the
-committed branch to the resolved remote with a normal upstream push when
-missing or ahead. Never force push. After fetch, local HEAD and upstream must
-match before PR mutation. Block on ambiguity or push failure.
+Recheck status and diff hash; movement returns to Preflight. Push missing/ahead
+upstream normally, never force; fetch and require upstream equals local HEAD.
+Create with explicit base/head and requested draft state, or update copy
+while preserving draft, reviewers, labels, assignees, and projects. Only an
+explicit draft conversion authorizes changing that state.
+Record each successful mutation; on interruption re-preflight instead of
+repeating a successful push/create. Register the URL with the host's PR-link
+tool when available, including existing PRs when work starts.
+Done when a PR URL or captured mutation error exists.
 
-Create a PR when none exists. Otherwise update the existing title and body while changing no other field; preserve draft state, reviewers, labels, assignees, and projects. Preserving linked issues excludes `Closes #N` lines the explicit issue authorizes. Use target and current branch explicitly. Record mutation as `none`, `pushed`, `pr-created`, or `pr-updated` after each successful action.
-Done when the platform returns a PR URL or a captured mutation error.
+## 4. Read back
 
-## 4. Verify and report
+Verify URL, base/head, title/body, draft, and preserved fields against the
+ledger. A partial API result or non-body mismatch permits one mutation retry
+after read-back, then `BLOCKED` with field differences. For an appended body
+or footer, apply `references/body-hygiene.md`.
+Confirm the three body headings, one-sentence Why, Special bounds, and exact
+Closes set. Auth/rate-limit/fetch/push/platform errors block.
+Report create/update, push, URL, depth, body strip, and trace only after match.
+Done when remote state and ledger agree.
 
-Read the PR back. Verify URL, base, head, title, body, and preserved draft state
-against the ledger. On a partial API result or non-body field mismatch, retry
-the PR mutation once after read-back; then report `BLOCKED` with a field-level
-difference. Auth, rate-limit, fetch, push, and platform errors are also
-`BLOCKED`.
-
-Confirm the ledger body has `## Why the change`, `## Special things to note`, and `## Change outline`; Why is one sentence; Special is 1-3 bullets or `- None.`; footer is `Closes #N`, one line per explicit issue with the N set exactly equal to the request N set, absent otherwise; and it has no `## Summary`, `## Details`, `## Breaking`, or `## Visuals`. Any skeleton or N mismatch is `BLOCKED` with a field-level difference.
-
-Then apply Body hygiene in `./REFERENCE.md`: the body must equal the ledger
-body (single trailing newline only). If harness footers or other text were
-appended, update the body once to the exact ledger body, re-read, and report
-whether a strip ran. Still dirty is `BLOCKED`.
-
-Report create or update, push status, URL, body strip status, chosen depth, and
-trace summary only after read-back matches.
-
-After interruption, re-run Preflight and verify remote and PR state before any
-retry. Do not duplicate a PR or repeat a successful push.
-
-Terminal values are `SUCCESS`, `NO_CHANGES`, and `BLOCKED`. Never commit, force
-push, reopen a PR, run builds, or run tests.
+Terminals: `SUCCESS`, `NO_CHANGES`, `BLOCKED`. No commits, force pushes,
+reopening closed PRs, builds, or tests in this leaf.
