@@ -1,96 +1,60 @@
 ---
 name: claude-code
 description: >
-  claude-code when launching the local Claude Code CLI (`claude`) for a
-  first-run install, interactive session, one-shot, stream, resume, worktree,
-  or auth, MCP, or plugin command.
+  claude-code to run the local Claude CLI or manage its installation, auth, MCP, and plugins.
 ---
 
-# Claude Code CLI
+# Claude Code
 
-Default run is `claude --print --output-format text "<prompt>"` from the
-target directory. Read-only is `--permission-mode plan`. `--print` writes
-unless plan is set. Wrong cwd is `BLOCKED`.
+## Options and boundaries
 
-## Options
+Default: `claude --print --output-format text "<prompt>"` from the target
+directory; permission mode and model omitted; parent wait 15m.
+"Read-only" / "plan" adds `--permission-mode plan`; print alone can write.
+"Use <model>" adds `--model`. "Interactive" / "TUI" omits `--print`.
+"Resume <id>" adds `--resume`; "continue" adds `--continue`; both block.
+"Worktree [name]" adds `--worktree [name]`; record the emitted path.
+"JSON" / "stream-json" selects that print output. Missing needed values or
+conflicting options are `BLOCKED`.
 
-Derive product CLI argv from the request. Unspecified: `--print`, omit
-permission mode, `--output-format text`, from the target directory, parent
-wait `15m`.
-"read-only" / "plan" → `--permission-mode plan`.
-"use opus" / named model → `--model` with that alias (`fable`, `opus`,
-`sonnet`). Unspecified model stays CLI default.
-"resume session <id>" → `--resume <id>`. "continue" → `--continue`. Both
-is `BLOCKED`.
-"worktree [name]" → `--worktree [name]`. Do not invent a path.
-"json" / "stream-json" → that `--output-format` with `--print`.
-"interactive" / "TUI" → omit `--print`.
-A missing needed session id or conflicting wording is `BLOCKED`.
-
-## Iron laws
-
-1. `--print` can write. `--permission-mode plan` is read-only. Omit `--print`
-   only for an asked-for TUI.
-2. A skipped trust dialog is not skipped permissions. Never add
-   `--dangerously-skip-permissions` or `--permission-mode bypassPermissions`
-   to recover a prompt.
-3. Gated, named waiver only: `--dangerously-skip-permissions`,
-   `--allow-dangerously-skip-permissions`, and `--permission-mode` values
-   `bypassPermissions`, `dontAsk`, and `auto`. Follow the gated table in
-   `./references/permissions.md`.
-4. `claude help` is `BLOCKED`. `claude remote-control` is not a help command.
+Permissions remain when print skips the trust dialog. A named waiver is
+required for skip-permissions, bypassPermissions, dontAsk, auto, or
+allow-dangerously-skip-permissions. Before using one, or when a print
+permission prompt appears, follow `references/permissions.md`; recovery
+does not invent a bypass. `claude help` starts a session: use `claude --help`.
+`remote-control` is not documentation.
 
 ## 1. Resolve
 
-Confirm `claude` is on PATH. If missing, follow First-run in
-`./references/cli-surface.md`. Record workspace, prompt, permission mode,
-session, worktree, output format, and wall-clock. Check auth with
-`claude auth status --text`. Do not print secrets. Missing login is
-`BLOCKED`. Record:
-`cmd | workspace | mode | session | worktree | gated | verified | terminal | wall-clock`.
+Fix absolute workspace, prompt, mode, session, worktree, output, and wait.
+Check binary and `claude auth status --text` without exposing secrets.
+Missing binary → follow `references/install.md`; missing auth → `BLOCKED`
+unless login was requested. Wrong cwd blocks.
+Record `cmd | workspace | mode | session | worktree | waiver | wait | evidence | terminal`.
+Done when target, binary, auth, and authorized options are fixed.
 
-Done when binary, workspace, mode, auth state, and wall-clock are recorded.
+## 2. Run
 
-## 2. Authorize
+Build argv from those options and quote the prompt literally. Default text
+is quiet until process exit; silence is not a hang. Wait for exit or the
+recorded deadline, and kill only this run's PID when that deadline expires.
+Nonzero exit: capture stderr, inspect the tree, and report `BLOCKED`.
 
-No gated flag without a named waiver. On a permission prompt under `--print`,
-follow Print-mode prompts in `./references/permissions.md`. Do not add
-`--dangerously-skip-permissions` because `--print` skipped a trust dialog.
+For JSON/stream output, follow `references/streaming.md`. For resume,
+continue, or background sessions, follow `references/sessions.md`.
+For worktrees or parallel runs, follow `references/worktrees.md`.
+For an asked-for TUI or management command, follow `references/management.md`.
+A rejected flag requires scoped `--help`, not a guessed replacement.
+Done when the process exits, an intended live handle is recorded, or a
+permission/authorization gate is reported.
 
-Done when gated state is recorded, or the run is `BLOCKED` / `AWAITING_USER`.
+## 3. Verify and report
 
-## 3. Build the command
+Inspect status and diff; CLI text is not proof. Run the narrowest covering
+tests for edited executable code. Plan mode must leave the tree unchanged.
+Verify each worktree and any integrated tree. Clean up only this run's
+sessions/worktrees unless explicitly kept; preserve auth, MCP, and plugins.
+Report command, mode, session/worktree, waiver, wait, and outcome evidence.
+Done when every requested outcome is observed or a blocker is evidenced.
 
-Construct argv from the derived options. Add `--permission-mode plan` for
-read-only work. Quote the prompt. Run from the target directory. If
-`--output-format` is `json` or `stream-json`, follow `--print` output in
-`./references/cli-surface.md`. If the user asked to install, update, or
-run the interactive TUI, follow that recipe in `./references/cli-surface.md`.
-
-Done when argv is recorded.
-
-## 4. Run
-
-Follow the matching recipe in `./references/orchestration.md` for one-shot,
-streaming, sessions, worktrees, parallelism, cleanup, or failures. Wait for
-exit or the recorded wall-clock. Do not kill a still-working process.
-
-Done when the process exits, a live handle is the intended outcome, or a
-named failure recipe applies.
-
-## 5. Verify
-
-Treat CLI text as unverified. Inspect `git status` and the diff. Run the
-narrowest covering tests for edited executable code. Read-only
-`--permission-mode plan` must leave the tree unchanged. For parallel or
-worktree runs, verify each tree from Parallelism in
-`./references/orchestration.md`.
-
-Done when each requested outcome is observed or `BLOCKED` with evidence.
-
-## 6. Report
-
-Lead with terminal state. Restate cmd, mode, session, worktree, gated
-waiver, wall-clock, and verification evidence.
-
-Terminal values are `SUCCESS`, `BLOCKED`, `NO_CHANGES`, and `AWAITING_USER`.
+Terminals: `SUCCESS`, `NO_CHANGES`, `BLOCKED`, `AWAITING_USER`.

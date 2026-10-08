@@ -3,7 +3,7 @@ id: design
 kind: action
 primary: upfront-design
 participants: []
-complete_when: upfront-design terminal observed (DIRECT, DESIGNED, CHECKED, or blocked/waiting reported)
+complete_when: upfront-design success observed (DIRECT, DESIGNED, or CHECKED); blocked/waiting pauses without chain advancement
 ---
 
 # design

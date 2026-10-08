@@ -1,162 +1,35 @@
-# Agent Skill Authoring Conventions
+# Skill authoring
 
-> Rules specific to writing skills for this repository. For global agent
-> behavior, see the `global-rules` skill. These conventions follow the
-> `writing-great-skills` framework: a skill exists to make the agent take the
-> same _process_ every run. Predictability is the goal every rule below serves.
+Skills make the agent follow a predictable process, not produce identical output.
 
-## Meta-Rule: Draft Before Writing
+## Authority and ownership
 
-**Never write a skill file without explicit user confirmation.**
+- Before writing a skill, propose its name, location, options, and structure;
+  obtain explicit user confirmation. Approval to implement that plan counts.
+- Skills live at `skills/<category>/<name>/SKILL.md`, normally in `engineering/`
+  or `personal/`. Use this tree, not `.agents/skills/`.
+- The leaf owns invocation, options, procedure, and terminals; routers own order.
+- Keep every-run instructions inline. Disclose branch-only material through a
+  pointer naming both the condition and the required action. No read-first gate.
+- Preserve behavior when pruning. Remove a guardrail only with behavioral evidence.
 
-1. Propose a plan (name, location, options, structure)
-2. Wait for user to say "yes" or request changes
-3. Only then write the `SKILL.md` file
+## Before committing
 
-This applies to every skill, no exceptions.
+Run `bash scripts/skill-guards.test.sh`, then check every touched skill:
 
-## Meta-Rule: Update README
+1. Frontmatter `name` matches its directory, is kebab-case, and is at most 64 characters.
+2. `description` exists and is at most 1024 characters.
+3. `SKILL.md` is at most 100 lines.
+4. README has its `/<name>` Quickstart entry and Reference link.
+5. Real `.md` links and backticked paths resolve; ignore `<placeholder>` paths.
+6. Claude `plugins[0].skills` exactly matches the sorted skill-directory set.
+7. Every non-router leaf has exactly one primary action playbook; all playbook
+   leaves and participants resolve. Here the router exception is `prath-mode`.
 
-**After writing a new skill, update `README.md` before committing.**
+When adding, renaming, or removing a skill, apply the README and playbook
+maintenance procedure in `authoring/README.md`. When drafting or restructuring
+agent-facing documents, apply its pointer, option, and ownership rules. For
+behavior changes or compression, run the relevant cases in `authoring/verification.md`.
 
-1. Add the skill to the quickstart invocation list.
-2. Add a failure mode entry in `## Why These Skills Exist` if applicable.
-3. Add a row to the `## Reference` table with name, link, and description.
-
-Do not commit the skill without the README update.
-
-## Meta-Rule: Describe skills by intent
-
-**README skill entries describe the whole skill, not the latest change.**
-
-1. Before changing a skill's README entries, reread its full `SKILL.md`.
-2. Keep Quickstart and Reference descriptions focused on purpose and scope.
-   Leave procedural steps, options, flags, scripts, limits, and recent fixes
-   in the skill files.
-3. Keep `## Why these skills exist` focused on the underlying failure modes.
-   Consolidate related rows instead of adding a row for each guardrail or fix.
-4. For an existing skill, edit README only when its purpose, scope, invocation,
-   or coverage is no longer accurate. A procedural refinement alone does not
-   require a README edit.
-
-## Meta-Rule: Keep prath-mode playbooks in sync
-
-**When adding, renaming, or removing a skill (except `prath-mode`), update
-`skills/engineering/prath-mode/` before committing.**
-
-1. **Add:** create `playbooks/<id>.md` with `kind: action` and
-   `primary: <skill-basename>`; add one matcher bullet in `prath-mode/SKILL.md`.
-2. **Rename:** rewrite that skill's `primary` playbook, every `leaf:<old>` and
-   `participants` entry, and the matcher bullet.
-3. **Remove:** delete its `primary` playbook; drop it from every chain
-   `participants` and `leaf:` step (rewrite or delete the chain if empty);
-   remove the matcher bullet.
-
-Do not commit a skill change that leaves playbook coverage or leaf paths broken.
-
-## Meta-Rule: Self-Check Before Committing
-
-**Before committing any skill addition or update, verify every rule below by
-reading the files. Run `scripts/skill-guards.test.sh` for marketplace set
-equality, README `./skills/` link existence, and prath-mode playbook coverage.
-You remain the check for the other rules.**
-
-For every skill you touched:
-
-1. **name**, present in frontmatter, kebab-case (`^[a-z0-9]+(-[a-z0-9]+)*$`),
-   64 chars or fewer, and exactly matches the skill's directory name.
-2. **description**, present and 1024 characters or fewer.
-3. **SKILL.md length**, 100 lines or fewer.
-4. **README coverage**, the skill appears in the `README.md` quickstart list
-   (as `/<name>`) and has a row in the `## Reference` table linking
-   `./skills/<category>/<name>/SKILL.md`.
-5. **Markdown links resolve**, every real `.md` path linked or backticked in
-   `SKILL.md` points to a file that exists. Ignore template paths containing
-   `<...>` placeholders.
-6. **Claude marketplace**, `plugins[0].skills` lists every `skills/*/*/SKILL.md`
-   directory, sorted, no extras.
-7. **prath-mode playbooks**, every non-`prath-mode` skill basename is `primary`
-   of exactly one `playbooks/*.md`; every `leaf:` and `participants` entry
-   resolves to a skill on disk.
-
-Fix every failure before committing. Do not commit until all seven pass.
-
----
-
-## Project Structure
-
-- Skills live in `skills/<category>/<name>/SKILL.md` (project-level)
-- Top-level categories are `personal/` and `engineering/` unless a third is clearly needed
-- Never use `.agents/skills/` for this repo
-- Each skill is a directory containing `SKILL.md` at minimum
-- Optional: `REFERENCE.md`, `references/`, `assets/`, and for router skills
-  `playbooks/` (one route file per matched outcome)
-
-## Disclose by branch, not by gate
-
-Material the agent needs on _every_ run stays inline in `SKILL.md`. Material
-only _some_ runs reach (a **branch**, a distinct way the skill is invoked) gets
-pushed into `REFERENCE.md` or `references/`, reached by a sharp **context
-pointer** at the step that needs it.
-
-- Inline what every branch needs; disclose what only some branches reach.
-- A pointer's _wording_ decides how reliably the agent follows it. Word it as an
-  instruction tied to its trigger condition: "classify every change against the
-  8 categories in `REFERENCE.md`", not "see REFERENCE.md".
-- Do not add a mandatory "read this file first" gate. A gate forces every run to
-  load reference some runs never use, defeating disclosure. If a pointer fires
-  unreliably on must-have material, sharpen its wording or inline the material.
-  Do not gate it.
-- If everything in a would-be `REFERENCE.md` is must-have on every run, keep it
-  inline and ship no `REFERENCE.md`.
-
-## Frontmatter
-
-| Field         | Rule                                                                                                                                                            |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`        | kebab-case, max 64 chars, match directory name                                                                                                                  |
-| `description` | Triggers that fire the skill, plus a reach clause if other skills invoke it. Front-load the leading word. Omit it to make a skill user-invoked. Max 1024 chars. |
-
-### Writing the description
-
-The description sits in the context window every turn, so prune it harder than
-the body.
-
-- **Front-load the leading word**, the word you actually type when you want the
-  skill (`commit`, `deslop`, `handoff`). It anchors invocation.
-- **One trigger per branch.** Synonyms renaming a single branch are duplication;
-  collapse them. Keep only genuinely distinct triggers.
-- **Cut identity already stated in the body.** No mandated boilerplate phrase.
-- Do not restate the description as a "When to use this skill" section in the
-  body. That is duplication of a line the agent already holds.
-
-## Natural language options
-
-If a skill has variants (diff scope, message style, target branch, etc.), derive
-them from the user's request. Do not expose a skill-invocation `--flag` table.
-
-- Show short example phrases and the option each selects
-- Always declare defaults when the request is silent
-- `BLOCKED` when wording is ambiguous, conflicting, or missing a needed value
-- Keep product CLI argv in prose when the skill wraps a binary; that argv is
-  emitted after derivation, not the user's config surface
-
-## Content Principles
-
-- Keep `SKILL.md` at or under 100 lines
-- Use progressive disclosure: inline what every run needs; push branch-only
-  reference into `REFERENCE.md` or `references/` behind a sharp context pointer
-- Co-locate: keep a concept's definition, rules, and caveats under one heading
-- Prefer procedures over declarations: teach _how to approach_, not _what to
-  produce_
-- Match specificity to fragility: guidelines for flexible tasks, exact steps for
-  fragile ones
-- State defaults, not menus: pick one approach, mention alternatives briefly
-- End each step on a checkable completion criterion, so the agent can tell done
-  from not-done and does not stop short
-- Reach for a leading word before a paragraph: a pretrained concept (`slop`,
-  `handoff`, `tracer bullets`) anchors behavior in one token
-- Keep each meaning in one place. The same fact in two files is duplication,
-  the leaf frontmatter owns its own triggers and options, not a central catalog
-- Hunt no-ops: delete any sentence the agent would already obey by default
-- Every instruction must be actionable. No vague advice, no filler.
+README describes whole-skill intent. Reread the full leaf before changing its
+entries; procedural refinements alone do not require README changes.

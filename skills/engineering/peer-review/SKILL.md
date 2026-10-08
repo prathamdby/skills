@@ -1,80 +1,59 @@
 ---
 name: peer-review
 description: >
-  peer-review when deciding whether an implementation plan, design, or proposed
-  change is ready to build.
+  peer-review to judge whether a plan, design, or proposed change is ready to build.
 ---
 
 # Peer review
 
-A review request authorizes analysis, not file edits.
+Analysis, not edit authority.
 
-## 1. Resolve the review target
+## 1. Resolve
 
-Require a plan, design, or proposed-change artifact and its governing
-requirements, pointed to by path, URL, pasted text, or attached IDE context.
-If none is provided, report `BLOCKED: review target required` and ask for one
-pointer. Never reconstruct a target from conversation memory.
+Require the target artifact and governing requirements by path, URL, pasted
+text, or attached context. None → `BLOCKED: review target required`, asking
+for one pointer. Do not reconstruct the target from conversation memory.
+Record `target | requirements | evidence | findings | verdict | edit authority`.
+Done when target and requirements are fixed or the blocked report is sent.
 
-Record:
-`target | requirements | evidence read | findings | verdict | edit authority`.
+## 2. Ground
 
-Done when the target and requirements are fixed, or the blocked report is sent.
+Read the target, requirements, affected contracts/source/tests. History is
+reached only for a cited past failure or a current claim needing it. Stop
+when each requirement and candidate concern has evidence; unrelated
+architecture is outside scope. On resume, verify target/requirements;
+changes restart Resolve instead of reusing stale findings.
+Done when each claim cites requirements, target, source, test, or history.
 
-## 2. Gather bounded evidence
+## 3. Review
 
-Read the target, requirements, directly affected contracts, relevant source,
-and current tests. Read history only when the target cites a past failure or a
-current claim needs it. Stop gathering when every requirement and candidate
-risk has a source pointer. Do not survey unrelated architecture.
+Map every requirement to proposed work and verification. Check boundaries,
+failure/rollback, ordering, compatibility, security, performance, and tests.
+Surface every material finding, without a count cap; omit preference nits.
+Unsupported security/compatibility/performance claims are findings, but an
+evidenced failure outranks a theoretical concern. Rank by probability × impact.
 
-After interruption, confirm target and requirements are unchanged before using
-the ledger; if either changed, discard the ledger and restart Step 1.
-
-Done when each review claim can cite a requirement, target section, source
-path, test, or history artifact.
-
-## 3. Analyze (exhaustive)
-
-Map each requirement to a proposed step and verification. Check boundaries,
-failure and rollback paths, ordering, compatibility, security, performance,
-and test coverage. Rank every finding by probability times impact. Do not
-promote a theoretical concern over an evidenced failure. Treat unsupported
-security, compatibility, or performance claims in the target as findings.
-
-Surface **every** material finding. Do not stop at the first blocker. Do not
-cap the list. Omit style and preference nits only.
-
-Verdict mapping (after ranking the full list):
-
-- no material findings: `Ship it.`
-- only independent repairable blockers: `Fix the blockers first, then ship.`
-  Repairable means at most three steps per blocker without changing approach
-  or requirements.
-- wrong approach, missing core requirements, or several coupled blockers:
-  `Needs rework.`
-
-Done when every material requirement has a finding or an explicit pass, and
-the verdict follows this mapping.
+Verdict: no material findings → `Ship it.`; independent repairable blockers
+→ `Fix the blockers first, then ship.` (each <= three steps, unchanged approach/
+requirements); wrong approach, missing core requirements, or coupled blockers
+→ `Needs rework.`
+Done when every material requirement has a finding or explicit pass.
 
 ## 4. Report
 
-Write exactly three sections:
+Exactly three sections:
+- `## Findings`: every ranked `finding → impact` bullet with citation,
+  or `None found.`
+- `## Fix`: numbered repairs in rank order, first rework decision, or `None.`
+- `## Verdict`: exactly one mapped sentence, no additional explanation.
+Done when the format and every finding's evidence hold.
 
-1. `## Findings`: ranked worst-first list of every material
-   `- <finding> → <impact>` bullet with a citation, or `None found.` No
-   count cap.
-2. `## Fix`: numbered steps covering each repairable blocker in rank order,
-   or the first rework decision, or `None.`
-3. `## Verdict`: exactly one mapped sentence and no added explanation.
+## Optional update
 
-Done when the three-section contract holds and every finding has a citation.
+Edit only when the user requested updating or confirms after the report.
+Apply only the reported Fix; broad rework needs a newly approved design.
+Reread the diff and report paths. Done when authorized changes match that Fix.
 
-## 5. Optional plan update
-
-Edit only when the user explicitly requested an update in the review request or
-confirms after reading it. Apply only the reported Fix; broad rework requires a
-new approved design. Re-read the diff and report changed paths.
-
-Terminal values: `BLOCKED` (missing target), `REVIEWED` (analysis-only),
-`AWAITING_CONFIRMATION` (needs confirm), `UPDATED` (verified plan edit).
+Terminals: `BLOCKED` (missing target), `REVIEWED` (analysis-only),
+`AWAITING_CONFIRMATION` (update awaits approval), `UPDATED` (verified
+authorized edit).

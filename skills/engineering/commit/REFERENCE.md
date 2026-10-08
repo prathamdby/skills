@@ -55,6 +55,12 @@ Reject and rewrite a draft containing:
 - ticket IDs, reviewer names, review or plan language, or unstated motives
 - review-session framing such as `address review feedback`, `address review
 findings`, `address PR feedback`, `review follow-up`, or `per review`
+- `address` paired with comments, threads, or requests; `per feedback`,
+  `as requested`, `from review`, `review comments`, and ledger-label or
+  PR-history framing
+- a subject passing the conversation-only test: if it still describes the
+  session after deleting the diff and retaining only the PR conversation,
+  rewrite it; subject and body both need hunk proof
 - a claim inferred from the branch name, commit history, or conversation
 - scope notation such as `feat(api):`
 - a vague verb such as update, change, address, or improve when a hunk supports

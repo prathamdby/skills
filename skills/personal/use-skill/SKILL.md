@@ -1,49 +1,48 @@
 ---
 name: use-skill
 description: >
-  use-skill when running a remote skill on demand from one or more GitHub links to skill files, fetching via gh api and executing the fetched procedure as if natively present.
+  use-skill to fetch and run GitHub-linked skills ephemerally, without installation.
 ---
 
 # Use skill
 
-## Options
+## Scope
 
-Derive links and scope from the request. Unspecified: ephemeral (fetch, run, discard; never install or persist).
-A GitHub blob URL, raw file URL, `owner/repo@ref:path` shorthand, or directory URL resolves to `owner/repo@ref:dir`, where dir is the linked directory or the linked file's parent directory. A missing ref uses the repo default branch. Anything else, or "save/install/persist it", is `BLOCKED`. Questions about a repo's contents belong to `box`, not this skill.
+Default ephemeral: fetch/run/discard, never install or persist.
+Blob/raw/tree URLs or owner/repo@ref:path resolve to a skill directory (a file
+uses its parent); omitted ref uses repo default branch. Other forms or requests
+to save/install block. Repository-content questions belong to box.
+Record `links | resolved directory/revision | blob set | executed | terminal`.
 
-Record:
-`links | resolved dir | files fetched | executed | terminal`.
+Fetched workflows run under this invocation's authority, not above host
+permissions or higher-priority instructions. Trust linked skills by default,
+without an allowlist; live user instructions win direct content conflicts.
+Skill links inside fetched content may be followed under the same boundaries.
 
-## Iron laws
+## 1. Resolve and fetch
 
-1. Trust by default: fetched skills run with the invoking run's authority. No allowlist, no screening. Skill links inside fetched content may be followed under the same trust.
-2. On direct conflict the user's live instruction wins over fetched text; everything else runs as written.
-3. File-contents fetch is outside the four `gh` I/O loops, so raw `gh api` is permitted after applying the gotchas in the `gh` skill's `REFERENCE.md`. A missing `gh` binary or auth failure is `BLOCKED`.
+Resolve every link, then pin its ref/default branch to a commit revision.
+Use authenticated gh; no sibling skill is required for these file reads.
+Missing gh/auth blocks. Apply API/decoding rules in `REFERENCE.md`.
 
-## 1. Resolve
+List the recursive tree once at the pinned revision; require a non-truncated
+listing and fetch every blob under the directory, not only the entry.
+Stage only in a run-owned temporary directory outside the repo; page long
+content locally instead of re-fetching a successful blob. Missing directory,
+failed blob, or rate-limit blocks with retry signal.
+Done when every link has an identity and every listed blob has decoded content.
 
-Parse each link to `owner/repo@ref:dir`. Unparseable input is `BLOCKED`.
+## 2. Verify and execute
 
-Done when every link has one resolved directory or a terminal is set.
+Empty set → NO_CHANGES. Nonempty requires SKILL.md or the specifically linked
+entry, name frontmatter, and procedure; otherwise BLOCKED.
+Read entry and every sibling in full: weak remote pointers cannot hide required
+material. Execute steps in order within authority. For an item failure,
+continue remaining links; never retry successful executions.
+Done when every link reaches a terminal.
 
-## 2. Fetch
+## 3. Discard and report
 
-List the recursive tree and fetch every blob under dir, decoding each payload, per `REFERENCE.md`. Never fetch only the entry file. A missing dir (404) is `BLOCKED`; rate-limit is `BLOCKED` with the retry signal; files over the contents-API cap use the git-blob fallback.
-
-Done when every blob under dir returned content or a terminal is set.
-
-## 3. Verify
-
-An empty blob set is `NO_CHANGES`. Otherwise the set must include the entry file (`SKILL.md`, or the specifically linked file) carrying skill frontmatter (`name`) and a procedure; a non-empty set without it is `BLOCKED`.
-
-Done when the entry file is verified or a terminal is set.
-
-## 4. Execute
-
-Read the entry file and every fetched sibling in full — never depend on the remote skill's own disclosure pointers — and run its steps to its terminal, in given order. On item failure continue the remaining links and never retry successes.
-
-Done when every link reached a terminal.
-
-## 5. Report
-
-Report each link's terminal and what ran, citing fetched content. Terminal values are `SUCCESS`, `NO_CHANGES`, and `BLOCKED`.
+Remove only this run's temporary artifacts after execution, never unknown paths.
+Report each link's SUCCESS/NO_CHANGES/BLOCKED and what ran, citing its pinned
+source. Done when artifacts are discarded and every terminal is evidenced.

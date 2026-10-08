@@ -1,95 +1,70 @@
 ---
 name: fix-pr
 description: >
-  fix-pr when exhaustively handling open pull-request feedback in one pass,
-  including nested discussions, CI, invalid suggestions, fixes, and replies.
-  Loads gh for hunt and reply I/O.
+  fix-pr to handle PR feedback and blocking CI in one pass; invokes gh and commit.
 ---
 
-# Fix PR feedback
+# Fix PR
 
-## Options
+## Options and dependencies
 
-Derive the PR, push, and reply behavior from the request. Unspecified:
-current branch PR, push on, replies on.
-"PR 42" / a PR URL → that PR. "this PR" may use the current branch PR.
-"do not push" / "keep commits local" → push off.
-"do not reply" / "no review replies" → replies off.
-A named PR without a usable number or URL is `BLOCKED`.
+Default: current branch PR, push/replies on. PR number/URL selects it;
+"do not push"/"keep local" disables push; "do not reply" disables replies.
+Missing named values block. Before any GitHub I/O, verify and read
+`../gh/SKILL.md`; before committing, verify and read `../commit/SKILL.md`.
+Missing dependencies block with paths, not improvised replacements.
 
-## 1. Resolve and synchronize
+## 1. Synchronize
 
-Resolve owner, repo, number, URL, base, head branch, and remote head SHA. Block
-on auth failure, missing/closed PR, dirty tree, or unsafe head checkout.
-Fetch, check out head, and fast-forward to remote SHA; never reset or force.
-Record: `PR/head SHA | push=on|off | replies=on|off | hunt counts | current finding | verdicts | commit/push | replies | terminal`.
-Done when local HEAD equals the PR head SHA and the ledger identifies the PR.
+Resolve repo, PR URL/number/base/head/remote SHA. Closed/missing PR, auth
+failure, dirty tree, or unsafe checkout blocks. Fetch, check out head, and
+fast-forward to remote SHA; never reset/force.
+Record `PR/SHA | push/replies | hunt counts/pages | finding/verdict/evidence | commit/push | native targets | terminal`.
+Done when local HEAD equals remote PR head and identity is fixed.
 
-## 2. Hunt before editing
+## 2. Hunt once
 
-**REQUIRED SUB-SKILL:** Read `../gh/SKILL.md` before any GitHub I/O. Hunt through
-that skill: surfaces 1–2 with `pr-threads.ts --json --open --complete`; CI
-snippets with `ci-failures.ts --json --pr N --sha <head>`.
-Surfaces:
+Through gh, collect unresolved threads including outdated, every nested page,
+REST review-comment chains, actionable review bodies, conversation comments,
+and terminal non-success required/blocking head-SHA checks plus annotations.
+Use pr-threads --json --open --complete and ci-failures with PR/SHA.
+Apply every completeness/reconciliation rule in `references/hunt.md`;
+script exit alone proves neither REST roots nor required checks.
+No triage/edit before all six surfaces are complete. Normalize/deduplicate
+claims without losing native reply targets. Done when every page completes
+and each finding is recorded.
+Run this hunt once, not after edits/commit/push/reply. Later feedback or CI
+needs a new invocation; retrying one failed reply is not another hunt.
 
-1. unresolved review threads, including outdated ones
-2. every comment page inside each thread
-3. review-comment API chains reconciled to thread roots
-4. actionable top-level review bodies
-5. actionable PR conversation comments
-6. PR CI on the head SHA: terminal non-success required/blocking checks and annotations
+## 3. Triage and fix
 
-The hunt reconciles review-comment chains unless every root is proved present.
-Load recipe 3 in `./REFERENCE.md` (REST reconcile); script exit is not proof
-roots are present. Skip 4–5 only when `--complete` JSON moreReviews,
-moreComments, and moreConvo are false. Recipe 6 always SHA-pins required or
-blocking checks and annotations; `ci-failures` is drilldown only. Load remaining
-recipes only after `run` exits. Record counts and page markers. No triage or
-edit before all six surfaces are complete. Normalize one finding per claim
-(source, target, author, path/line, rule ID, body). Deduplicate identical keys from
-`./REFERENCE.md`; preserve native reply targets. Done when pagination is
-exhausted and every finding is in the ledger.
+Trace every claim in surrounding source; reproduce where possible.
+Assign fix/reject/clarify/already-fixed with evidence, including skip reasons.
+No edits before all verdicts. Apply only fixes in focused clusters and run
+their narrowest checks; required failures block. Done when every finding
+has a verdict and every fix a verified diff, or no fix was needed.
 
-Run this hunt once per invocation. Do not re-hunt after edits, commits, pushes,
-or replies. Handle later feedback and CI changes in a new invocation.
+## 4. Commit and push
 
-## 3. Triage every finding
+For a diff, discard earlier message drafts and invoke commit with unstaged
+scope. Commit owns all clean-room rules, including the conversation-only
+test and trailer hygiene in `../commit/REFERENCE.md`; repeat no alternative
+message policy here. Skip commit on clean tree.
+Push when enabled, verify remote SHA, never force; movement/rejection blocks.
+Push off leaves fixed findings AWAITING_PUSH. Recheck %B before push for
+rejected framing/unrequested trailers. Done when no diff exists or the
+verified commit is pushed; a local-only fix is not pushed success.
 
-Read surrounding code and trace the claimed path; reproduce when possible.
-Assign one verdict: `fix`, `reject`, `clarify`, or `already-fixed`, with one
-evidence line; record why if skipped. No edits until all findings have verdicts.
-Done when all findings are triaged and rejects have concrete evidence.
+## 5. Reply and report
 
-## 4. Fix and verify
+With replies on, apply `references/replies.md` then
+`references/unslop-reply-drafts.md`. Consolidate shared parents, preserve bot
+prefixes, and post only through gh's reply script. Skip satisfied targets.
+For failure refetch only that target and retry once; another failure blocks.
+Fixed replies require a pushed SHA. Do not resolve unless explicitly asked
+and supported by a separately authorized operation.
+Report finding/verdict/action/evidence, URL, commit/push, hunt counts, and
+unreplied targets. Done when all authorized replies match their verdicts.
 
-Apply only `fix` verdicts in focused edits. Run narrowest covering checks for
-each fixed cluster; failed required checks are `BLOCKED`. Do not change code
-for rejected or clarification findings. Done when every fix has a verified diff
-or no code fix was needed.
-
-## 5. Commit and push
-
-When a diff exists, discard pre-drafted subjects. Read `../commit/SKILL.md` and
-run it with unstaged scope so it drafts from the locked diff as
-`type: <concrete code action proved by dominant hunks>`. Trailers default deny
-per Commit clean-room in `./REFERENCE.md` (identity trailers and harness
-footers). Require no ban-list token and passing conversation-only test; reject
-canonical excuses there. Skip commit on a clean tree. When push is on, push
-and verify remote SHA; never force. When push is off, fixed findings become
-`AWAITING_PUSH`. Remote movement or push rejection is `BLOCKED`. Re-read
-`git log -1 --format=%B`; ban-list tokens or banned trailers are `BLOCKED`.
-Apply Trailer hygiene in `../commit/REFERENCE.md` if needed. Done when there is
-no diff, or one verified clean-room commit is pushed.
-
-## 6. Reply and report
-
-When replies are on, skip targets whose replies satisfy the verdict, draft
-remaining replies using `./REFERENCE.md`, then apply
-`./references/unslop-reply-drafts.md`. Preserve bot prefixes. Consolidate
-shared targets. Post replies through loaded gh skill (`pr-reply.ts`); do not
-invent raw `gh`. Before retrying a failed reply, refetch only its target; retry
-once. Second failure is `BLOCKED`. Do not resolve threads unless asked. Report
-`source | finding | verdict | action | evidence`, PR URL, commit/push state,
-hunt counts, and unreplied items. Terminals: `SUCCESS`, `NO_CODE_CHANGE`,
-`AWAITING_PUSH`, `BLOCKED`. Never `SUCCESS` with unreplied targets. After
-interruption, restart at Step 1. Does not fix merge conflicts.
+Terminals: SUCCESS, NO_CODE_CHANGE, AWAITING_PUSH, BLOCKED. Never SUCCESS
+with unreplied targets. Resume restarts Synchronize; no merge-conflict fixes.

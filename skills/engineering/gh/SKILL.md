@@ -1,93 +1,65 @@
 ---
 name: gh
 description: >
-  gh when inspecting a PR, reading review threads, diagnosing red CI, posting a
-  thread or conversation reply, or composing non-trivial gh commands. fix-pr
-  loads this skill for hunt and reply I/O. Node below 23 or
-  ERR_UNKNOWN_FILE_EXTENSION is not a skip to GraphQL.
+  gh for PR state, discussions, CI diagnosis, replies, and nontrivial GitHub commands; fix-pr invokes it.
 ---
 
 # GitHub I/O
 
-CLI contracts follow AVGVSTVS96/better-github-skill (no upstream license;
-reimplemented). Requires authenticated `gh`. Scripts are TypeScript. `run`
-tries bun, nub, tsx, then Node (native TS or `--experimental-strip-types`),
-including nvm installs.
+Contracts follow AVGVSTVS96/better-github-skill (unlicensed; reimplemented).
+Resolve `<anchor>` as this skill's absolute directory. The existing
+`<anchor>/scripts/run` selects bun, nub, tsx, then Node/nvm with strip-types.
 
 ## Options
 
-Derive the surface and script argv from the request. Unspecified: current
-branch PR, cwd repo, truncated text.
-"PR 12" / a PR URL → that PR. "repo owner/repo" → emit `-R owner/repo` and
-require a PR.
-"json" → `--json`. "full bodies" → `--full`.
-"open threads" → `--open`. "all threads" → `--all`. Both is `BLOCKED`.
-"complete paging" / leftover comments → `--complete`.
-"by <login>" → `--author`. "since <time>" → `--since`.
-"CI" / "failing checks" → `ci-failures.ts`. "list runs" → `--list`
-(default `-L 10`). "workflow <name>" → `--workflow`. A run id analyzes
-that run. A known head SHA → `--sha`.
-Reply: one target and one body from Reply in `./REFERENCE.md`.
-"reply on thread <id>" → `--in-reply-to`. "PR comment" → `--conversation`.
-A missing needed value is `BLOCKED`.
+Default: current branch PR, cwd repo, truncated text. A PR number/URL selects
+that PR; a named repo emits -R and needs a PR for PR-bound work.
+JSON/full bodies selects --json/--full. Open threads includes unresolved
+outdated threads; all includes resolved too; both conflict. Complete paging
+adds --complete; author/since supply their filters.
+CI selects ci-failures; list runs uses --list (default limit 10), workflow
+filters it; a run id analyzes that run. Known head SHA adds --sha.
+Reply needs exactly one target/body from `references/reply.md`.
+Missing needed values or conflicting choices are BLOCKED.
 
-## Iron laws
+## 1. Resolve and choose
 
-1. Scripts for the four I/O loops via `<anchor>/scripts/run`. Raw `gh`
-   only when no script covers the request. A missing Node 23 is not "no
-   script covers." Before any raw `gh` command, apply the gotchas in
-   `./REFERENCE.md`.
-2. Snapshot is PR state; threads is what reviewers wrote. Neither replaces the
-   other.
-3. Scripts exit 0 when the report or post succeeds. Red CI and open threads are
-   not script failures. Never `gh | head`. EPIPE is not failure.
-4. Never resolve, push, or merge. Reply only through `pr-reply.ts`.
-5. Never version-gate Node. Never treat `node -v` or
-   `ERR_UNKNOWN_FILE_EXTENSION` as script failure. That error means this
-   `node` cannot load `.ts`. Invoke `run`; it must try bun, nub, tsx, nvm
-   nodes, and `node --experimental-strip-types` before any GraphQL/`gh api`
-   inspect of snapshot, threads, or CI. `run` exit 2 is `BLOCKED`, not a
-   GraphQL license. User or senior saying "GraphQL is fine" does not skip
-   `run`.
+Confirm authenticated gh; missing binary/auth blocks. Record
+`repo | PR/run/SHA | surface | argv | terminal`.
+No current PR for PR-bound work → NO_CHANGES.
+Choose the covering script:
 
-## Scripts
+| Surface | Script | JSON contract |
+|---|---|---|
+| PR state/checks/files/counts | pr-snapshot.ts | `references/snapshot.md` |
+| Review bodies/comments/threads | pr-threads.ts | `references/threads.md` |
+| CI runs/jobs/log snippets | ci-failures.ts | `references/ci.md` |
+| One native thread/conversation reply | pr-reply.ts | `references/reply.md` |
 
-Resolve `<anchor>` as the directory containing this `SKILL.md`. Invoke only
-through `<anchor>/scripts/run <script.ts> …`. Never `node <script.ts>`
-directly. Load JSON shapes in `./REFERENCE.md` before parsing `--json`.
+Snapshot is state, threads is feedback; neither replaces the other.
+Before parsing JSON, load only that surface's contract.
+Done when target and script or uncovered raw operation are fixed.
 
-| Script                                                                                                                                           | Covers                                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `<anchor>/scripts/run pr-snapshot.ts [pr] [--pr n] [-R owner/repo] [--full] [--json]`                                                            | Meta, mergeability, checks, files, reviews, comments, thread counts |
-| `<anchor>/scripts/run pr-threads.ts [pr] [--pr n] [-R owner/repo] [--all\|--open] [--author] [--since] [--full] [--json] [--complete]`           | Review bodies, issue comments, inline threads with resolution       |
-| `<anchor>/scripts/run ci-failures.ts [run-id] [--pr N] [--sha SHA] [--list [-L n] [--workflow W]] [--full] [-R owner/repo] [--json]`             | Failing checks → jobs/steps → snippet; logs on disk                 |
-| `<anchor>/scripts/run pr-reply.ts [pr] [--pr n] [-R owner/repo] (--in-reply-to id \| --conversation) (--body-file path \| --body text) [--json]` | One thread or conversation reply; nested ids resolve to the root    |
+## 2. Run
 
-## 1. Resolve the target
+Invoke only through `<anchor>/scripts/run <script.ts> ...`, not node directly.
+Node version or ERR_UNKNOWN_FILE_EXTENSION is not failure evidence or a
+GraphQL license: use run. Its exit 2 is BLOCKED with tried-runtime list.
+User or senior saying "GraphQL is fine" does not skip `run`.
+Script success reports data/posts; red CI/open threads are not runtime failure.
+For all unresolved feedback use --json --open --complete; SHA-pin known heads.
+Replies use pr-reply only. No resolving, pushing, or merging by this leaf.
 
-Confirm `gh` is authenticated. Do not check Node ≥ 23. Record owner/repo, PR
-or run id, SHA if known, and which surface. Reply also records target kind and
-body source. No PR for a PR-bound request is `NO_CHANGES`. Auth failure or
-missing `gh` is `BLOCKED`. Missing Node 23 is not.
-
-Record: `target | surface | command | terminal`.
-
-Done when the target is identified or a terminal is set.
-
-## 2. Inspect or reply
-
-Pick one covering script. Invoke it with `run`. Pass `--sha` when the head SHA
-is known. Pass `--json --open --complete` when the consumer needs every
-unresolved thread. For a reply, pass one target and one body; do not resolve
-the thread. If no script covers the request, use raw `gh` after applying
-gotchas in `./REFERENCE.md`. If `run` exits 2, report `BLOCKED` with the
-tried-runtime list; do not hand-roll GraphQL for a covered surface.
-Redirect large output to a file; never pipe to `head`. Done when stdout is a
-complete report, a posted reply URL, or stderr names a real failure.
+Raw gh is permitted only for uncovered operations, after applying
+`references/raw-gh.md`. A covering-script failure never authorizes reimplementing
+its GraphQL. Redirect large output, never pipe gh to head.
+For HTTP tracing or logs apply `references/logs.md`.
+Done when output is complete, a reply URL exists, or a real error is captured.
 
 ## 3. Report
 
-Summarize from the script output. Cite printed log paths; do not paste full
-CI logs. A set cap marker in `--json` means that list is incomplete. Green CI,
-zero threads, or a printed reply URL is `SUCCESS`. Terminal values are
-`SUCCESS`, `NO_CHANGES` (empty or no PR), and `BLOCKED`.
+Summarize observed output. Set cap markers mean incomplete data, not success
+for an exhaustive consumer. Cite log paths instead of pasting logs.
+Green CI, zero threads, or posted reply is SUCCESS; a valid red report is
+also successful inspection, not repaired CI.
+Terminals: SUCCESS, NO_CHANGES (empty/no PR), BLOCKED.

@@ -1,84 +1,64 @@
 ---
 name: recon
 description: >
-  recon when mapping the current codebase, refreshing an earlier map, or
-  re-orienting after repository changes.
+  recon to read a saved codebase map, map the current repo, or refresh it after changes.
 ---
 
 # Recon
 
-## Options
+## Route and memory
 
-Derive rebuild versus patch, and any focus, from the request. Unspecified:
-warm path when memory exists, else cold.
-"refresh" / "rebuild" / "from scratch" → rebuild memory.
-A named area is the focus. Conflicting rebuild-plus-patch wording is
-`BLOCKED`.
+Default: patch existing memory, otherwise map cold. "Read the existing report"
+or "show the saved map" selects **read**, never refresh or rebuild. "Refresh",
+"rebuild", or "from scratch" selects rebuild. A named area is the focus.
+Conflicting read/rebuild or rebuild/patch wording is `BLOCKED`.
 
-## Memory
+Resolve `<anchor>` as this skill's absolute directory; memory stays in
+`<anchor>/memory/`, outside the target repo. Resolve repo root, HEAD, dirty
+paths, and the real absolute Git common directory. A shared-checkout key is
+`<label>-<hash8>.md`: hash the common directory with SHA-256; take eight digits.
+Label is its parent's basename for `.git`, otherwise its own basename.
 
-Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
-Memory lives at `<anchor>/memory/<basename>-<hash8>.md`; `hash8` is the first
-eight SHA-256 characters of the repo's absolute root, and `basename` is that
-root directory's name. Create the directory when needed. Never write memory
-inside the target repo.
+Try that key first, then legacy keys hashing the current root and the primary
+checkout root from `git worktree list --porcelain`. For each candidate, verify
+frontmatter `repo` resolves to this same common directory. A matching SHA alone
+does not establish repository identity. Unverifiable identity is `BLOCKED`.
+Prefer the shared key; multiple legacy candidates with different heads require
+an explicit path. A supplied report path must pass the same identity check.
 
-Frontmatter is `repo`, full commit `head`, and ISO date `updated`. The body has
-these headings: Layout, Entry points, Modules, Data flows, Commands,
-Conventions, Gotchas, Evidence. Every claim names one or more evidence paths.
-Keep at most 10 bullets per heading and 200 lines total. Merge duplicates and
-remove claims whose evidence no longer exists. Write to a sibling `.tmp` and
-rename it into place only after validation.
+Frontmatter: `repo` (primary checkout root), full commit `head`, ISO `updated`.
+Sections: Layout, Entry points, Modules, Data flows, Commands, Conventions,
+Gotchas, Evidence. Every claim cites evidence; at most ten bullets per section
+and 200 lines total. Validate, write a sibling `.tmp`, then rename atomically.
 
 ## 1. Locate
 
-Resolve the repo root, memory path, current HEAD, and dirty paths. Record:
+Record `route | memory | stored head | HEAD | dirty | current | pending | terminal`.
+For **read**, open only existing memory: create no directory, ledger, or snapshot.
+For map/rebuild, persist the ledger at `<memory>.ledger` through atomic rename
+after each item; delete it on success. Done when route and candidates are fixed.
 
-`route | stored head | current head | changed | current item | pending | terminal`
+## 2. Read or map
 
-Persist it after each item through a sibling temporary file and atomic rename at
-`<memory-path>.ledger`; delete it on success. Done when paths and route are known.
+**Read:** return the saved map with snapshot path/date/head, coverage, and dirty
+overlay. Compare stored head to HEAD; disclose stale or unresolvable metadata,
+but do not repair it or inspect source to refresh claims. No report →
+`NO_REPORT`, naming searched paths. Done with `READ` when the saved map and
+limitations are presented and no file changed.
 
-## 2. Cold or refresh
+**Map:** use `references/mapping.md` for cold/rebuild exploration or committed
+warm drift. A missing/unresolvable head takes the cold path. Reuse verified
+legacy memory, but write new snapshots to the shared key; leave legacy files
+untouched. Done when every section has evidence or `None found`, limits hold,
+and the stored head equals current HEAD.
 
-Explore breadth first: manifests, top-level layout, entry points, dependency
-boundaries, commands, and conventions. Read at most three representative anchor
-files for at most 30 modules named by workspace manifests; go deeper only for
-the named focus. Use non-overlapping read-only subagents when available.
-Write every required section and evidence path, then prune to the limits.
+## 3. Resume and report
 
-Done when the memory file exists, its `head` equals current HEAD, and every
-heading contains evidence or says `None found`.
+After interruption, recompute HEAD and changed paths; restart affected work
+when the ledger differs. Resume the first pending item. Present the map in
+thread, labeling sections rebuilt, patched, or representative-only; cite its
+path, focus, drift, unverified areas, and dirty overlay. Warm maps end with
+`Drift since last recon`. Done when each claim's coverage is disclosed.
 
-## 3. Warm drift
-
-Read memory before repo files. Take the cold path if `head` is absent or not a
-resolvable commit. Otherwise collect name-status changes from stored head to
-HEAD. Rebuild through Step 2 if more than 200 files changed or changes exceed
-25% of tracked files.
-
-Otherwise read committed HEAD blobs for changed paths and memory claims citing
-them; never use dirty worktree content. Follow renames, rewrite every evidence
-path through the rename map, remove deleted evidence, and inspect one-hop
-importers when a package root, manifest, or exported entry changed. Remove or
-rewrite claims contradicted by changed files. With a named focus, reread that
-subtree within the same cap. Report dirty paths only as an overlay.
-
-Done when each committed changed path is reflected, affected claims are
-revalidated or removed, limits hold, and frontmatter names current HEAD.
-
-## 4. Resume and report
-
-After interruption, recompute HEAD and changed paths. If they differ from the
-ledger, restart the affected cold or warm step. Resume the first pending item
-from the persisted ledger. Present the updated map without requiring the user
-to open the memory file. On warm runs, end with `Drift since last recon`.
-
-Done when the report cites the memory snapshot, focus results, drift, and any
-unverified area; labels each heading rebuilt, patched, or representative-only;
-and discloses dirty paths.
-
-## Constraints
-
-- `head` always names an existing commit, never a dirty-tree placeholder.
-- Do not turn the memory into a file inventory or append-only history.
+Terminals: `READ`, `NO_REPORT`, `SUCCESS`, `BLOCKED`. Stored `head` always
+names a real commit on writes. Memory is a map, not an inventory or history.

@@ -1,85 +1,53 @@
 ---
 name: box
 description: >
-  box when cloning, updating, listing, or searching an external git repository
-  from its real local source.
+  box to manage external Git clones and answer questions from their local source.
 ---
 
 # Box
 
-## Options
+## Options and ownership
 
-Derive persist, update, list, and thread mode from the request. Unspecified:
-clone if needed, search, and report. Never persist unless asked.
-"persist" / "add to AGENTS.md" → persist after search.
-"update" / "pull first" → pull an existing clone before search.
-"list" / "what is cloned" → list the manifest and stop.
-"no subagents" / "run in this thread" → Direct mode.
-Conflicting list-plus-search wording or a missing needed URL is `BLOCKED`.
+Default clone-if-needed/search/report; persist only when asked.
+"Update"/"pull first" fast-forwards first; "list" reports clones and stops.
+"Persist"/"add to AGENTS.md" enables that write after search.
+"No subagents"/"in this thread", or unavailable delegation, selects Direct;
+otherwise Delegated. Keep this explicit mode switch, not a size heuristic.
+Conflicting list/search or missing needed URL blocks.
 
-## Paths and mode
+Resolve this skill's absolute anchor, sandbox/manifest.json, sandbox/<slug>,
+and working repo/AGENTS.md. Sandboxes stay outside the working repo.
+Direct executes stage contracts. Delegated uses one Prepare writer, disjoint
+read-only Search workers, one Persist writer; parent only dispatches/aggregates.
+A failed worker blocks; workers cannot delegate.
+Record `mode | slug/URL/path | prepare | search scopes/evidence | persist | current | terminal`.
 
-Resolve `<anchor>` as the absolute directory containing this `SKILL.md`.
-Use `<anchor>/sandbox/manifest.json` and `<anchor>/sandbox/<slug>/`. Include
-absolute paths in every brief. Resolve the working directory and its
-`AGENTS.md` to absolute paths; never place sandbox data there.
+## 1. Detect and prepare
 
-Use Direct mode when the request asks for no subagents or when no subagent
-tool exists. Otherwise use Delegated mode. Direct runs each contract itself.
-Delegated uses one Prepare writer, disjoint read-only Search workers, and one
-Persist writer; the coordinator only detects, dispatches, aggregates, and
-reports. In Delegated mode the coordinator never executes a stage contract. A
-failed stage worker makes the run `BLOCKED`. Direct mode uses the same ledger.
+Bare/list: missing manifest is empty; report slug, URL, path and stale clones,
+then stop. URL slug is final segment without .git; names match case-sensitively.
+Zero/multiple matches need a URL. Done when list is sent or identity fixed.
 
-Record:
-`mode | slug | URL | prepare | search scopes | persist | current | terminal`.
-After interruption, verify the manifest, clone, returned search evidence, and
-persist markers. Resume at the earliest incomplete done condition and
-redispatch any search scope without a result.
+For search, run/dispatch `references/prepare.md` with absolute inputs. Wait
+for validation before search. A partial clone never enters the manifest;
+unknown directories are not deleted. Done when clone origin and manifest match.
 
-## 1. Detect
+## 2. Search
 
-A list request or a bare invocation treats a missing manifest as `[]`, prints
-each slug, URL, and local path, marks invalid clones stale, then stops. With a
-URL, use its final path segment without `.git` as the slug. With a name, match
-slug case-sensitively. Zero or several matches ask for the URL.
+Assign non-overlapping subtrees/questions with absolute clone paths. Search
+local files only, read-only; no question means README/manifests/layout/entries.
+Require path:line evidence or a scoped no-match, surrounding context, and
+omissions. Briefs include anchor, identity, stage, write boundary, inputs,
+outputs, and no nested delegation. Done when every scope returns evidence.
 
-Done when the list is reported or slug, URL, and local path are resolved.
+## 3. Aggregate and persist
 
-## 2. Prepare
+Answer by theme with deduplicated citations and unsearched areas.
+Only when persist was requested and search is complete, run/dispatch
+`references/persist.md`; its only target is the working repo's AGENTS.md.
+Done when answer is cited and any authorized marker block exists exactly once.
 
-Run or dispatch the Prepare contract in `./REFERENCE.md`. Wait before search.
-A failed or partial clone is never added to the manifest. On retry, move a
-manifest-free invalid clone to a timestamped `.partial` sibling before cloning;
-never delete an unknown directory.
-
-Done when the local path contains a valid clone, its origin matches the URL,
-and the manifest entry is current, or a prepare error is reported.
-
-## 3. Search
-
-Run or dispatch the Search contract in `./REFERENCE.md`. Partition parallel
-workers by non-overlapping subtree or question. If the request gives no
-question, inspect structure, README, manifests, and entry points. Bound each
-worker to its scope and require `path:line` citations or `no matches`. Reject
-overlapping scopes before dispatch.
-
-Done when every scope returned evidence or an explicit no-match result.
-
-## 4. Aggregate and persist
-
-Answer the user's question by theme, deduplicate citations, and disclose
-unsearched areas. When persist is on, run or dispatch the Persist contract only
-after search. It may edit only the working directory's `AGENTS.md`.
-
-Done when the answer is cited and, when requested, the marker block exists
-exactly once.
-
-## 5. Report
-
-Report repo, absolute local path, prepare status, searched scopes, no-match
-areas, and persist status. Terminal values are `SUCCESS`, `BLOCKED`, and
-`NO_MATCHES`. Use `NO_MATCHES` only when every scope returned no matches.
-
-Never push, commit inside clones, infer contents from a URL, or let stages
-overlap their write ownership.
+On resume verify manifest/clone/results/markers; restart the earliest unfinished
+condition, redispatch missing searches. Report identity/path, preparation,
+scopes/no-matches, persist. SUCCESS/BLOCKED/NO_MATCHES (all scopes empty).
+No clone commits/pushes, URL-based guesses, or overlapping write ownership.

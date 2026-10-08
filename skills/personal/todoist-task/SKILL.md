@@ -1,94 +1,53 @@
 ---
 name: todoist-task
 description: >
-  todoist-task when creating or previewing Todoist tasks from natural-language
-  requirements, including projects, subtasks, dates, and consistent wording.
+  todoist-task to create or preview self-contained tasks with requested metadata.
 ---
 
 # Todoist task
 
-## Contract
+Preserve meaning, literals, links, and constraints; invent no requirements or
+completion criteria. Default Inbox, no parent/date, p4; creation unless preview.
+Record `request | title/description | project/parent/date/priority | missing | duplicate | IDs | verified | terminal`.
 
-Create tasks that remain clear without their originating conversation. Preserve
-meaning, technical literals, links, and stated constraints. Do not invent
-requirements, metadata, or completion criteria.
+## 1. Resolve and clarify
 
-Derive the project, parent, due date, priority, and whether to create or preview
-from the user's natural-language request. Default to Inbox, no due date, `p4`,
-and no parent when the user supplies none.
+Use Todoist connector only. Unavailable/disconnected blocks, not substitution.
+Preview uses read-only metadata resolution and never creates a task/project.
+Resolve relative dates with user's Todoist timezone/configured week; ordinary
+deadline/done-by means due date, dedicated deadline only when explicitly asked
+and supported.
+Resolve project exactly, create one only if requested. Parent needs URL/ID/
+unique title; subtasks have no date unless supplied or inheritance was requested.
 
-Record:
-`request | title | project | parent | due | priority | missing | duplicate | created | verified | terminal`
+Apply future-reader test: identifiable/executable six months later without the
+conversation? Projects do not name tools/repos/branches/files/issues.
+Ask one question listing missing identifiers, create nothing that turn, then
+resume without another confirmation. User-accepted ambiguity is recorded.
+Done when metadata and references resolve or uncertainty is explicitly accepted.
 
-Terminals are `CREATED`, `PREVIEW`, `NEEDS_CONTEXT`, `DUPLICATE`, and `BLOCKED`.
+## 2. Format
 
-## 1. Resolve
+Title: action verb + specific deliverable + necessary qualifier, sentence case,
+no period; aim 4–10 words, specificity wins. Preserve exact technical names.
+Description: short context/result sentence, bullets for distinct supplied
+requirements, supplied test/delivery/follow-up last. Hyperlink links.
+Use headings only for distinct areas of a long task; avoid imposed Objective/
+Requirements/Done when boilerplate, repeated metadata, and invented work.
+Done when title and description stand alone and read naturally.
 
-Use the Todoist connector. If unavailable or disconnected, report `BLOCKED`;
-do not substitute another service.
+## 3. Preview or create
 
-Resolve relative dates with the user's Todoist timezone and configured week.
-Treat ordinary "deadline" or "done by" wording as a due date. Use Todoist's
-deadline feature only when explicitly requested and supported.
+Resolve project/parent and search active normalized title + parent;
+match → DUPLICATE. Preview shows exact payload and returns PREVIEW without
+write calls. Otherwise create each item once; never retry batch successes.
+Done when preview is sent or each creation has an ID/identified failure.
 
-Resolve a named project exactly. Do not create a missing project unless the user
-requested it. Resolve a parent from its URL, ID, or unique title. Subtasks receive
-no due date unless the user supplies one or asks to inherit the parent's date.
+## 4. Verify
 
-Done when every supplied metadata field has one resolved value.
+Read back every created title/description/project/parent/date/priority.
+Correct an authorized mismatch once; remaining difference → BLOCKED with ID.
+Report verified title, project, parent if present, due date.
+Done when every reported success matches the service.
 
-## 2. Require specificity
-
-Apply the future-reader test: could the user identify and execute this task six
-months later without the conversation that created it?
-
-Find unnamed references such as "the two tools", "the old implementation", "the
-current branch", "the issue", or "the updated prompt". A project identifies the
-company, not its tools, repositories, branches, issues, files, or designs.
-
-If identifiers are missing, ask one concise question listing all missing items.
-Do not create the task in that turn. Resume after the answer without requesting
-another confirmation. URLs, IDs, and unique names resolve references. If the
-user accepts vague wording, record that choice.
-
-Done when the task passes the test or the user accepts the named ambiguity.
-
-## 3. Format
-
-Write the title as `Action verb + specific deliverable + necessary qualifier`.
-Use sentence case and no trailing period. Aim for 4 to 10 words, but let
-specificity override the length limit. Preserve exact technical names.
-
-Write the description in natural language. Begin with a short sentence that
-explains the intended result or relevant context. Use bullets for distinct
-requirements. End with any testing, delivery, or follow-up instructions supplied
-by the user. Hyperlink every link and keep descriptions cleanly formatted.
-
-Do not impose headings such as `Objective`, `Requirements`, or `Done when`. Use
-headings only when a long task contains separate areas of work. Clarify the
-wording without making it formal, repetitive, or impersonal. Do not repeat
-metadata or add work the user did not request.
-
-Done when the title identifies the work and the description reads naturally
-without depending on the original conversation.
-
-## 4. Check and create
-
-Resolve the project and parent through read-only calls. Search for an active task
-with the same normalized title and parent. If found, report `DUPLICATE` and do
-not create another.
-
-If the user requested a preview, present the exact title, description, and
-metadata, then stop with `PREVIEW`. Otherwise create the recorded task once. In
-a batch, never retry successful items because another item failed.
-
-Done when creation returns an ID or every failure is identified.
-
-## 5. Verify
-
-Fetch each created task and compare its title, description, project, parent, due
-date, and priority with the recorded payload. Correct an authorized mismatch
-once. If it remains, report `BLOCKED` with the ID and exact difference.
-
-Report the verified title, project, parent when present, and due date.
-Done when every reported success matches Todoist.
+Terminals: CREATED, PREVIEW, NEEDS_CONTEXT, DUPLICATE, BLOCKED.
