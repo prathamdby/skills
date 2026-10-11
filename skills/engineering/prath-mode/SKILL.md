@@ -28,6 +28,7 @@ leaf; playbooks own predetermined order, not copies of leaf behavior.
 - `codex`: Codex CLI, `playbooks/codex.md`
 - `todoist`: task creation/preview, `playbooks/todoist.md`
 - `use-skill`: remote skill execution, `playbooks/use-skill.md`
+- `restate`: plain restatement and catch-up, `playbooks/restate.md`
 - `ship`: implement/deslop/commit/PR, `playbooks/ship.md`
 - `design-then-ship`: design and delivery, `playbooks/design-then-ship.md`
 - `save-work`: optional cleanup/commit, `playbooks/save-work.md`
