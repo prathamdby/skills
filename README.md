@@ -45,6 +45,7 @@ codex plugin add skills@pratham-skills
 - `/box` manages local clones of external repositories and answers questions from their source.
 - `/use-skill` runs remote skills from GitHub links without installing them.
 - `/todoist-task` creates or previews Todoist tasks that make sense without the original conversation.
+- `/restate` restates the last message in plain language, catches the user up, and summarizes any decision they need to make.
 - `/handoff` saves session context and validates it when resuming work.
 - `/orchestrate` coordinates delegated work while keeping the main agent responsible for verification.
 - `/cursor-agent` runs and manages the local Cursor Agent CLI and verifies its results.
@@ -68,6 +69,7 @@ codex plugin add skills@pratham-skills
 | The agent guesses what an external repository contains. | [`box`](./skills/engineering/box/SKILL.md) | Answers questions from managed local clones of the actual source. |
 | The agent needs a remote skill without adding it to the installed collection. | [`use-skill`](./skills/personal/use-skill/SKILL.md) | Fetches and runs GitHub-hosted skills on demand. |
 | Tasks lose their meaning when separated from the conversation that created them. | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Creates clear Todoist tasks with the requested context and metadata. |
+| Replies stay in jargon, so the user cannot tell what happened or what they need to decide. | [`restate`](./skills/personal/restate/SKILL.md) | Restates the last message in plain language and summarizes any decision. |
 | Work resumes with lost context or stale assumptions about artifacts and progress. | [`handoff`](./skills/engineering/handoff/SKILL.md) | Saves actionable session context and validates it before continuing. |
 | Delegated work overlaps or is accepted without checking the result. | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md) | Coordinates subagents with clear ownership and verified outcomes. |
 | Cursor Agent runs use incorrect commands or workspace permissions. | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Runs and manages the local CLI while respecting permissions and verifying results. |
@@ -91,6 +93,7 @@ codex plugin add skills@pratham-skills
 | [`box`](./skills/engineering/box/SKILL.md) | Manage and research external repositories from local source. |
 | [`use-skill`](./skills/personal/use-skill/SKILL.md) | Run GitHub-hosted skills on demand without installing them. |
 | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Create or preview clear, self-contained Todoist tasks. |
+| [`restate`](./skills/personal/restate/SKILL.md) | Restate the last message in plain language and summarize any decision. |
 | [`handoff`](./skills/engineering/handoff/SKILL.md) | Preserve session context and resume work from validated state. |
 | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md) | Coordinate delegated work with verified ownership and results. |
 | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Run, manage, and verify local Cursor Agent CLI work. |
