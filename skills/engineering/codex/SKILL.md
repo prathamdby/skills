@@ -14,7 +14,9 @@ wait 15m. Calling this skill authorizes that run: pass `--yolo` without asking.
 pass `--yolo`, not both. Bare `codex` is an asked-for TUI and omits `--yolo`.
 "Use <model>" adds `-m`. A named sandbox adds `--sandbox <mode>` and omits
 `--yolo`. "Worktree" adds boolean `--worktree`, never a name or invented path.
-"Review" selects `codex --yolo review`. Missing values or conflicts are `BLOCKED`.
+"Review" selects `codex --yolo review` unless a sandbox is named. A named
+sandbox omits `--yolo` and uses `codex exec --sandbox <mode> review`.
+Missing values or conflicts are `BLOCKED`.
 
 `--full-auto` is rejected. `--search` and `--ask-for-approval` are global,
 before `exec`, and only when the user names them. Skip-git-repo-check,
