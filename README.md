@@ -72,9 +72,9 @@ codex plugin add skills@pratham-skills
 | Replies stay in jargon, so the user cannot tell what happened or what they need to decide. | [`restate`](./skills/personal/restate/SKILL.md) | Restates the last message in plain language and summarizes any decision. |
 | Work resumes with lost context or stale assumptions about artifacts and progress. | [`handoff`](./skills/engineering/handoff/SKILL.md) | Saves actionable session context and validates it before continuing. |
 | Delegated work overlaps or is accepted without checking the result. | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md) | Coordinates subagents with clear ownership and verified outcomes. |
-| Cursor Agent runs use incorrect commands or workspace permissions. | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Runs and manages the local CLI while respecting permissions and verifying results. |
-| Claude Code runs confuse execution modes and permissions. | [`claude-code`](./skills/engineering/claude-code/SKILL.md) | Runs and manages the local CLI while respecting permissions and verifying results. |
-| Codex runs confuse execution modes and sandbox behavior. | [`codex`](./skills/engineering/codex/SKILL.md) | Runs and manages the local CLI while respecting permissions and verifying results. |
+| Cursor Agent runs use the wrong command or stop to ask for workspace trust. | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Runs the local CLI with `--trust` and `--yolo` when the skill is invoked, and verifies results. |
+| Claude Code runs confuse execution modes or stop on a permission prompt. | [`claude-code`](./skills/engineering/claude-code/SKILL.md) | Runs the local CLI with permission checks skipped when the skill is invoked, and verifies results. |
+| Codex runs confuse execution modes or stop for approval. | [`codex`](./skills/engineering/codex/SKILL.md) | Runs the local CLI with `--yolo` when the skill is invoked, and verifies results. |
 
 ## Reference
 

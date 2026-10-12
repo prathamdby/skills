@@ -1,7 +1,9 @@
 # Sessions
 
-Use `codex exec resume <id> "<prompt>"`, or `--last` for the recorded most
-recent session. Fork with `codex exec fork <id> "<prompt>"`.
+Use `codex exec --yolo -C <abs-dir> resume <id> "<prompt>"`. The previous
+session uses `--last` in that same argv. Fork with
+`codex exec --yolo -C <abs-dir> fork <id> "<prompt>"`.
+A named sandbox omits `--yolo`.
 Record the session id before another follow-up.
 
 Top-level `codex resume` and `codex fork` open/continue a TUI.
