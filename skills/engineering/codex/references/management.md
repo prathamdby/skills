@@ -1,7 +1,8 @@
 # Review, interactive, and management commands
 
-Review uses `codex --yolo review --base <branch>`, `--uncommitted`, or
-`--commit <sha>`. Optional title/prompt are user-derived. Top-level review
+Review uses the leaf argv, which includes `--yolo`:
+`codex --yolo review --base <branch>`, `--uncommitted`, or `--commit <sha>`.
+Optional title/prompt are user-derived. Top-level review
 rejects sandbox, -C, JSON, and skip-git-repo-check: run in the target cwd.
 For exec output flags use `codex exec --yolo review`. A rejected `--yolo` on
 review uses scoped help and does not become a prompt. Done when the review
