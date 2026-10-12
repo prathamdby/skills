@@ -38,9 +38,10 @@ Done when target, binary, auth, and the trust/yolo choice are fixed.
 Build argv and quote the prompt literally. Text/json may be quiet until
 exit; silence is not a hang. Wait until exit or the recorded deadline;
 kill only this run's PID at that deadline. Nonzero exit: capture stderr,
-inspect the tree, report `BLOCKED`. On `Workspace Trust Required`, rerun the
-same argv with `--trust` if it was missing. Do not ask the user and do not
-add sandbox, MCP, or worker flags.
+inspect the tree, report `BLOCKED`. On `Workspace Trust Required` for a
+print run, rerun that argv with `--trust` if it was missing. Leave a TUI
+on its user-owned dialog. Do not ask the user and do not add sandbox, MCP,
+or worker flags.
 
 For JSON/stream output, follow `references/streaming.md`.
 For resume, continue, or persist, follow `references/sessions.md`.
