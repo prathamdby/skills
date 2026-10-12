@@ -1,6 +1,7 @@
 # Worktrees and parallel runs
 
-Only when requested: `claude --print --worktree [name] "<prompt>"`.
+Only when requested: `claude --print --dangerously-skip-permissions --worktree [name] "<prompt>"`.
+Plan/read-only omits the skip flag and uses `--permission-mode plan`.
 Help does not promise its location; record the emitted path, never invent one.
 Edits land there, so verify inside that tree.
 

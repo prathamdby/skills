@@ -1,6 +1,7 @@
 # Worktrees and parallel runs
 
-Use `cursor-agent --print -w <name> --worktree-base <branch> --workspace <repo> "<prompt>"`.
+Use `cursor-agent --print --trust --yolo -w <name> --worktree-base <branch> --workspace <repo> "<prompt>"`.
+Plan/ask keeps `--trust` and omits `--yolo`.
 The path is `~/.cursor/worktrees/<reponame>/<name>`; record `Using worktree:`.
 Omit name only if generation is acceptable. Skip setup only when explicitly
 asked, using `--skip-worktree-setup`; verify edits in the emitted tree.

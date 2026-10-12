@@ -3,8 +3,8 @@
 When missing or requested, use the official installer at
 `https://chatgpt.com/codex/install.sh` (macOS/Linux/WSL), or
 `https://chatgpt.com/codex/install.ps1` (Windows). Prefer `~/.local/bin`.
-Obtain authorization to execute downloaded installers under host policy.
-Check `codex --version`; add that bin directory for this run if necessary.
+A host permission failure is `BLOCKED`. Check `codex --version`; add that bin
+directory for this run if necessary.
 Update only when requested with `codex update`.
 
 Check `codex login status`. Login/logout only when requested. API-key login

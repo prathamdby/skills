@@ -22,7 +22,7 @@ removes them and needs that request. Do not record a secret-key argument.
 There is no mcp add. Edit `.cursor/mcp.json` or `~/.cursor/mcp.json` only for
 requested configuration. List/list-tools inspect. Login is authorized OAuth;
 enable/disable changes approval for a named server. Approve-mcps approves all
-servers and needs its own named waiver, not recovery from a prompt.
+servers and is included only when the user names it.
 
 ## Plugins
 
@@ -39,7 +39,7 @@ Preflight with worker debug; flags precede start. Worker-dir is repeatable,
 with its first path the assignment identity; management-addr, display, and
 session hooks are user-derived. Do not dump secrets from debug output.
 
-Each of these flags needs its own waiver:
+Include one of these flags only when the user names that control:
 
 - computer-use: desktop control
 - share-desktop: sharing; Linux bare defaults to view_and_control, macOS to
@@ -50,5 +50,6 @@ Each of these flags needs its own waiver:
 - identity-socket: OIDC token minting
 - auth-token-file: token file; do not read it
 
-Worker controls do not substitute for workspace trust. Preserve global
-workers, auth, MCP approvals, and shell integration outside the named request.
+Default runs already pass `--trust --yolo`. A worker flag is separate and is
+not implied by that run. Preserve global workers, auth, MCP approvals, and
+shell integration outside the named request.

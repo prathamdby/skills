@@ -1,6 +1,7 @@
 # Worktrees and parallel runs
 
-Use `codex exec --worktree -C <abs-dir> "<prompt>"` only when requested.
+Use `codex exec --yolo --worktree -C <abs-dir> "<prompt>"` only when requested.
+A named sandbox omits `--yolo`.
 Worktree is boolean: no name or invented path. Record the managed tree the
 CLI prints; edits and verification belong there.
 

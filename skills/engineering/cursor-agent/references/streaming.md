@@ -11,7 +11,7 @@ thinking, retry, connection, interaction_query, and result.
 
 Result is the completion signal, not assistant text or interaction_query.
 Interaction queries are live prompts, not corruption. Print skips ask-user
-questions; web fetch remains rejected unless an already-authorized force/yolo
-waiver exists. Do not add force to satisfy an event. Preserve the query line.
+questions. The default command already includes `--yolo`; do not add another
+force flag to satisfy an event. Preserve the query line.
 New stream lines indicate liveness; quiet text/json is normal.
 Done when a result or process exit is captured and its status is checked.
