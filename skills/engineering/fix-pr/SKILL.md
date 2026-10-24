@@ -60,11 +60,15 @@ verified commit is pushed; a local-only fix is not pushed success.
 With replies on, apply `references/replies.md` then
 `references/unslop-reply-drafts.md`. Consolidate shared parents, preserve bot
 prefixes, and post only through gh's reply script. Skip satisfied targets.
-For failure refetch only that target and retry once; another failure blocks.
+An inline reply failure is not retried. Follow the pr-reply error and post
+that body on the main conversation. A main-conversation post that fails is
+refetched and retried once; another failure blocks.
 Fixed replies require a pushed SHA. Do not resolve unless explicitly asked
 and supported by a separately authorized operation.
 Report finding/verdict/action/evidence, URL, commit/push, hunt counts, and
 unreplied targets. Done when all authorized replies match their verdicts.
 
 Terminals: SUCCESS, NO_CODE_CHANGE, AWAITING_PUSH, BLOCKED. Never SUCCESS
-with unreplied targets. Resume restarts Synchronize; no merge-conflict fixes.
+with an unsatisfied finding. A finding answered in its inline thread, or on
+the main conversation via fallback, is satisfied. Resume restarts
+Synchronize; no merge-conflict fixes.

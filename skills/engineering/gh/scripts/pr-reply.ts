@@ -60,6 +60,36 @@ function replyPath(repo: string, pr: number, rootId?: number): string {
   return `repos/${repo}/issues/${pr}/comments`;
 }
 
+function inlineReplyFailed(e: unknown): Error {
+  const detail = e instanceof Error ? e.message : String(e);
+  return new Error(
+    `${detail}\nInline reply failed. Post this same body with --conversation on the main conversation.`,
+  );
+}
+
+async function findExistingReply(
+  repo: string,
+  pr: number,
+  rootId: number,
+  body: string,
+): Promise<Posted | undefined> {
+  let seen: number | undefined;
+  for (let page = 1; ; page++) {
+    const comments = await restJson<Posted[]>(
+      `repos/${repo}/pulls/${pr}/comments`,
+      { per_page: "100", page: String(page) },
+    );
+    const first = comments[0]?.id;
+    if (comments.length === 0 || first === seen) return undefined;
+    seen = first;
+    const hit = comments.find(
+      (comment) => comment.in_reply_to_id === rootId && comment.body === body,
+    );
+    if (hit) return hit;
+    if (comments.length < 100) return undefined;
+  }
+}
+
 function readReplyBody(
   body: string | undefined,
   bodyFile: string | undefined,
@@ -101,13 +131,33 @@ run(async () => {
   const repo = await resolveRepo(v.repo);
 
   let rootId: number | undefined;
+  let posted: Posted;
   if (threadId != null) {
-    const existing = await restJson<Posted>(
-      `repos/${repo}/pulls/comments/${threadId}`,
-    );
-    rootId = existing.in_reply_to_id ?? existing.id;
+    try {
+      const existing = await restJson<Posted>(
+        `repos/${repo}/pulls/comments/${threadId}`,
+      );
+      const id = existing.in_reply_to_id ?? existing.id;
+      if (id == null) throw new Error(`review comment ${threadId} has no id`);
+      rootId = id;
+      try {
+        posted = await restPost<Posted>(replyPath(repo, pr, rootId), { body });
+      } catch (postErr) {
+        let already: Posted | undefined;
+        try {
+          already = await findExistingReply(repo, pr, id, body);
+        } catch {
+          already = undefined;
+        }
+        if (!already) throw postErr;
+        posted = already;
+      }
+    } catch (e) {
+      throw inlineReplyFailed(e);
+    }
+  } else {
+    posted = await restPost<Posted>(replyPath(repo, pr, rootId), { body });
   }
-  const posted = await restPost<Posted>(replyPath(repo, pr, rootId), { body });
   const url = posted.html_url ?? posted.url ?? "";
   const kind = rootId != null ? "thread" : "conversation";
   if (v.json) {
