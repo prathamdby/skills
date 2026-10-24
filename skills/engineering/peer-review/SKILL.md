@@ -13,8 +13,8 @@ Analysis, not edit authority. Judge the stated problem before the change.
 Require the target artifact and governing requirements by path, URL, pasted
 text, or attached context. None → `BLOCKED: review target required`, asking
 for one pointer. Do not reconstruct the target from conversation memory.
-If the stated problem is ambiguous, keep the named target and record the
-ambiguity in Findings.
+If the stated problem is ambiguous, keep the named target and record that
+ambiguity as a material finding.
 Record `target | requirements | evidence | findings | verdict | edit authority`.
 Done when target and requirements are fixed or the blocked report is sent.
 
@@ -29,8 +29,8 @@ Unrelated architecture is outside scope. Label each load-bearing claim
 checked, inferred, or supplied and unchecked. A verified code fact does not
 verify a product conclusion. A claim that depends on a dependency stays
 unchecked until its manifest or lockfile and the dependency's own source or
-docs are read. On resume, verify the target and the requirements. A change
-restarts Resolve.
+docs are read. On resume, verify the target and the requirements. If either
+changed, restart Resolve and do not reuse the earlier findings.
 Done when each claim cites requirements, target, source, test, or history,
 and carries its label.
 
