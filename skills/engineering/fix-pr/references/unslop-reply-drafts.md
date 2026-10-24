@@ -11,8 +11,8 @@ meaning, IDs, paths, SHAs, or required bot commands.
 
 ## Reply contract
 
-- Lead with the result: fixed, rejected, already fixed, or needs clarification.
-- Use one to three short sentences. A consolidated parent may use one bullet per finding.
+- During the voice pass, the opening in `replies.md` stays as written.
+- A consolidated parent may use one bullet per finding.
 - Name the concrete code path, behavior, test, or commit.
 - Use "I" only for an action actually taken.
 - Keep uncertainty when evidence is incomplete. Do not add fake confidence.
