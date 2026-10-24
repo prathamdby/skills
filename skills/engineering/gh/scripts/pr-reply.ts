@@ -78,12 +78,8 @@ function threadCheckFailed(postErr: unknown, lookupErr: unknown): ThreadCheckErr
   );
 }
 
-async function findExistingReply(
-  repo: string,
-  pr: number,
-  rootId: number,
-  body: string,
-): Promise<Posted | undefined> {
+async function listReviewComments(repo: string, pr: number): Promise<Posted[]> {
+  const all: Posted[] = [];
   let seen: number | undefined;
   for (let page = 1; ; page++) {
     const comments = await restJson<Posted[]>(
@@ -91,14 +87,45 @@ async function findExistingReply(
       { per_page: "100", page: String(page) },
     );
     const first = comments[0]?.id;
-    if (comments.length === 0 || first === seen) return undefined;
+    if (comments.length === 0 || first === seen) return all;
     seen = first;
-    const hit = comments.find(
-      (comment) => comment.in_reply_to_id === rootId && comment.body === body,
-    );
-    if (hit) return hit;
-    if (comments.length < 100) return undefined;
+    all.push(...comments);
+    if (comments.length < 100) return all;
   }
+}
+
+function replyAlreadyInThread(
+  comments: readonly Posted[],
+  rootId: number,
+  body: string,
+): Posted | undefined {
+  return comments.find(
+    (comment) => comment.in_reply_to_id === rootId && comment.body === body,
+  );
+}
+
+async function findExistingReply(
+  repo: string,
+  pr: number,
+  rootId: number,
+  body: string,
+): Promise<Posted | undefined> {
+  return replyAlreadyInThread(await listReviewComments(repo, pr), rootId, body);
+}
+
+async function findReplyAfterGetFailure(
+  repo: string,
+  pr: number,
+  threadId: number,
+  body: string,
+): Promise<{ rootId: number; posted: Posted } | undefined> {
+  const comments = await listReviewComments(repo, pr);
+  const target = comments.find((comment) => comment.id === threadId);
+  const rootId = target ? (target.in_reply_to_id ?? target.id) : threadId;
+  if (rootId == null) return undefined;
+  const posted = replyAlreadyInThread(comments, rootId, body);
+  if (!posted) return undefined;
+  return { rootId, posted };
 }
 
 function readReplyBody(
@@ -145,23 +172,49 @@ run(async () => {
   let posted: Posted;
   if (threadId != null) {
     try {
-      const existing = await restJson<Posted>(
-        `repos/${repo}/pulls/comments/${threadId}`,
-      );
-      const id = existing.in_reply_to_id ?? existing.id;
-      if (id == null) throw new Error(`review comment ${threadId} has no id`);
-      rootId = id;
+      let existing: Posted;
       try {
-        posted = await restPost<Posted>(replyPath(repo, pr, rootId), { body });
-      } catch (postErr) {
-        let already: Posted | undefined;
+        existing = await restJson<Posted>(
+          `repos/${repo}/pulls/comments/${threadId}`,
+        );
+      } catch (getErr) {
         try {
-          already = await findExistingReply(repo, pr, id, body);
+          const recovered = await findReplyAfterGetFailure(
+            repo,
+            pr,
+            threadId,
+            body,
+          );
+          if (recovered) {
+            rootId = recovered.rootId;
+            posted = recovered.posted;
+            existing = recovered.posted;
+          } else {
+            throw getErr;
+          }
         } catch (lookupErr) {
-          throw threadCheckFailed(postErr, lookupErr);
+          if (lookupErr === getErr) throw getErr;
+          throw threadCheckFailed(getErr, lookupErr);
         }
-        if (!already) throw postErr;
-        posted = already;
+      }
+      if (rootId == null) {
+        const id = existing.in_reply_to_id ?? existing.id;
+        if (id == null) throw new Error(`review comment ${threadId} has no id`);
+        rootId = id;
+        try {
+          posted = await restPost<Posted>(replyPath(repo, pr, rootId), {
+            body,
+          });
+        } catch (postErr) {
+          try {
+            const already = await findExistingReply(repo, pr, id, body);
+            if (!already) throw postErr;
+            posted = already;
+          } catch (lookupErr) {
+            if (lookupErr === postErr) throw postErr;
+            throw threadCheckFailed(postErr, lookupErr);
+          }
+        }
       }
     } catch (e) {
       if (e instanceof ThreadCheckError) throw e;
