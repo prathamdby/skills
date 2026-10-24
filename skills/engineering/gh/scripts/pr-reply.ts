@@ -60,10 +60,21 @@ function replyPath(repo: string, pr: number, rootId?: number): string {
   return `repos/${repo}/issues/${pr}/comments`;
 }
 
+class ThreadCheckError extends Error {}
+
 function inlineReplyFailed(e: unknown): Error {
   const detail = e instanceof Error ? e.message : String(e);
   return new Error(
     `${detail}\nInline reply failed. Post this same body with --conversation on the main conversation.`,
+  );
+}
+
+function threadCheckFailed(postErr: unknown, lookupErr: unknown): ThreadCheckError {
+  const postDetail = postErr instanceof Error ? postErr.message : String(postErr);
+  const lookupDetail =
+    lookupErr instanceof Error ? lookupErr.message : String(lookupErr);
+  return new ThreadCheckError(
+    `${postDetail}\nCould not check the thread for an existing reply: ${lookupDetail}\nVerify the thread before posting this body on the main conversation.`,
   );
 }
 
@@ -146,13 +157,14 @@ run(async () => {
         let already: Posted | undefined;
         try {
           already = await findExistingReply(repo, pr, id, body);
-        } catch {
-          already = undefined;
+        } catch (lookupErr) {
+          throw threadCheckFailed(postErr, lookupErr);
         }
         if (!already) throw postErr;
         posted = already;
       }
     } catch (e) {
+      if (e instanceof ThreadCheckError) throw e;
       throw inlineReplyFailed(e);
     }
   } else {
