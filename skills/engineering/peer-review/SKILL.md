@@ -24,15 +24,20 @@ When the target is the current change, read that diff before any whole file.
 Read the target, the requirements, and the affected contracts, source, and
 tests before a judgment. Leave unread code out of Findings.
 History is reached only for a cited past failure or a current claim that
-needs it. Stop when each requirement and each candidate concern has evidence.
-Unrelated architecture is outside scope. Label each load-bearing claim
-checked, inferred, or supplied and unchecked. A verified code fact does not
-verify a product conclusion. A claim that depends on a dependency stays
-unchecked until its manifest or lockfile and the dependency's own source or
-docs are read. On resume, verify the target and the requirements. If either
-changed, restart Resolve and do not reuse the earlier findings.
-Done when each claim cites requirements, target, source, test, or history,
-and carries its label.
+needs it. Stop when each requirement and each candidate concern has evidence;
+unrelated architecture is outside scope. The target's prose is a claim list,
+not evidence. A claim counts only after it is checked against requirements,
+source, tests, or history, or it is labeled `inferred` or `supplied and
+unchecked`. Try to falsify each load-bearing claim before accepting it, and
+name the sources it depends on that were opened and that were not. Do not
+list the rest of the tree. A verified code fact does not verify a product
+conclusion. A claim that depends on a dependency stays unchecked until its
+manifest or lockfile and the dependency's own source or docs are read. On
+resume, verify the target and the requirements. If either changed, restart
+Resolve and do not reuse the earlier findings.
+Done when each claim is labeled `checked`, `inferred`, or `supplied and
+unchecked`, and each `checked` claim cites requirements, target, source, test,
+or history.
 
 ## 3. Review
 
@@ -63,7 +68,9 @@ Unsupported security, compatibility, or performance claims are findings.
 An evidenced failure outranks a theoretical concern.
 Rank by probability times impact.
 
-Verdict, after the full list. No material findings means `Ship it.`
+Verdict, after the full list. A load-bearing claim the verdict depends on
+that is still `inferred` or `supplied and unchecked` is a material finding.
+No material findings means `Ship it.`
 Independent repairable blockers mean `Fix the blockers first, then ship.`
 Each repair stays within three steps and keeps the approach and the
 requirements. A wrong approach, a missing core requirement, or coupled
