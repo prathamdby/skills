@@ -64,15 +64,21 @@ patterns, not implementation bodies or restatements. Standard/deep includes:
 Assumptions; Shape (bold sentence + pattern); Layer map (NEW/CHANGED roles);
 phase sequence; file-plus-symbol grounding (prose: file + contract step);
 worst-first Risks (probability × impact, or stated judgment); Milestones;
-non-goals; Handoff. Sketch includes only Shape and Risks.
+non-goals. Sketch includes only Shape and Risks.
 
-Small work is one PR; otherwise each milestone is a reviewable vertical PR.
-Begin with the thinnest end-to-end contract/check slice. Name landed symbols,
-expected success and relevant failure outcomes, and assertions or observed
-manual results proving them. Exit zero alone is not proof.
-Handoff follows the caller's next route; default `/peer-review`, then `ship`.
-When nothing will be built, such as a docs-only plan, use `/peer-review` or
-stop. Preserve an explicit caller route.
+Small work is one PR. Larger work lists every milestone in build order, and
+each milestone is one reviewable vertical PR. Approval covers that whole
+list, in that order. The first milestone is the thinnest end-to-end
+contract/check slice. Later milestones stay in the same approval. Do not
+ask which milestone to build.
+Name landed symbols, expected success and relevant failure outcomes, and
+assertions or observed manual results proving them. Exit zero alone is not
+proof.
+End the plan on its last section. End a DIRECT reply on its three lines.
+End a BLOCKED reply on the missing piece and the workable example. Add no
+next step, handoff, review route, or ship route in any section. A route the
+caller already has stays with the caller. Name a skill or file when the work
+changes it.
 Done with `PLANNED` when behavior is grounded or assumed, risks are owned,
 and every milestone has outcome-linked checks.
 
