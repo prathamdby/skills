@@ -1,7 +1,7 @@
 ---
 name: restate
 description: >
-  Plain restatement
+  When the user wants the last reply said again in plain words, or wants the decision they need to make.
 ---
 
 # Restate

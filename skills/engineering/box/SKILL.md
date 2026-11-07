@@ -1,7 +1,7 @@
 ---
 name: box
 description: >
-  External repository
+  When the user wants a question answered from a local clone of another Git repository.
 ---
 
 # Box

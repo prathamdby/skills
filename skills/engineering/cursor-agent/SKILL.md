@@ -1,7 +1,7 @@
 ---
 name: cursor-agent
 description: >
-  cursor-agent CLI
+  When the user wants the local cursor-agent CLI run or its installation, login, or connected tools changed.
 ---
 
 # Cursor Agent

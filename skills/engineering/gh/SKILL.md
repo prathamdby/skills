@@ -1,7 +1,7 @@
 ---
 name: gh
 description: >
-  Inspect GitHub
+  When the user wants a pull request, its discussion, its checks, or another GitHub record read, or a reply posted without a code change.
 ---
 
 # GitHub I/O

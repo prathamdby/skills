@@ -1,7 +1,7 @@
 ---
 name: fix-pr
 description: >
-  Fix review feedback
+  When the user wants review comments or failing checks on a pull request fixed in the code.
 ---
 
 # Fix PR

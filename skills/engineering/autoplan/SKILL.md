@@ -1,7 +1,7 @@
 ---
 name: autoplan
 description: >
-  Plan without questions
+  When the user wants an implementation plan written without stopping for questions.
 ---
 
 # Autoplan

@@ -1,7 +1,7 @@
 ---
 name: peer-review
 description: >
-  Ready to build
+  When the user asks whether a plan, a design, or a proposed change is ready to build.
 ---
 
 # Peer review

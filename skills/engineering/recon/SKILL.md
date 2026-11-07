@@ -1,7 +1,7 @@
 ---
 name: recon
 description: >
-  Map this repo
+  When the user wants this repository's saved map read, created, or refreshed.
 ---
 
 # Recon

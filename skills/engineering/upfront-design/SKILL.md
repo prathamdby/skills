@@ -1,7 +1,7 @@
 ---
 name: upfront-design
 description: >
-  Phased design
+  When the user wants a design agreed before coding, a draft resumed, or an approved milestone checked.
 ---
 
 # Upfront design

@@ -1,7 +1,7 @@
 ---
 name: todoist-task
 description: >
-  Todoist task
+  When the user wants a Todoist task created, or shown before it is created.
 ---
 
 # Todoist task

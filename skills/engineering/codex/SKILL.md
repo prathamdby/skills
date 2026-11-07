@@ -1,7 +1,7 @@
 ---
 name: codex
 description: >
-  Codex CLI
+  When the user wants the local Codex CLI run or its installation, login, or connected tools changed.
 ---
 
 # Codex

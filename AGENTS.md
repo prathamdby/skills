@@ -15,10 +15,11 @@ Skills make the agent follow a predictable process, not produce identical output
 
 ## Description triggers
 
-The frontmatter field stays named `description`. Use a few meaningful words
-for the cue that should activate this skill. Put the distinguishing word
-first. Cut long sentences, lists, extra qualifiers, and explanation. Leave
-the procedure in the body.
+The frontmatter field stays named `description`. Write one short sentence
+that says when to activate this skill. Open on the situation, and include
+the detail that separates it from a neighboring skill. Prefer clarity over
+extreme brevity. There is no word-count target. Leave the procedure and
+the result in the body.
 
 ## Before committing
 

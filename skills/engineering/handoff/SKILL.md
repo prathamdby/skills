@@ -1,7 +1,7 @@
 ---
 name: handoff
 description: >
-  Handoff
+  When the user wants context saved for a later session, or work continued from a handoff.
 ---
 
 # Handoff

@@ -1,7 +1,7 @@
 ---
 name: claude-code
 description: >
-  Claude Code CLI
+  When the user wants the local Claude Code CLI run or its installation, login, or connected tools changed.
 ---
 
 # Claude Code

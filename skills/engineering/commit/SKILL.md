@@ -1,7 +1,7 @@
 ---
 name: commit
 description: >
-  Commit the changes
+  When the user wants the current git changes saved as a commit.
 ---
 
 # Commit

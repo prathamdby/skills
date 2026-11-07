@@ -1,7 +1,7 @@
 ---
 name: use-skill
 description: >
-  Run a remote skill
+  When the user gives a GitHub link to a skill and wants it run without installing it.
 ---
 
 # Use skill
