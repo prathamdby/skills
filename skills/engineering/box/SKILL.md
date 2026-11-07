@@ -1,7 +1,7 @@
 ---
 name: box
 description: >
-  External Git repositories activate this skill when the user asks about one, or asks to list, update, or read a local clone. A map of the working repo is the recon skill.
+  External repository
 ---
 
 # Box

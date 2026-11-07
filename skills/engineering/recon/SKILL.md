@@ -1,7 +1,7 @@
 ---
 name: recon
 description: >
-  Codebase maps activate this skill when the user asks to read this repo's saved map, to map the repo, or to refresh that map. An external repository is the box skill.
+  Map this repo
 ---
 
 # Recon

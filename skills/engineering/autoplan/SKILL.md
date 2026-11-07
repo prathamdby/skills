@@ -1,7 +1,7 @@
 ---
 name: autoplan
 description: >
-  Implementation plans with no questions activate this skill, including a request named autoplan. A design that must be agreed in phases is the upfront-design skill.
+  Plan without questions
 ---
 
 # Autoplan

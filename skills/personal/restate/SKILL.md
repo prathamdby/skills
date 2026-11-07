@@ -1,8 +1,7 @@
 ---
 name: restate
 description: >
-  Restating activates this skill when the user asks for the last reply in
-  plain words, a catch-up since their last message, or what they need to decide.
+  Plain restatement
 ---
 
 # Restate

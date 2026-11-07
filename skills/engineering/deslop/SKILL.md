@@ -1,7 +1,7 @@
 ---
 name: deslop
 description: >
-  Deslop activates this skill when the user asks to deslop a diff, or to remove slop from it without changing what the code does. A request to commit the result is the commit skill.
+  Deslop a diff
 ---
 
 # Deslop

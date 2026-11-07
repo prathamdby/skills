@@ -1,7 +1,7 @@
 ---
 name: cursor-agent
 description: >
-  cursor-agent requests activate this skill when the user asks to run it, install it, sign in, or change its MCP servers, plugins, or workers.
+  cursor-agent CLI
 ---
 
 # Cursor Agent

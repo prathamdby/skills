@@ -1,7 +1,7 @@
 ---
 name: todoist-task
 description: >
-  Todoist activates this skill when the user asks to create a task, or to preview that task before creating it.
+  Todoist task
 ---
 
 # Todoist task

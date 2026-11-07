@@ -1,7 +1,7 @@
 ---
 name: codex
 description: >
-  Codex activates this skill when the user asks to run the local codex CLI, or to install it, sign in, or change its MCP servers or plugins.
+  Codex CLI
 ---
 
 # Codex

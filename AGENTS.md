@@ -15,17 +15,10 @@ Skills make the agent follow a predictable process, not produce identical output
 
 ## Description triggers
 
-The frontmatter field stays named `description`. State the situations that
-should activate this skill, in plain words a request would match. A person
-uses that text to pick the skill. A model uses it too, unless the skill sets
-`disable-model-invocation: true`.
-
-Put the distinguishing word first. Give each distinct request one trigger.
-Use one wording for the synonyms of that request.
-When a similar request belongs to a neighboring skill, name that skill.
-Write normal sentences. Leave the procedure, the options, and the result
-in the body. Omit identity that the body already explains, and omit a duplicate
-When to use section.
+The frontmatter field stays named `description`. Use a few meaningful words
+for the cue that should activate this skill. Put the distinguishing word
+first. Cut long sentences, lists, extra qualifiers, and explanation. Leave
+the procedure in the body.
 
 ## Before committing
 

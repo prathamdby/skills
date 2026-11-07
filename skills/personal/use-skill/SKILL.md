@@ -1,7 +1,7 @@
 ---
 name: use-skill
 description: >
-  GitHub skill links activate this skill when the user asks to run the linked skill without installing it. A question about repository source is the box skill.
+  Run a remote skill
 ---
 
 # Use skill

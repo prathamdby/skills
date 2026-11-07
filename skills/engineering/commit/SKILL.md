@@ -1,7 +1,7 @@
 ---
 name: commit
 description: >
-  Commits activate this skill when the user asks to save the current git changes or to write a commit message. Opening a pull request is the make-pr skill.
+  Commit the changes
 ---
 
 # Commit

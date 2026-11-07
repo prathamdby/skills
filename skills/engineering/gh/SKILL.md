@@ -1,7 +1,7 @@
 ---
 name: gh
 description: >
-  Pull request status, review discussion, a CI failure, a reply that leaves the code unchanged, or a GitHub read that no script covers, such as rulesets or a file at a ref, activates this skill. A request to fix those findings is the fix-pr skill.
+  Inspect GitHub
 ---
 
 # GitHub I/O
