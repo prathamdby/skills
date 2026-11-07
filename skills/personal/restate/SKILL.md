@@ -1,7 +1,7 @@
 ---
 name: restate
 description: >
-  When the user wants the last reply said again in plain words, or wants the decision they need to make.
+  When the user wants the last reply said again in plain words, wants a catch-up since their last message, or wants the decision they need to make.
 ---
 
 # Restate

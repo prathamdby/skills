@@ -1,7 +1,7 @@
 ---
 name: box
 description: >
-  When the user wants a question answered from a local clone of another Git repository.
+  When the user wants a local clone of another Git repository listed, pulled up to date, or used to answer a question.
 ---
 
 # Box
