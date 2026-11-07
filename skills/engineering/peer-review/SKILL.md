@@ -1,7 +1,7 @@
 ---
 name: peer-review
 description: >
-  Questions about being ready to build activate this skill for a plan, a design, or a proposed change. Pull request comments and failing checks are the fix-pr skill.
+  Questions about being ready to build activate this skill for a plan, a design, or a proposed change. Reading pull request comments or CI is the gh skill, and changing code for that feedback is the fix-pr skill.
 ---
 
 # Peer review
