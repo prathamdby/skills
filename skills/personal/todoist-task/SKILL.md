@@ -1,7 +1,7 @@
 ---
 name: todoist-task
 description: >
-  todoist-task to create or preview self-contained tasks with requested metadata.
+  Todoist activates this skill when the user asks to create a task, or to preview that task before creating it.
 ---
 
 # Todoist task

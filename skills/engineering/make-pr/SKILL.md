@@ -1,7 +1,7 @@
 ---
 name: make-pr
 description: >
-  make-pr to publish committed changes and create or update their pull request.
+  Opening a pull request, updating its title or body, or publishing commits that already exist activates this skill. Creating the commit is the commit skill.
 ---
 
 # Make PR

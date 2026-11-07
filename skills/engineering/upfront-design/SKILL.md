@@ -1,7 +1,7 @@
 ---
 name: upfront-design
 description: >
-  upfront-design to agree phased designs before coding, resume drafts, or verify approved milestones.
+  Design agreement activates this skill when the user wants a phased design before coding, a draft resumed, or an approved milestone checked. An implementation plan with no questions is the autoplan skill.
 ---
 
 # Upfront design

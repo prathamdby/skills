@@ -13,12 +13,26 @@ Skills make the agent follow a predictable process, not produce identical output
   pointer naming both the condition and the required action. No read-first gate.
 - Preserve behavior when pruning. Remove a guardrail only with behavioral evidence.
 
+## Description triggers
+
+The frontmatter field stays named `description`. State the situations that
+should activate this skill, in plain words a request would match. The model
+uses that text to choose the skill.
+
+Put the distinguishing word first. Give each distinct request one trigger.
+Use one wording for the synonyms of that request.
+When a similar request belongs to a neighboring skill, name that skill.
+Write normal sentences. Leave the procedure, the options, and the result
+in the body. Omit identity that the body already explains, and omit a duplicate
+When to use section.
+
 ## Before committing
 
 Run `bash scripts/skill-guards.test.sh`, then check every touched skill:
 
 1. Frontmatter `name` matches its directory, is kebab-case, and is at most 64 characters.
-2. `description` exists and is at most 1024 characters.
+2. `description` exists, is at most 1024 characters, and follows
+   Description triggers.
 3. `SKILL.md` is at most 100 lines.
 4. README has its `/<name>` Quickstart entry and Reference link.
 5. Real `.md` links and backticked paths resolve; ignore `<placeholder>` paths.

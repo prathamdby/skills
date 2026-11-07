@@ -1,7 +1,7 @@
 ---
 name: gh
 description: >
-  gh for PR state, discussions, CI diagnosis, replies, and nontrivial GitHub commands; fix-pr invokes it.
+  Pull request status, review discussion, a CI failure, or a reply that leaves the code unchanged activates this skill. A request to fix those findings is the fix-pr skill.
 ---
 
 # GitHub I/O

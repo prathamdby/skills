@@ -1,7 +1,7 @@
 ---
 name: deslop
 description: >
-  deslop to remove diff bloat and foreign patterns without changing behavior.
+  Deslop activates this skill when the user asks to deslop a diff, or to remove slop from it without changing what the code does. A request to commit the result is the commit skill.
 ---
 
 # Deslop

@@ -1,7 +1,7 @@
 ---
 name: autoplan
 description: >
-  autoplan to produce a grounded implementation plan without questions; gated design uses upfront-design.
+  Implementation plans with no questions activate this skill, including a request named autoplan. A design that must be agreed in phases is the upfront-design skill.
 ---
 
 # Autoplan

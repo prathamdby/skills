@@ -1,6 +1,6 @@
 ---
 name: prath-mode
-description: Route a goal to a skill or delivery chain.
+description: Routing activates this skill when the user invokes /prath-mode or asks to send a goal to one skill or one delivery chain.
 disable-model-invocation: true
 ---
 

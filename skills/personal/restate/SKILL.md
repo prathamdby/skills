@@ -1,8 +1,8 @@
 ---
 name: restate
 description: >
-  restate to say the last message again in plain words, catch the user up
-  since their last message, and summarize any decision they need to make.
+  Restating activates this skill when the user asks for the last reply in
+  plain words, a catch-up since their last message, or what they need to decide.
 ---
 
 # Restate

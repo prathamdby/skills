@@ -1,7 +1,7 @@
 ---
 name: handoff
 description: >
-  handoff to save resumable context or continue from a validated handoff document.
+  Handoffs activate this skill when the user asks to save context for another session, or to continue from a handoff document.
 ---
 
 # Handoff

@@ -1,7 +1,7 @@
 ---
 name: cursor-agent
 description: >
-  cursor-agent to run the local Cursor CLI or manage installation, login, integrations, and workers.
+  cursor-agent requests activate this skill when the user asks to run it, install it, sign in, or change its MCP servers, plugins, or workers.
 ---
 
 # Cursor Agent

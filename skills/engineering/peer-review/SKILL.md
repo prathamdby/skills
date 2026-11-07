@@ -1,7 +1,7 @@
 ---
 name: peer-review
 description: >
-  peer-review to judge whether a plan, design, or proposed change is ready to build.
+  Questions about being ready to build activate this skill for a plan, a design, or a proposed change. Pull request comments and failing checks are the fix-pr skill.
 ---
 
 # Peer review

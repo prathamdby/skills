@@ -1,7 +1,7 @@
 ---
 name: claude-code
 description: >
-  claude-code to run the local Claude CLI or manage its installation, auth, MCP, and plugins.
+  Claude Code activates this skill when the user asks to run the local claude CLI, or to install it, sign in, or change its MCP servers or plugins.
 ---
 
 # Claude Code

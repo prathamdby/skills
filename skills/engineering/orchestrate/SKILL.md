@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Coordinate delegated work with parent-owned scope and verification.
+description: Orchestration activates this skill when the user asks for subagents to do the work, until the user says to stop orchestrating.
 disable-model-invocation: true
 ---
 

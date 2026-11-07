@@ -1,7 +1,7 @@
 ---
 name: fix-pr
 description: >
-  fix-pr to handle PR feedback and blocking CI in one pass; invokes gh and commit.
+  Pull request fixes activate this skill when the user asks to address review feedback or blocking CI. An inspection or a reply with no code change is the gh skill.
 ---
 
 # Fix PR

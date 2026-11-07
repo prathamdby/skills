@@ -22,12 +22,11 @@ are different; they do not contain that array.
 
 ## Pointers and invocation
 
-Front-load the leading word in model-facing descriptions. Use one trigger per
-distinct branch; collapse synonyms for the same branch. Omit identity already
-explained in the body and a duplicate When to use section.
+Model-facing `description` wording lives under Description triggers in
+`../AGENTS.md`.
 
-Use `disable-model-invocation: true` only for human-only reach. Its description
-is a human summary. Keep model reach when another skill needs the leaf.
+Use `disable-model-invocation: true` only for human-only reach. Keep model
+reach when another skill needs the leaf.
 
 Write a context pointer as an action tied to a branch: "For a Claude stream,
 follow `skills/engineering/claude-code/references/streaming.md`."
