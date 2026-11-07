@@ -1,7 +1,7 @@
 ---
 name: box
 description: >
-  box to manage external Git clones and answer questions from their local source.
+  When the user wants a local clone of another Git repository listed, pulled up to date, used to answer a question, or recorded in AGENTS.md.
 ---
 
 # Box

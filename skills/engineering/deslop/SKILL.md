@@ -1,7 +1,7 @@
 ---
 name: deslop
 description: >
-  deslop to remove diff bloat and foreign patterns without changing behavior.
+  When the user wants slop removed from a diff and the behavior left the same.
 ---
 
 # Deslop

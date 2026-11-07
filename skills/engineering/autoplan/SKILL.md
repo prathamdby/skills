@@ -1,7 +1,7 @@
 ---
 name: autoplan
 description: >
-  autoplan to produce a grounded implementation plan without questions; gated design uses upfront-design.
+  When the user wants an implementation plan written without stopping for questions.
 ---
 
 # Autoplan

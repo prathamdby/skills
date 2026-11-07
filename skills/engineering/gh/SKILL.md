@@ -1,7 +1,7 @@
 ---
 name: gh
 description: >
-  gh for PR state, discussions, CI diagnosis, replies, and nontrivial GitHub commands; fix-pr invokes it.
+  When the user wants a pull request, its discussion, its checks, or another GitHub record read, or a reply posted without a code change.
 ---
 
 # GitHub I/O

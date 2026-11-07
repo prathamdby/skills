@@ -1,7 +1,7 @@
 ---
 name: use-skill
 description: >
-  use-skill to fetch and run GitHub-linked skills ephemerally, without installation.
+  When the user gives a GitHub link to a skill and wants it run without installing it.
 ---
 
 # Use skill

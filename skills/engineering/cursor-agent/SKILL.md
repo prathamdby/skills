@@ -1,7 +1,7 @@
 ---
 name: cursor-agent
 description: >
-  cursor-agent to run the local Cursor CLI or manage installation, login, integrations, and workers.
+  When the user wants the local cursor-agent CLI run, its installation or login changed, its connected tools changed, or a Cursor worker started.
 ---
 
 # Cursor Agent

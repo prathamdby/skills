@@ -1,7 +1,7 @@
 ---
 name: codex
 description: >
-  codex to run the local Codex CLI or manage its installation, login, MCP, and plugins.
+  When the user wants the local Codex CLI run or its installation, login, or connected tools changed.
 ---
 
 # Codex

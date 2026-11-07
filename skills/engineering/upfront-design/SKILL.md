@@ -1,7 +1,7 @@
 ---
 name: upfront-design
 description: >
-  upfront-design to agree phased designs before coding, resume drafts, or verify approved milestones.
+  When the user wants a design agreed before coding, a draft resumed, or an approved milestone checked.
 ---
 
 # Upfront design

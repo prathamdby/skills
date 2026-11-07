@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Coordinate delegated work with parent-owned scope and verification.
+description: When the user wants the work split across subagents until they say to stop.
 disable-model-invocation: true
 ---
 

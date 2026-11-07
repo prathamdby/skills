@@ -1,7 +1,7 @@
 ---
 name: make-pr
 description: >
-  make-pr to publish committed changes and create or update their pull request.
+  When the user wants a pull request opened or updated for commits that already exist.
 ---
 
 # Make PR

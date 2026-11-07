@@ -1,7 +1,7 @@
 ---
 name: claude-code
 description: >
-  claude-code to run the local Claude CLI or manage its installation, auth, MCP, and plugins.
+  When the user wants the local Claude Code CLI run or its installation, login, or connected tools changed.
 ---
 
 # Claude Code

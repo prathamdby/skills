@@ -1,8 +1,7 @@
 ---
 name: restate
 description: >
-  restate to say the last message again in plain words, catch the user up
-  since their last message, and summarize any decision they need to make.
+  When the user wants the last reply said again in plain words, wants a catch-up since their last message, or wants the decision they need to make.
 ---
 
 # Restate

@@ -1,7 +1,7 @@
 ---
 name: commit
 description: >
-  commit to save scoped changes with a message proved by the selected diff.
+  When the user wants the current git changes saved as a commit.
 ---
 
 # Commit

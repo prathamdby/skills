@@ -1,7 +1,7 @@
 ---
 name: recon
 description: >
-  recon to read a saved codebase map, map the current repo, or refresh it after changes.
+  When the user wants this repository's saved map read, created, or refreshed.
 ---
 
 # Recon

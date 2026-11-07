@@ -1,7 +1,7 @@
 ---
 name: peer-review
 description: >
-  peer-review to judge whether a plan, design, or proposed change is ready to build.
+  When the user asks whether a plan, a design, or a proposed change is ready to build.
 ---
 
 # Peer review
