@@ -16,10 +16,11 @@ Skills make the agent follow a predictable process, not produce identical output
 ## Description triggers
 
 The frontmatter field stays named `description`. Write one short sentence
-that says when to activate this skill. Open on the situation, and include
-the detail that separates it from a neighboring skill. Prefer clarity over
-extreme brevity. There is no word-count target. Leave the procedure and
-the result in the body.
+that says when to activate this skill. Name each distinct request that
+should activate it, and use one wording for synonyms of the same request.
+Open on the situation, and include the detail that separates it from a
+neighboring skill. Prefer clarity over extreme brevity. There is no
+word-count target. Leave the procedure and the result in the body.
 
 ## Before committing
 
