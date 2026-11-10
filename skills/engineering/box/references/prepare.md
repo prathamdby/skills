@@ -1,7 +1,7 @@
 # Prepare contract
 
-Input: absolute anchor, slug, URL, update boolean.
-Create sandbox and initialize missing manifest as [].
+Input: absolute sandbox root (`~/.box/` expanded), slug, URL, update boolean.
+Create that root and initialize its missing manifest.json as [].
 Normalize origin comparison: lowercase host, SCP syntax to host/owner/repo,
 strip .git/trailing slash. Slug collision tries owner-repo; ambiguity blocks.
 

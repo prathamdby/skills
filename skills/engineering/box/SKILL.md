@@ -15,8 +15,10 @@ Default clone-if-needed/search/report; persist only when asked.
 otherwise Delegated. Keep this explicit mode switch, not a size heuristic.
 Conflicting list/search or missing needed URL blocks.
 
-Resolve this skill's absolute anchor, sandbox/manifest.json, sandbox/<slug>,
-and working repo/AGENTS.md. Sandboxes stay outside the working repo.
+Resolve this skill's absolute anchor for references and expand `~/.box/` to
+the absolute sandbox root. Store `manifest.json` and `<slug>/` there, outside
+the working repo, so clones survive skill updates. Resolve working repo/AGENTS.md.
+Keep runtime artifacts out of the skill directory.
 Direct executes stage contracts. Delegated uses one Prepare writer, disjoint
 read-only Search workers, one Persist writer; parent only dispatches/aggregates.
 A failed worker blocks; workers cannot delegate.
