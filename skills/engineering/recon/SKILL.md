@@ -13,9 +13,11 @@ or "show the saved map" selects **read**, never refresh or rebuild. "Refresh",
 "rebuild", or "from scratch" selects rebuild. A named area is the focus.
 Conflicting read/rebuild or rebuild/patch wording is `BLOCKED`.
 
-Resolve `<anchor>` as this skill's absolute directory; memory stays in
-`<anchor>/memory/`, outside the target repo. Resolve repo root, HEAD, dirty
-paths, and the real absolute Git common directory. A shared-checkout key is
+Expand `~/.recon/` to the absolute memory root, outside the target repo.
+Store snapshots, ledgers, and sibling temporary files there so they survive
+skill updates; keep runtime artifacts out of the skill directory.
+Resolve repo root, HEAD, dirty paths, and the real absolute Git common directory.
+A shared-checkout key is
 `<label>-<hash8>.md`: hash the common directory with SHA-256; take eight digits.
 Label is its parent's basename for `.git`, otherwise its own basename.
 
