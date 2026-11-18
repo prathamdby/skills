@@ -1,7 +1,7 @@
 ---
 name: make-pr
 description: >
-  When the user wants a pull request opened or updated for commits that already exist.
+  Publish. Open a pull request for commits that already exist, or update that pull request.
 ---
 
 # Make PR

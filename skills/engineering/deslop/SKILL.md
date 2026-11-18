@@ -1,7 +1,7 @@
 ---
 name: deslop
 description: >
-  When the user wants slop removed from a diff and the behavior left the same.
+  Deslop. Remove slop from a diff and leave the behavior unchanged.
 ---
 
 # Deslop

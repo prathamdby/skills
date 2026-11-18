@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "skills",
-      "description": "Planning, git, review, delegation, and session-continuity skills",
+      "description": "Planning, git, review, and session-continuity skills",
       "author": {
         "name": "Pratham Dubey"
       },
@@ -23,22 +23,16 @@
       "skills": [
         "./skills/engineering/autoplan",
         "./skills/engineering/box",
-        "./skills/engineering/claude-code",
-        "./skills/engineering/codex",
         "./skills/engineering/commit",
-        "./skills/engineering/cursor-agent",
         "./skills/engineering/deslop",
         "./skills/engineering/fix-pr",
         "./skills/engineering/gh",
         "./skills/engineering/handoff",
         "./skills/engineering/make-pr",
-        "./skills/engineering/orchestrate",
         "./skills/engineering/peer-review",
         "./skills/engineering/prath-mode",
         "./skills/engineering/recon",
-        "./skills/engineering/upfront-design",
         "./skills/personal/restate",
-        "./skills/personal/todoist-task",
         "./skills/personal/use-skill"
       ]
     }

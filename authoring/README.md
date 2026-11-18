@@ -28,8 +28,8 @@ Model-facing `description` wording lives under Description triggers in
 Use `disable-model-invocation: true` only for human-only reach. Keep model
 reach when another skill needs the leaf.
 
-Write a context pointer as an action tied to a branch: "For a Claude stream,
-follow `skills/engineering/claude-code/references/streaming.md`."
+Write a context pointer as an action tied to a branch: "For a handoff resume,
+follow `skills/engineering/handoff/references/resume.md`."
 A vague "see reference" does not define when to load.
 Sharpen an unreliable pointer before inlining its target. Material needed on
 every branch belongs in the entry, not behind a mandatory reference gate.
