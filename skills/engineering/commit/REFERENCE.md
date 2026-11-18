@@ -2,7 +2,10 @@
 
 Load only the selected style section, then run the shared rejection check.
 Load Trailer hygiene only during Step 4 verify, or when drafting with
-trailers allowed.
+trailers allowed. For the draft, follow `../../../authoring/output-voice.md`.
+The type prefix, the 50-character subject, the 72-character wrap, the
+imperative test, the rejection list, trailer hygiene, and a body that states
+what changed and why the proving hunks exist win on conflict.
 
 ## Conventional formatting rules
 

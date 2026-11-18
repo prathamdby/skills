@@ -59,7 +59,9 @@ and the stored head equals current HEAD.
 After interruption, recompute HEAD and changed paths; restart affected work
 when the ledger differs. Resume the first pending item. Present the map in
 thread, labeling sections rebuilt, patched, or representative-only; cite its
-path, focus, drift, unverified areas, and dirty overlay. Warm maps end with
+path, focus, drift, unverified areas, and dirty overlay. For that thread
+report, follow `../../../authoring/output-voice.md`. The section list, the
+ten-bullet cap, and the 200-line cap win on conflict. Warm maps end with
 `Drift since last recon`. Done when each claim's coverage is disclosed.
 
 Terminals: `READ`, `NO_REPORT`, `SUCCESS`, `BLOCKED`. Stored `head` always

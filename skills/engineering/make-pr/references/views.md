@@ -1,7 +1,9 @@
 # Change outline views
 
 Load only for a theme whose changed shape benefits from a view.
-Each item is a short caption beside one fence. Prefer one clear view;
+Each item is a short caption beside one fence. For a caption, follow
+`../../../../authoring/output-voice.md`. Caption and fence rules in this file
+win on conflict. Prefer one clear view;
 add another only when a boundary, order, call, or layout remains unclear.
 
 Shallow: prefer one or two views total, caption only when needed.

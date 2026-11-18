@@ -45,6 +45,8 @@ outputs, and no nested delegation. Done when every scope returns evidence.
 ## 3. Aggregate and persist
 
 Answer by theme with deduplicated citations and unsearched areas.
+For the answer and the report, follow `../../../authoring/output-voice.md`.
+The marker block in `references/agents-md-template.md` wins on conflict.
 Only when persist was requested and search is complete, run/dispatch
 `references/persist.md`; its only target is the working repo's AGENTS.md.
 Done when answer is cited and any authorized marker block exists exactly once.

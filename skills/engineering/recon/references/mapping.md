@@ -1,6 +1,8 @@
 # Mapping
 
 Load only for map or rebuild; reading a saved report does not reach this file.
+For the map draft, follow `../../../../authoring/output-voice.md`. The section
+list, the ten-bullet cap, and the 200-line cap win on conflict.
 
 ## Cold or rebuild
 

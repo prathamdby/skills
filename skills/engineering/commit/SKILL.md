@@ -52,4 +52,7 @@ Keep the REPL strip and unpublished/run-owned-HEAD checks; a clean -m is not
 proof of clean HEAD. Done when commit and message match after any safe amend.
 
 Report SHA, subject, scope, hooks/trailers, trace, amend status, and remaining
-tracked/untracked work. Terminals: SUCCESS, NO_CHANGES, BLOCKED. Never push.
+tracked/untracked work. For that report, follow
+`../../../authoring/output-voice.md`. The report is not the commit message.
+The message contract stays in `REFERENCE.md`.
+Terminals: SUCCESS, NO_CHANGES, BLOCKED. Never push.

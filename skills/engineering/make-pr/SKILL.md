@@ -62,6 +62,8 @@ or footer, apply `references/body-hygiene.md`.
 Confirm the three body headings, one-sentence Why, Special bounds, and exact
 Closes set. Auth/rate-limit/fetch/push/platform errors block.
 Report create/update, push, URL, depth, body strip, and trace only after match.
+For that thread report, follow `../../../authoring/output-voice.md`.
+Headings and the hunk trace stay in `REFERENCE.md`.
 Done when remote state and ledger agree.
 
 Terminals: `SUCCESS`, `NO_CHANGES`, `BLOCKED`. No commits, force pushes,

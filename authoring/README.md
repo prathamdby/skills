@@ -52,6 +52,7 @@ procedure. Existing cross-skill dependencies must be explicit and checked before
 acting; selecting one skill does not install its siblings automatically.
 Keep branch references inside their owning skill so a copied directory includes
 them. Do not introduce a runtime dependency on authoring tools or `/tmp`.
+Final-prose limits live in `output-voice.md`, leaves point at that file instead of copying the rules, and this file is the exception to the inside-skill reference rule and the no-authoring-runtime-dependency rule.
 
 Use a leading word only when it recruits a useful existing concept. Preserve
 grammar and concrete actions; abbreviated fragments are not token optimization.
