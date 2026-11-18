@@ -26,7 +26,8 @@ select it using `references/views.md`.
 
 For the PR body, follow `../../../authoring/output-voice.md`. The three
 headings, the one-sentence Why, Special bounds, the Change outline, and the
-hunk trace win on conflict. The title stays imperative. The body stays
+hunk trace win on conflict. Dash and parenthesis substitutes, and a colon
+only before a list, also win. The title stays imperative. The body stays
 impersonal.
 
 Write grammatical sentences with one idea each. Keep technical

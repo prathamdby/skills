@@ -14,6 +14,8 @@ meaning, IDs, paths, SHAs, or required bot commands.
 - During the voice pass, the opening in `replies.md` stays as written.
   For the draft after that opening, follow `../../../../authoring/output-voice.md`.
   The opening in `replies.md` stays verbatim. Bot prefixes stay.
+  Rule 13's parenthesis, en-dash, and hyphen substitute ban wins on conflict.
+  Rule 14's colon-before-list ban wins on conflict.
 - A consolidated parent may use one bullet per finding.
 - Name the concrete code path, behavior, test, or commit.
 - Use "I" only for an action actually taken.

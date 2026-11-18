@@ -34,6 +34,6 @@ One word per action. One name per thing. Use active voice with a named actor. A 
 
 ## Bans
 
-Ban AI vocabulary, filler, review-session framing, and harness footers. Do not write we, let's, please, simply, or easy. These bans apply where no tighter owner already states them.
+Ban AI vocabulary, filler, review-session framing, and harness footers. AI vocabulary means additionally, crucial, delve, enduring, enhance, fostering, garner, interplay, intricate, abstract landscape, pivotal, showcase, tapestry, testament, underscore, and vibrant. Do not write we, let's, please, simply, or easy. These bans apply where no tighter owner already states them.
 
 Provenance: 6139ec62ba2a902b27680b18ce9e0408579ef7b8. Local owners stay `skills/engineering/commit/REFERENCE.md` and `skills/engineering/make-pr/references/body-hygiene.md`.
