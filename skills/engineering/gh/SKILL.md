@@ -1,7 +1,7 @@
 ---
 name: gh
 description: >
-  When the user wants a pull request, its discussion, its checks, or another GitHub record read, or a reply posted without a code change.
+  GitHub. Read pull-request state; read its discussion; read its checks; read another GitHub record; post a reply without a code change.
 ---
 
 # GitHub I/O

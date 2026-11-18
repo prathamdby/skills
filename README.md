@@ -2,8 +2,7 @@
 
 [![skills.sh](https://skills.sh/b/prathamdby/skills)](https://skills.sh/prathamdby/skills)
 
-A small set of agent workflows for software delivery, research, delegation,
-task management, and session continuity. Each skill has a narrow job, explicit
+A small set of agent workflows for software delivery, research, and session continuity. Each skill has a narrow job, explicit
 stop conditions, and options derived from the user's request.
 
 ## Install
@@ -33,7 +32,6 @@ codex plugin add skills@pratham-skills
 ## Quickstart
 
 - `/prath-mode` routes a goal to the right skill or multi-step workflow.
-- `/upfront-design` develops an approved design and delivery plan, then checks implementation against it.
 - `/autoplan` turns a repository change request into an evidence-backed implementation plan without interruptions.
 - `/peer-review` assesses whether a plan, design, or proposed change is ready to build.
 - `/deslop` removes unnecessary complexity from a git diff without changing behavior.
@@ -44,20 +42,14 @@ codex plugin add skills@pratham-skills
 - `/recon` reads a saved map without refreshing it, or maps and refreshes the current codebase.
 - `/box` manages local clones of external repositories and answers questions from their source.
 - `/use-skill` runs remote skills from GitHub links without installing them.
-- `/todoist-task` creates or previews Todoist tasks that make sense without the original conversation.
 - `/restate` restates the last message in plain language, catches the user up, and summarizes any decision they need to make.
 - `/handoff` saves session context and validates it when resuming work.
-- `/orchestrate` coordinates delegated work while keeping the main agent responsible for verification.
-- `/cursor-agent` runs and manages the local Cursor Agent CLI and verifies its results.
-- `/claude-code` runs and manages the local Claude Code CLI and verifies its results.
-- `/codex` runs and manages the local Codex CLI and verifies its results.
 
 ## Why these skills exist
 
 | Common failure | Skill | How it helps |
 | --- | --- | --- |
 | The agent picks the wrong workflow or repeats work owned by another skill. | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md) | Routes work through the appropriate skills and delivery workflows. |
-| Coding starts before the problem, design, and delivery plan are agreed. | [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Guides collaborative design and checks implementation against approved milestones. |
 | Planning stalls on repeated questions or lacks a grounded path to implementation. | [`autoplan`](./skills/engineering/autoplan/SKILL.md) | Produces an evidence-backed implementation plan autonomously. |
 | A plan, a design, or a proposed change misses a requirement or carries a risky assumption into implementation. | [`peer-review`](./skills/engineering/peer-review/SKILL.md) | Checks that plan, design, or change against its requirements, ranks every material finding, and labels an assumption that would change the verdict. |
 | Generated edits make code harder to maintain without adding behavior. | [`deslop`](./skills/engineering/deslop/SKILL.md) | Removes unnecessary complexity while preserving behavior. |
@@ -68,20 +60,14 @@ codex plugin add skills@pratham-skills
 | Each session rediscovers the repository or relies on an outdated map. | [`recon`](./skills/engineering/recon/SKILL.md) | Reads saved maps without changing them and maintains evidence-backed snapshots. |
 | The agent guesses what an external repository contains. | [`box`](./skills/engineering/box/SKILL.md) | Answers questions from managed local clones of the actual source. |
 | The agent needs a remote skill without adding it to the installed collection. | [`use-skill`](./skills/personal/use-skill/SKILL.md) | Fetches and runs GitHub-hosted skills on demand. |
-| Tasks lose their meaning when separated from the conversation that created them. | [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Creates clear Todoist tasks with the requested context and metadata. |
 | Replies stay in jargon, so the user cannot tell what happened or what they need to decide. | [`restate`](./skills/personal/restate/SKILL.md) | Restates the last message in plain language and summarizes any decision. |
 | Work resumes with lost context or stale assumptions about artifacts and progress. | [`handoff`](./skills/engineering/handoff/SKILL.md) | Saves actionable session context and validates it before continuing. |
-| Delegated work overlaps or is accepted without checking the result. | [`orchestrate`](./skills/engineering/orchestrate/SKILL.md) | Coordinates subagents with clear ownership and verified outcomes. |
-| Cursor Agent runs use the wrong command or stop to ask for workspace trust. | [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Runs the local CLI with `--trust` and `--yolo` when the skill is invoked, and verifies results. |
-| Claude Code runs confuse execution modes or stop on a permission prompt. | [`claude-code`](./skills/engineering/claude-code/SKILL.md) | Runs the local CLI with permission checks skipped when the skill is invoked, and verifies results. |
-| Codex runs confuse execution modes or stop for approval. | [`codex`](./skills/engineering/codex/SKILL.md) | Runs the local CLI with `--yolo` when the skill is invoked, and verifies results. |
 
 ## Reference
 
 | Skill | Description |
 | --- | --- |
 | [`prath-mode`](./skills/engineering/prath-mode/SKILL.md) | Route goals to skills and multi-step workflows. |
-| [`upfront-design`](./skills/engineering/upfront-design/SKILL.md) | Develop, resume, and check approved designs and delivery plans. |
 | [`autoplan`](./skills/engineering/autoplan/SKILL.md) | Produce an evidence-backed implementation plan without interruptions. |
 | [`peer-review`](./skills/engineering/peer-review/SKILL.md) | Assess plans, designs, and proposed changes for readiness to build. |
 | [`deslop`](./skills/engineering/deslop/SKILL.md) | Simplify a git diff without changing behavior. |
@@ -92,13 +78,8 @@ codex plugin add skills@pratham-skills
 | [`recon`](./skills/engineering/recon/SKILL.md) | Read saved maps or build and refresh evidence-backed snapshots. |
 | [`box`](./skills/engineering/box/SKILL.md) | Manage and research external repositories from local source. |
 | [`use-skill`](./skills/personal/use-skill/SKILL.md) | Run GitHub-hosted skills on demand without installing them. |
-| [`todoist-task`](./skills/personal/todoist-task/SKILL.md) | Create or preview clear, self-contained Todoist tasks. |
 | [`restate`](./skills/personal/restate/SKILL.md) | Restate the last message in plain language and summarize any decision. |
 | [`handoff`](./skills/engineering/handoff/SKILL.md) | Preserve session context and resume work from validated state. |
-| [`orchestrate`](./skills/engineering/orchestrate/SKILL.md) | Coordinate delegated work with verified ownership and results. |
-| [`cursor-agent`](./skills/engineering/cursor-agent/SKILL.md) | Run, manage, and verify local Cursor Agent CLI work. |
-| [`claude-code`](./skills/engineering/claude-code/SKILL.md) | Run, manage, and verify local Claude Code CLI work. |
-| [`codex`](./skills/engineering/codex/SKILL.md) | Run, manage, and verify local Codex CLI work. |
 
 ## Development
 

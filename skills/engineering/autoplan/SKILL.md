@@ -1,7 +1,7 @@
 ---
 name: autoplan
 description: >
-  When the user wants an implementation plan written without stopping for questions.
+  Plan. Write an implementation plan for a repository change without asking.
 ---
 
 # Autoplan

@@ -15,12 +15,16 @@ Skills make the agent follow a predictable process, not produce identical output
 
 ## Description triggers
 
-The frontmatter field stays named `description`. Write one short sentence
-that says when to activate this skill. Name each distinct request that
-should activate it, and use one wording for synonyms of the same request.
-Open on the situation, and include the detail that separates it from a
-neighboring skill. Prefer clarity over extreme brevity. There is no
-word-count target. Leave the procedure and the result in the body.
+The frontmatter field stays named `description`. It is a context pointer.
+
+A model-invoked skill front-loads the leading word, names one trigger per
+distinct branch, collapses synonyms of that branch, and cuts identity the
+body already carries. Keep the detail that separates it from a neighbor.
+
+A user-invoked skill (`disable-model-invocation: true`) uses a human-facing
+one-line summary with trigger lists stripped.
+
+Leave the procedure and the result in the body.
 
 ## Before committing
 
