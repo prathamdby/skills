@@ -12,6 +12,8 @@ meaning, IDs, paths, SHAs, or required bot commands.
 ## Reply contract
 
 - During the voice pass, the opening in `replies.md` stays as written.
+  For the draft after that opening, follow `../../../../authoring/output-voice.md`.
+  The opening in `replies.md` stays verbatim. Bot prefixes stay.
 - A consolidated parent may use one bullet per finding.
 - Name the concrete code path, behavior, test, or commit.
 - Use "I" only for an action actually taken.
@@ -47,16 +49,14 @@ Rule numbers are stable IDs that other skills cite. A removed rule leaves a gap.
 
 ### Language
 
-7. **AI vocabulary.** Replace words such as additionally, crucial, delve, enduring, enhance, fostering, garner, interplay, intricate, abstract landscape, pivotal, showcase, tapestry, testament, underscore, and vibrant.
 8. **Fancy ways to say "is".** Replace "serves as", "stands as", "boasts", and "features" with "is" or "has".
 9. **"Not just X, but Y."** State the point directly.
 10. **Rule of three.** Use the natural number instead of forcing three items.
-11. **Synonym cycling.** Pick one term and repeat it in the paragraph.
 12. **False ranges.** List topics directly when the endpoints are not a meaningful scale.
 
 ### Style
 
-13. **Em dash overuse.** Avoid em dashes entirely. Use periods or commas only, not parentheses, en dashes, or hyphen-as-dash substitutes.
+13. **Em dash overuse.** Use periods or commas only, not parentheses, en dashes, or hyphen-as-dash substitutes.
 14. **Colon overuse.** Use colons only before a list or example. Rewrite mid-sentence connectors as direct sentences.
 15. **Boldface overuse.** Do not bold every proper noun or acronym.
 16. **Inline-header lists.** Convert a bold label that restates the line into prose.
@@ -82,7 +82,6 @@ Rule numbers are stable IDs that other skills cite. A removed rule leaves a gap.
 what the sentence tells the reader to do or know. Cut it if that is not concrete
 or if it could appear unchanged in another project's docs.
 28. **Shorten or split dense sentences.** Use one idea per sentence or bullet.
-29. **Active voice.** Name the actor, except when the actor is unknown or does not matter.
 30. **Cut adverbs.** Use a stronger verb or a measured result.
 31. **Prefer the plain word.** Use "use" instead of "utilize" or "leverage", "help" instead of "facilitate", "many" instead of "numerous", and "if" instead of "in the event that".
 32. **Mannered prose.** Replace metaphor, flourish, rhetorical fragments, personified code, figurative verbs, and stock framing with literal language.

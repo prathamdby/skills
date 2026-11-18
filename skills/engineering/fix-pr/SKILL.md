@@ -66,7 +66,9 @@ refetched and retried once; another failure blocks.
 Fixed replies require a pushed SHA. Do not resolve unless explicitly asked
 and supported by a separately authorized operation.
 Report finding/verdict/action/evidence, URL, commit/push, hunt counts, and
-unreplied targets. Done when all authorized replies match their verdicts.
+unreplied targets. For that thread report, follow
+`../../../authoring/output-voice.md`. Openings stay in `replies.md`.
+Done when all authorized replies match their verdicts.
 
 Terminals: SUCCESS, NO_CODE_CHANGE, AWAITING_PUSH, BLOCKED. Never SUCCESS
 with an unsatisfied finding. A finding answered in its inline thread, or on

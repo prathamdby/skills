@@ -45,4 +45,6 @@ Done when every link reaches a terminal.
 
 Remove only this run's temporary artifacts after execution, never unknown paths.
 Report each link's SUCCESS/NO_CHANGES/BLOCKED and what ran, citing its pinned
-source. Done when artifacts are discarded and every terminal is evidenced.
+source. For that report, follow `../../../authoring/output-voice.md`.
+The terminal names win on conflict.
+Done when artifacts are discarded and every terminal is evidenced.

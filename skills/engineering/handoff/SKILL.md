@@ -38,6 +38,8 @@ per section, omitting empty optional sections.
    replace through a sibling temporary file, then scan the final file.
    Done when structure, bounds, three scans, and existing file pass.
 4. Report path, captured scope, and `resume the handoff at <absolute-path>`.
+   For that report, follow `../../../authoring/output-voice.md`. The required
+   resume phrase, bounds, and redaction win on conflict.
    Done when file and resume instruction exist.
 
 ## Resume
@@ -51,7 +53,9 @@ per section, omitting empty optional sections.
 3. Choose highest-priority unblocked task under live focus and begin it,
    recovering only its artifact context. No task → evidenced BLOCKED, not
    another summary. Done at success, a real blocker, or confirmation gate.
-4. Report drift and work outcome. Create no new handoff unless requested.
+4. Report drift and work outcome. For that report, follow
+   `../../../authoring/output-voice.md`. The required resume phrase, bounds,
+   and redaction win on conflict. Create no new handoff unless requested.
 
 Terminals: SUCCESS, BLOCKED, AWAITING_USER, INTERRUPTED, with evidence.
 On interruption revalidate artifacts touched since the last validation.

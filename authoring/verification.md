@@ -24,6 +24,7 @@ Keep safety instructions when that behavioral evidence is unavailable.
 | handoff | Compact redacted artifact resumes into an unblocked task | Stale artifacts cannot drive work; no task or malformed required sections blocks |
 | box | Direct/delegated mode follows the requested override and available tools | Invalid listed clone is untouched; incomplete search cannot persist |
 | remote skill | Pinned tree includes every blob; all sibling content is read | Missing entry/reference or truncated tree blocks; successful items are not retried |
+| output voice | The draft path for commit, make-pr, and a fix-pr reply loads `authoring/output-voice.md`. The commit, make-pr, and fix-pr thread reports load it too. A commit subject still shows the type prefix, the 50-character cap, and the imperative test. A commit body still states what changed and why. A fix or reject opening matches `replies.md`. | A pointer that only says "see reference" fails the trace. `reply.md` gains no voice rule. A `description` hunk in this diff fails the bound. A personal-skill pointer that resolves under `skills/authoring/` fails the trace. |
 
 ## Pass bar
 

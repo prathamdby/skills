@@ -79,7 +79,7 @@ Done when every material requirement has a finding or an explicit pass.
 
 ## 4. Report
 
-Exactly three sections.
+Exactly three sections. For this report, follow `../../../authoring/output-voice.md`. The three sections and the mapped verdict sentence win on conflict.
 - `## Findings` lists every ranked `finding → impact` bullet with a citation
   and a label, or `None found.`
 - `## Fix` lists numbered repairs in rank order, or the first rework

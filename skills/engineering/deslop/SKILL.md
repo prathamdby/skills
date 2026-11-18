@@ -46,6 +46,8 @@ Recheck selected diff/status, no new slop or moved out-of-scope layers.
 Executable/type/control/error/validation/API edits require the narrowest
 covering test; missing/failing required tests block. Docs/comments/whitespace
 may use diff audit alone. Report scope, files, category counts, staging
-preservation, audit, tests. Done when each edit and staging invariant is proved.
+preservation, audit, tests. For that report, follow
+`../../../authoring/output-voice.md`. Category counts and the staging report
+fields win on conflict. Done when each edit and staging invariant is proved.
 
 Terminals: SUCCESS, CLEAN, NO_CHANGES, BLOCKED. No commits or scope expansion.

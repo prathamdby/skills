@@ -58,7 +58,11 @@ Done when output is complete, a reply URL exists, or a real error is captured.
 
 ## 3. Report
 
-Summarize observed output. Set cap markers mean incomplete data, not success
+Summarize observed output. For that summary, follow
+`../../../authoring/output-voice.md`. When this leaf composes a reply body,
+apply that file before `references/reply.md`. A body the caller already
+supplied is posted as given. `references/reply.md` stays transport.
+Set cap markers mean incomplete data, not success
 for an exhaustive consumer. Cite log paths instead of pasting logs.
 Green CI, zero threads, or posted reply is SUCCESS; a valid red report is
 also successful inspection, not repaired CI.

@@ -59,6 +59,8 @@ and each risk has an owner.
 
 ## 3. Plan
 
+For this plan, follow `../../../authoring/output-voice.md`. The section list
+in Plan, including Assumptions, wins on conflict.
 Specify decisions, changed contracts, constraints, and deviations from cited
 patterns, not implementation bodies or restatements. Standard/deep includes:
 Assumptions; Shape (bold sentence + pattern); Layer map (NEW/CHANGED roles);

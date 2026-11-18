@@ -22,7 +22,9 @@ Record `source | window | decisions | terminal`.
 Write as one person talking to another. Use everyday words and short
 sentences. Keep the facts, names, and outcomes. Say each thing once, in
 fewer words than a long source. Use a specialist term only when the user
-used it or the fact disappears without it.
+used it or the fact disappears without it. For this reply, follow
+`../../../authoring/output-voice.md`. The three-part order and the catch-up
+item win on conflict.
 
 ## 1. Gather
 
