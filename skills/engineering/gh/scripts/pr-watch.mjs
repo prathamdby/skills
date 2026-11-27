@@ -11,6 +11,7 @@ const COMMAND_ORDER = [
   "watches list",
   "watches inspect",
   "watches remove",
+  "watches run",
   "events list",
   "help",
   "help search",
@@ -258,6 +259,18 @@ const COMMAND_METADATA = {
     nouns: ["watch", "remove", "end"],
     examples: ["watches remove w_7x2kq --json"],
   },
+  "watches run": {
+    path: "watches run",
+    summary: "Run one bounded watch sweep.",
+    arguments: [],
+    options: commandOptions([
+      option("--watch", null, "string", "WATCH", null, null, "Sweep only one active watch."),
+    ]),
+    lifecycle: null,
+    resultSchema: RESULT_SCHEMAS["watches run"],
+    nouns: ["watch", "run", "sweep"],
+    examples: ["watches run --watch w_7x2kq --json"],
+  },
   "events list": {
     path: "events list",
     summary: "Inspect the local pull request watch event log.",
@@ -366,6 +379,7 @@ const ALLOWED_OPTIONS = {
   "watches list": new Set(["state", "all", "limit", "next", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "watches inspect": new Set(["json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "watches remove": new Set(["json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
+  "watches run": new Set(["watch", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "events list": new Set(["watch", "since", "all", "limit", "next", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   help: new Set(["all", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "help search": new Set(["json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
@@ -1545,6 +1559,7 @@ async function executeAdd(ctx, parsed, fields) {
   const id = result.watch.id;
   const next = [
     nextCommand(ctx.runnerPath, ["watches", "inspect", id, "--json"], "Inspect the watch state"),
+    nextCommand(ctx.runnerPath, ["watches", "run", "--watch", id, "--json"], "Run one bounded sweep for this watch"),
   ];
   if (ctx.json) {
     let document = {
@@ -1562,6 +1577,158 @@ async function executeAdd(ctx, parsed, fields) {
     writeWarnings(ctx, result.warnings);
   }
   return 0;
+}
+
+function sweepError(error) {
+  if (!error || typeof error !== "object") return error;
+  const out = {
+    reason: typeof error.reason === "string" ? error.reason : "internal_error",
+    message: typeof error.message === "string" ? error.message : "The group read failed.",
+    retryable: error.retryable === true,
+  };
+  if (typeof error.retryAfter === "number" && error.retryAfter >= 0) out.retryAfter = error.retryAfter;
+  return out;
+}
+
+function groupWarnings(results) {
+  const warnings = [];
+  for (const result of Array.isArray(results) ? results : []) {
+    if (result?.outcome === "failed") {
+      warnings.push(warning("sweep_group_failed", `Sweep group ${result.id} failed.`, {
+        id: result.id,
+        error: sweepError(result.error),
+      }));
+    } else if (result?.outcome === "paused") {
+      warnings.push(warning("sweep_group_paused", `Sweep group ${result.id} is paused.`, {
+        id: result.id,
+        error: sweepError(result.error),
+      }));
+    }
+  }
+  return warnings;
+}
+
+function projectSweepSummary(summary) {
+  const projected = {
+    succeeded: summary.succeeded,
+    failed: summary.failed,
+    skipped: summary.skipped,
+    unknown: summary.unknown,
+    startedAt: summary.startedAt,
+    finishedAt: summary.finishedAt,
+    durationMs: summary.durationMs,
+    watchCount: summary.watchCount,
+    groupCount: summary.groupCount,
+    readGroupCount: summary.readGroupCount,
+  };
+  const integerKeys = ["succeeded", "failed", "skipped", "unknown", "watchCount", "groupCount", "readGroupCount"];
+  const valid = integerKeys.every((key) => Number.isSafeInteger(projected[key]) && projected[key] >= 0) &&
+    typeof projected.startedAt === "string" &&
+    typeof projected.finishedAt === "string" &&
+    typeof projected.durationMs === "number" && projected.durationMs >= 0;
+  if (!valid) throw cliError("internal_error", "The sweep operation returned an invalid summary.");
+  return projected;
+}
+
+function projectSweepResult(result) {
+  if (
+    !result || typeof result !== "object" ||
+    typeof result.id !== "string" ||
+    !["unchanged", "read", "paused", "failed", "ended"].includes(result.outcome) ||
+    typeof result.detailRead !== "boolean" ||
+    typeof result.activityRead !== "boolean" ||
+    !Number.isSafeInteger(result.eventCount) || result.eventCount < 0
+  ) {
+    throw cliError("internal_error", "The sweep operation returned an invalid group result.");
+  }
+  const projected = {
+    id: result.id,
+    outcome: result.outcome,
+    detailRead: result.detailRead,
+    activityRead: result.activityRead,
+    eventCount: result.eventCount,
+  };
+  if (result.error !== undefined) projected.error = sweepError(result.error);
+  return projected;
+}
+
+function validateSweepOutcome(result) {
+  if (
+    !result || typeof result !== "object" ||
+    !["completed", "partial", "failed", "paused"].includes(result.outcome) ||
+    !result.summary || typeof result.summary !== "object" ||
+    !Array.isArray(result.events) || !Array.isArray(result.results)
+  ) {
+    throw cliError("internal_error", "The sweep operation returned an unexpected outcome.");
+  }
+  return {
+    outcome: result.outcome,
+    summary: projectSweepSummary(result.summary),
+    events: result.events,
+    results: result.results.map(projectSweepResult),
+    warnings: validateOperationWarnings(result.warnings),
+  };
+}
+
+function boundedSweepDocument(result, extraWarnings) {
+  const warnings = [...extraWarnings, ...groupWarnings(result.results)];
+  const document = {
+    outcome: result.outcome,
+    summary: result.summary,
+    events: result.events,
+    results: result.results,
+  };
+  if (warnings.length > 0) document.warnings = warnings;
+  return document;
+}
+
+async function executeRun(ctx, parsed, fields) {
+  const selectorShape = parsed.options.get("watch") === undefined ? null : parseWatchSelector(parsed.options.get("watch"));
+  const operations = await getOperations(ctx);
+  if (!operations || typeof operations.sweep !== "function") throw operationsMissingError();
+  const input = await prepareSweepInput(ctx, parsed, selectorShape);
+  throwIfCanceled(ctx);
+  const result = validateSweepOutcome(await operations.sweep(input));
+  const extraWarnings = validateOperationWarnings(result.warnings);
+  if (ctx.json) {
+    const document = projectDocument(
+      boundedSweepDocument(result, extraWarnings),
+      fields,
+      CANONICAL_FIELDS["watches run"],
+    );
+    ctx.io.stdout(jsonText(document, ctx.stdoutTTY));
+  } else {
+    for (const event of result.events) {
+      ctx.io.stdout(`${sanitizeHumanText(compactEventLine(event))}\n`);
+    }
+    writeWarnings(ctx, [...extraWarnings, ...groupWarnings(result.results)]);
+    if (result.outcome !== "completed") {
+      ctx.io.stderr(`sweep ${sanitizeHumanText(result.outcome)}\n`);
+    }
+  }
+  return result.outcome === "completed" ? 0 : 1;
+}
+
+function compactEventLine(event) {
+  const at = event.createdAt ?? "";
+  const repo = event.repo ?? "";
+  const pr = event.pr ?? "";
+  return `${at} ${event.type} ${repo}#${pr}: ${eventSummary(event)}`;
+}
+
+async function prepareSweepInput(ctx, parsed, selectorShape = null) {
+  let watchId = null;
+  if (selectorShape !== null) {
+    const state = await readState(ctx.deps);
+    watchId = resolveWatch(state, selectorShape, { activeOnly: true }).id;
+  }
+  return {
+    watchId,
+    cwd: effectiveCwd(ctx),
+    env: environment(ctx.deps),
+    now: ctx.deps.now,
+    isCanceled: () => Boolean(ctx.signalState.signal),
+  };
 }
 
 function throwIfCanceled(ctx) {
@@ -1813,6 +1980,7 @@ async function dispatch(ctx, command, parsed) {
     case "watches list": return executeWatchesList(ctx, parsed, fields);
     case "watches inspect": return executeInspect(ctx, parsed, fields);
     case "watches remove": return executeRemove(ctx, parsed, fields);
+    case "watches run": return executeRun(ctx, parsed, fields);
     case "events list": return executeEventsList(ctx, parsed, fields);
     case "help": return executeHelp(ctx, parsed, fields);
     case "help search": return executeHelpSearch(ctx, parsed, fields);
@@ -1959,7 +2127,17 @@ export async function githubInterface(module, { store, engine, now, lib } = {}) 
       timeoutMs: meta.timeoutMs,
     }),
   };
-  const client = transport;
+  let client;
+  try {
+    client = engine.createQuotaAwareTransport({
+      store,
+      transport,
+      credentialFingerprint: lib.gitHubCredentialFingerprint,
+      now,
+    });
+  } catch {
+    return null;
+  }
   return {
     readFingerprints: (slices, options) => candidate.readFingerprints(client, slices, options),
     readDetail: (target) => candidate.readDetail(client, target),
@@ -1983,7 +2161,7 @@ async function createDefaultOperations(deps, ctx) {
   }
   const now = () => nowMs(deps);
   const github = await githubInterface(githubModule, { store, engine, now, lib });
-  if (!github || typeof engine.addWatch !== "function") return null;
+  if (!github || typeof engine.addWatch !== "function" || typeof engine.runSweep !== "function") return null;
   return {
     async add(input) {
       const target = await resolveCheckoutTarget(input, lib);
@@ -1995,6 +2173,16 @@ async function createDefaultOperations(deps, ctx) {
         pr: target.pr,
         id: typeof input.randomId === "function" ? normalizeRandomId(input.randomId()) : undefined,
         now: typeof input.now === "function" ? input.now : now,
+        isCanceled: typeof input.isCanceled === "function" ? input.isCanceled : null,
+      });
+    },
+    async sweep(input) {
+      return engine.runSweep({
+        store,
+        github,
+        watchId: input.watchId ?? null,
+        now: typeof input.now === "function" ? input.now : now,
+        tailCache: input.tailCache ?? null,
         isCanceled: typeof input.isCanceled === "function" ? input.isCanceled : null,
       });
     },

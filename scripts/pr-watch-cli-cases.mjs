@@ -253,6 +253,7 @@ export function registerCliCases({ test, assert, runCli }) {
       "watches list",
       "watches inspect",
       "watches remove",
+      "watches run",
       "events list",
       "help",
       "help search",
@@ -264,7 +265,7 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.match(result.stdout, /watches/);
     assert.match(result.stdout, /events/);
 
-    result = await invoke(runCli, harness, ["watches", "list", "--help", "--json"]);
+    result = await invoke(runCli, harness, ["watches", "run", "--help", "--json"]);
     assert.equal(result.code, 0);
     assert.equal(result.stderr, "");
     assert.deepEqual(Object.keys(result.json()), [
@@ -276,10 +277,10 @@ export function registerCliCases({ test, assert, runCli }) {
       "lifecycle",
       "resultSchema",
     ]);
-    assert.equal(result.json().path, "watches list");
+    assert.equal(result.json().path, "watches run");
     assert.deepEqual(
       result.json().resultSchema.map((item) => item.name),
-      ["watches", "pagination", "warnings"],
+      ["outcome", "summary", "events", "results", "warnings"],
     );
     for (const item of result.json().options) {
       assert.deepEqual(Object.keys(item), [
@@ -294,9 +295,9 @@ export function registerCliCases({ test, assert, runCli }) {
       ]);
     }
 
-    result = await invoke(runCli, harness, ["help", "search", "baseline", "--json"]);
+    result = await invoke(runCli, harness, ["help", "search", "sweep", "--json"]);
     assert.equal(result.code, 0);
-    assert.deepEqual(result.json().commands[0].path, "watches add");
+    assert.deepEqual(result.json().commands[0].path, "watches run");
 
     result = await invoke(runCli, harness, ["watches", "add", "--help", "--json"]);
     assert.equal(result.code, 0);
@@ -377,6 +378,9 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.equal(result.stdout, "");
     assert.equal(result.errorJson().reason, "internal_error");
 
+    result = await invoke(runCli, harness, ["watches", "run", "--json"]);
+    assert.equal(result.code, 1);
+    assert.equal(result.errorJson().reason, "internal_error");
   });
 
   test("cli lists watches in contract order with filters, cursors, and clamping", async (t) => {
@@ -501,7 +505,7 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.match(result.stderr, /removed watch w_act01/);
   });
 
-  test("cli add delegates inputs and emits runner-based inspect next command", async (t) => {
+  test("cli add delegates inputs and emits runner-based inspect and sweep next commands", async (t) => {
     const calls = [];
     const added = watch("w_new99", { pr: 123 });
     const harness = makeHarness(t, {
@@ -524,6 +528,7 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.equal(result.json().outcome, "added");
     assert.deepEqual(result.json().next.map((item) => item.argv), [
       [RUNNER, "pr-watch.mjs", "watches", "inspect", "w_new99", "--json"],
+      [RUNNER, "pr-watch.mjs", "watches", "run", "--watch", "w_new99", "--json"],
     ]);
     assert.equal(result.json().warnings[0].reason, "baseline_incomplete");
   });
@@ -548,6 +553,62 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.match(result.stderr, /added watch w_new99/);
   });
 
+  test("cli bounded sweep keeps JSON stream purity and prints human events only on stdout", async (t) => {
+    const produced = event(5, "w_act01", "remarks", NOW, { count: 2 });
+    const operations = {
+      async sweep() {
+        return {
+          outcome: "completed",
+          summary: sweepSummary(),
+          events: [produced],
+          results: [{ id: "github.com:owner/repo#123", outcome: "read", detailRead: true, activityRead: true, eventCount: 1 }],
+        };
+      },
+    };
+    let harness = makeHarness(t, { operations });
+    let result = await invoke(runCli, harness, ["watches", "run", "--json"]);
+    assert.equal(result.code, 0);
+    assert.equal(result.stderr, "");
+    assert.deepEqual(Object.keys(result.json()), ["outcome", "summary", "events", "results"]);
+    assert.equal(result.json().events.length, 1);
+
+    harness = makeHarness(t, { operations });
+    result = await invoke(runCli, harness, ["watches", "run"]);
+    assert.equal(result.code, 0);
+    assert.match(result.stdout, /remarks owner\/repo#123/);
+    assert.equal(result.stderr, "");
+  });
+
+  test("cli partial sweeps exit 1 with a result document and no error document", async (t) => {
+    const operations = {
+      async sweep() {
+        return {
+          outcome: "partial",
+          summary: sweepSummary({ succeeded: 1, failed: 1, groupCount: 2 }),
+          events: [],
+          results: [
+            { id: "github.com:owner/repo#123", outcome: "read", detailRead: true, activityRead: true, eventCount: 0 },
+            {
+              id: "github.com:owner/repo#124",
+              outcome: "failed",
+              detailRead: true,
+              activityRead: false,
+              eventCount: 0,
+              error: { reason: "network_error", message: "network failed", retryable: true },
+            },
+          ],
+        };
+      },
+    };
+    const harness = makeHarness(t, { operations });
+    const result = await invoke(runCli, harness, ["watches", "run", "--json"]);
+    assert.equal(result.code, 1);
+    assert.equal(result.stderr, "");
+    assert.equal(result.json().outcome, "partial");
+    assert.equal(result.json().warnings[0].reason, "sweep_group_failed");
+    assert.equal(result.json().warnings[0].data.id, "github.com:owner/repo#124");
+  });
+
   test("cli human list output keeps rows on stdout and warnings on stderr", async (t) => {
     const harness = makeHarness(t);
     const result = await invoke(runCli, harness, ["watches", "list", "--limit", "999"]);
@@ -563,6 +624,7 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.equal(result.code, 0);
     assert.equal(result.stderr, "");
     assert.match(result.stdout, /watches add/);
+    assert.match(result.stdout, /watches run/);
 
     result = await invoke(runCli, harness, ["watches", "inspect", "--help", "--json"]);
     assert.equal(result.code, 0);
@@ -621,6 +683,26 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.equal(result.errorJson().data.rowsFetched, 0);
     assert.equal(result.errorJson().data.next, null);
     assert.equal(result.errorJson().retryable, false);
+  });
+
+  test("cli run accepts only active watches and validates selectors before sweeping", async (t) => {
+    let calls = 0;
+    const harness = makeHarness(t, {
+      operations: {
+        async sweep() {
+          calls += 1;
+          return { outcome: "completed", summary: sweepSummary(), events: [], results: [] };
+        },
+      },
+    });
+    let result = await invoke(runCli, harness, ["watches", "run", "--watch", "w_end01", "--json"]);
+    assert.equal(result.code, 1);
+    assert.equal(result.errorJson().reason, "not_found");
+    assert.equal(calls, 0);
+
+    result = await invoke(runCli, harness, ["watches", "run", "--watch", "bad", "--json"]);
+    assert.equal(result.code, 2);
+    assert.equal(calls, 0);
   });
 
   test("cli add validates GH_HOST before invoking operations", async (t) => {
