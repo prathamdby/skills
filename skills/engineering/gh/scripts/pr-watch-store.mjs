@@ -700,13 +700,21 @@ async function inspectLock(lockPath, staleLockMs, nowMs) {
   return { state: "live", owner: null };
 }
 
-async function reclaimStaleLock(lockPath) {
+async function reclaimStaleLock(lockPath, expectedOwner) {
   const aside = `${lockPath}.stale-${process.pid}-${crypto.randomBytes(8).toString("hex")}`;
   try {
     await fs.rename(lockPath, aside);
   } catch (error) {
     if (error?.code === "ENOENT") return false;
     throw invalidConfig("Could not reclaim a stale watch-state lock.", "lock", { operation: "rename" });
+  }
+  const moved = await readOwner(aside);
+  const stillStale = expectedOwner?.token
+    ? moved?.token === expectedOwner.token
+    : moved === null;
+  if (!stillStale) {
+    await fs.rename(aside, lockPath).catch(() => {});
+    return false;
   }
   await fs.rm(aside, { recursive: true, force: true }).catch(() => {});
   return true;
@@ -780,7 +788,7 @@ async function acquireLock({
     const inspection = await inspectLock(lockPath, staleLockMs, normalizeNow(now()));
     if (inspection.state === "missing") continue;
     if (inspection.state === "stale") {
-      await reclaimStaleLock(lockPath);
+      await reclaimStaleLock(lockPath, inspection.owner);
       continue;
     }
     if (nonBlocking) {

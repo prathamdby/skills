@@ -1916,7 +1916,7 @@ async function resolveCheckoutTarget(input, lib) {
   return { host: input.host, repo, pr };
 }
 
-async function githubInterface(module, { store, engine, now, lib } = {}) {
+export async function githubInterface(module, { store, engine, now, lib } = {}) {
   if (!module) return null;
   let candidate = module;
   if (
@@ -1944,8 +1944,7 @@ async function githubInterface(module, { store, engine, now, lib } = {}) {
     !lib ||
     typeof lib.graphqlMetadata !== "function" ||
     typeof lib.restMetadata !== "function" ||
-    typeof lib.gitHubCredentialFingerprint !== "function" ||
-    typeof engine?.createQuotaAwareTransport !== "function"
+    typeof lib.gitHubCredentialFingerprint !== "function"
   ) {
     return null;
   }

@@ -264,3 +264,36 @@ test("engine registration reports enterprise degradation on add and unchanged re
   }
 });
 
+test("registration binds the raw transport when the engine has no quota adapter", async () => {
+  const engine = await import("../skills/engineering/gh/scripts/pr-watch-engine.mjs");
+  if (typeof engine.createQuotaAwareTransport === "function") return;
+  const { githubInterface } = await import("../skills/engineering/gh/scripts/pr-watch.mjs");
+  const github = {
+    async readFingerprints() {
+      return [];
+    },
+    async readDetail(_client, target) {
+      return target;
+    },
+    async readActivity(_client, target) {
+      return target;
+    },
+  };
+  const bound = await githubInterface(github, {
+    store: {},
+    engine,
+    now: () => 0,
+    lib: {
+      graphqlMetadata() {},
+      restMetadata() {},
+      gitHubCredentialFingerprint() {},
+    },
+  });
+  assert.equal(typeof bound?.readDetail, "function");
+  assert.deepEqual(await bound.readDetail({ host: "github.com", repo: "owner/repo", pr: 1 }), {
+    host: "github.com",
+    repo: "owner/repo",
+    pr: 1,
+  });
+});
+

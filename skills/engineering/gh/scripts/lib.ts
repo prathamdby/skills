@@ -559,7 +559,11 @@ async function fetchBounded(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, { ...init, signal: controller.signal });
+    const response = await fetch(url, { ...init, signal: controller.signal });
+    const text = await response.text();
+    return Object.assign(response, {
+      text: async () => text,
+    });
   } catch (e) {
     const aborted = e instanceof Error &&
       (e.name === "AbortError" || e.name === "TimeoutError" ||
