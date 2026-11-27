@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
-# Run a gh TypeScript script with the first working runtime.
-# Usage: run <script.ts> [args...]
+# Run a gh script with the first working runtime.
+# Usage: run <script> [args...]
 # Exit 2 = no runtime. Any other status is from the script or its runtime.
 set -eu
 
 if [ "$#" -lt 1 ]; then
-  echo "usage: run <script.ts> [args...]" >&2
+  echo "usage: run <script> [args...]" >&2
   exit 2
 fi
 
@@ -123,5 +123,5 @@ if [ -d "$NVM_DIR/versions/node" ]; then
   done
 fi
 
-echo "run: no TypeScript runtime. Tried bun, nub, tsx, node${TRIED:+ (ran: $TRIED)}. Install bun, nub, tsx, or Node ≥ 22.6." >&2
+echo "run: no script runtime. Tried bun, nub, tsx, node${TRIED:+ (ran: $TRIED)}. Install bun, nub, tsx, or Node ≥ 22.6." >&2
 exit 2
