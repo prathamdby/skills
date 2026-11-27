@@ -2,6 +2,7 @@
 
 Compatibility pointer for existing callers:
 - Before raw gh, apply `references/raw-gh.md`.
+- For future pull-request change watching, apply `references/watch.md`.
 - For snapshot JSON, use `references/snapshot.md`.
 - For discussion JSON, use `references/threads.md`.
 - For CI JSON, use `references/ci.md`.

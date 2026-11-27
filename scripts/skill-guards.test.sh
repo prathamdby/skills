@@ -186,5 +186,14 @@ PY
 fi
 
 echo
+if node --test scripts/pr-watch.test.mjs; then
+  PASS=$((PASS + 1))
+  echo "ok pr-watch contract tests"
+else
+  FAIL=$((FAIL + 1))
+  echo "not ok pr-watch contract tests"
+fi
+
+echo
 echo "passed=$PASS failed=$FAIL"
 [ "$FAIL" -eq 0 ]

@@ -20,5 +20,8 @@ Apply before an uncovered raw operation:
     may mean no classic rule/admin access; inspect rulesets, not a guessed path.
 11. Compare BASE...HEAD exposes ahead_by/behind_by.
 12. Multiline jq belongs in a temporary file passed with -f.
-13. Do not sleep-poll runs/checks. Use host watchers when available; otherwise
-    background a supported run-watch or checks-watch command.
+13. Do not ad hoc sleep-poll runs/checks or PR state. For future PR changes,
+    the approved exception is `<anchor>/scripts/run pr-watch.mjs` because the
+    watch engine is bounded, stateful, quota-aware, and deduped. For run or
+    checks waiting, use host watchers when available; otherwise background a
+    supported run-watch or checks-watch command.
