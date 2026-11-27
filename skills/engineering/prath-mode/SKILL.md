@@ -17,7 +17,7 @@ leaf; playbooks own predetermined order, not copies of leaf behavior.
 - `commit`: commit only, `playbooks/commit.md`
 - `open-pr`: publish/update PR, `playbooks/open-pr.md`
 - `finish-pr`: feedback fixes, `playbooks/finish-pr.md`
-- `inspect-pr`: PR/CI inspection or reply, `playbooks/inspect-pr.md`
+- `inspect-pr`: PR/CI inspection, PR watching, or reply, `playbooks/inspect-pr.md`
 - `understand-repo`: map/read saved map, `playbooks/understand-repo.md`
 - `research-external`: local external source, `playbooks/research-external.md`
 - `session`: handoff/resume, `playbooks/session.md`
@@ -27,7 +27,7 @@ leaf; playbooks own predetermined order, not copies of leaf behavior.
 - `save-work`: optional cleanup/commit, `playbooks/save-work.md`
 
 An immediate action outranks a chain. Review does not prepend to ship.
-Inspection/reply stays inspect-pr; fixing feedback selects finish-pr.
+Inspection, watching, and replies stay inspect-pr; fixing feedback selects finish-pr.
 Neither inspect-pr nor gh escalates into fix-pr; fix-pr owns its gh call.
 Deslop is required in ship, optional in save-work; resolve mixed index/worktree
 paths before it. Parent owns implementation.

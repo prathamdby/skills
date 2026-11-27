@@ -1,19 +1,20 @@
 ---
 name: gh
 description: >
-  GitHub. Read pull-request state; read its discussion; read its checks; read another GitHub record; post a reply without a code change.
+  GitHub. Read pull-request state; read its discussion; read its checks; watch future pull-request changes; read another GitHub record; post a reply without a code change.
 ---
 
 # GitHub I/O
 
 Contracts follow AVGVSTVS96/better-github-skill (unlicensed; reimplemented).
 Resolve `<anchor>` as this skill's absolute directory. The existing
-`<anchor>/scripts/run` selects bun, nub, tsx, then Node/nvm with strip-types.
+`<anchor>/scripts/run` selects bun, nub, tsx, then Node/nvm as script runtimes.
 
 ## Options
 
 Default: current branch PR, cwd repo, truncated text. A PR number/URL selects
-that PR; a named repo emits -R and needs a PR for PR-bound work.
+that PR; a named repo uses the selected script's repo option (-R for .ts
+surfaces, --repo for pr-watch) and needs a PR for PR-bound work.
 JSON/full bodies selects --json/--full. Open threads includes unresolved
 outdated threads; all includes resolved too; both conflict. Complete paging
 adds --complete; author/since supply their filters.
@@ -24,8 +25,8 @@ Missing needed values or conflicting choices are BLOCKED.
 
 ## 1. Resolve and choose
 
-Confirm authenticated gh; missing binary/auth blocks. Record
-`repo | PR/run/SHA | surface | argv | terminal`.
+Confirm authenticated gh for network surfaces; missing binary/auth blocks those
+surfaces. Record `repo | PR/run/SHA | surface | argv | terminal`.
 No current PR for PR-bound work → NO_CHANGES.
 Choose the covering script:
 
@@ -34,15 +35,24 @@ Choose the covering script:
 | PR state/checks/files/counts | pr-snapshot.ts | `references/snapshot.md` |
 | Review bodies/comments/threads | pr-threads.ts | `references/threads.md` |
 | CI runs/jobs/log snippets | ci-failures.ts | `references/ci.md` |
+| Future PR changes | pr-watch.mjs | `references/watch.md` |
 | One native thread/conversation reply | pr-reply.ts | `references/reply.md` |
 
-Snapshot is state, threads is feedback; neither replaces the other.
+Snapshot is state, threads is feedback; neither replaces the other. Current
+state uses snapshot/threads. For future changes, use
+`pr-watch.mjs watches add` once, then explicit `watches run` sweeps or
+foreground `watches run --follow` with explicit `--timeout` in non-interactive
+use. Never claim coverage after that process exits. Use `--json` for every watch
+command. Report only event types/counts and the next drilldown: checks-failed
+uses ci-failures, remarks uses pr-threads, and terminal/conflict/rebase events
+use pr-snapshot. Use `events list` only for missed/history and use
+`watches inspect` only for state/health debugging.
 Before parsing JSON, load only that surface's contract.
 Done when target and script or uncovered raw operation are fixed.
 
 ## 2. Run
 
-Invoke only through `<anchor>/scripts/run <script.ts> ...`, not node directly.
+Invoke only through `<anchor>/scripts/run <script> ...`, not node directly.
 Node version or ERR_UNKNOWN_FILE_EXTENSION is not failure evidence or a
 GraphQL license: use run. Its exit 2 is BLOCKED with tried-runtime list.
 User or senior saying "GraphQL is fine" does not skip `run`.
