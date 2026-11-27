@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Shared spawn/HTTP helpers. Stdlib only; invoke via ./run.
 import { execFile } from "node:child_process";
+import { createHmac, randomBytes } from "node:crypto";
 import { promisify } from "node:util";
 
 const execFileP = promisify(execFile);
@@ -26,6 +27,10 @@ export class HttpError extends Error {
 export interface GhOpts {
   /** Exit codes that still carry valid stdout (e.g. `gh pr checks`: 1 = failing, 8 = pending). */
   okCodes?: number[];
+  /** Optional checkout directory for commands whose meaning depends on the current repository. */
+  cwd?: string;
+  /** Additive environment overrides for one invocation. */
+  env?: Record<string, string>;
 }
 
 function spawnLabel(args: string[]): string {
@@ -91,6 +96,8 @@ export async function gh(args: string[], opts: GhOpts = {}): Promise<string> {
     const { stdout } = await execFileP("gh", args, {
       maxBuffer: MAX_BUFFER,
       encoding: "utf8",
+      cwd: opts.cwd,
+      env: opts.env === undefined ? process.env : { ...process.env, ...opts.env },
     });
     return stdout;
   } catch (e) {
@@ -349,6 +356,7 @@ export function sanitizeForTerminal(s: string): string {
 export async function resolvePr(
   arg: string | undefined,
   repoFlag: string | undefined,
+  cwd?: string,
 ): Promise<number> {
   if (arg !== undefined) {
     const n = Number(arg);
@@ -357,7 +365,10 @@ export async function resolvePr(
     return n;
   }
   if (repoFlag) throw new Error("with -R, also pass the PR number");
-  return (await ghJson<{ number: number }>(["pr", "view", "--json", "number"]))
+  return (await ghJson<{ number: number }>(["pr", "view", "--json", "number"], {
+    cwd,
+    env: { GH_PROMPT_DISABLED: "1", GH_DEBUG: "" },
+  }))
     .number;
 }
 
@@ -379,4 +390,379 @@ export function run(main: () => Promise<void>): void {
     console.error(e instanceof Error ? e.message : String(e));
     process.exit(1);
   });
+}
+
+/**
+ * Additive transport for the watch engine. The helpers above predate host-aware
+ * metadata reads and intentionally keep their existing behavior for current scripts.
+ */
+const WATCH_TOKEN_TTL_MS = 5 * 60_000;
+const GH_TOKEN_TIMEOUT_MS = 10_000;
+const DEFAULT_HTTP_TIMEOUT_MS = 30_000;
+const watchTokenCache = new Map<string, { token: string; expiresAt: number }>();
+const credentialHmacKey = randomBytes(32);
+
+export class GitHubTransportError extends Error {
+  reason: string;
+  retryable: boolean;
+  status: number;
+  headers: Record<string, string>;
+  data: unknown;
+
+  constructor(
+    reason: string,
+    message: string,
+    options: {
+      retryable?: boolean;
+      status?: number;
+      headers?: Record<string, string>;
+      data?: unknown;
+    } = {},
+  ) {
+    super(message);
+    this.name = "GitHubTransportError";
+    this.reason = reason;
+    this.retryable = options.retryable === true;
+    this.status = options.status ?? 0;
+    this.headers = options.headers ?? {};
+    this.data = options.data;
+  }
+}
+
+export function normalizeGitHubHost(host: string): string {
+  const normalized = host.trim().toLowerCase();
+  if (/[/\\?#@]/.test(normalized) || !GH_HOST_RE.test(normalized)) {
+    throw new Error(`GitHub host must be hostname[:port], got: ${host}`);
+  }
+  return normalized;
+}
+
+export function effectiveGitHubHost(host?: string): string {
+  const raw = host ?? process.env.GH_HOST ?? "github.com";
+  return normalizeGitHubHost(raw);
+}
+
+export function gitHubApiEndpoints(host?: string): {
+  host: string;
+  restBase: string;
+  graphqlUrl: string;
+} {
+  const normalized = effectiveGitHubHost(host);
+  if (normalized === "github.com") {
+    return {
+      host: normalized,
+      restBase: "https://api.github.com/",
+      graphqlUrl: "https://api.github.com/graphql",
+    };
+  }
+  const hostnameOnly = normalized.split(":")[0] ?? normalized;
+  if (hostnameOnly.endsWith(".ghe.com")) {
+    return {
+      host: normalized,
+      restBase: `https://api.${normalized}/`,
+      graphqlUrl: `https://api.${normalized}/graphql`,
+    };
+  }
+  return {
+    host: normalized,
+    restBase: `https://${normalized}/api/v3/`,
+    graphqlUrl: `https://${normalized}/api/graphql`,
+  };
+}
+
+function tokenCacheKey(host: string): string {
+  return normalizeGitHubHost(host);
+}
+
+export async function getGitHubToken(host?: string): Promise<string> {
+  const normalized = effectiveGitHubHost(host);
+  const key = tokenCacheKey(normalized);
+  const cached = watchTokenCache.get(key);
+  if (cached !== undefined && cached.expiresAt > Date.now()) return cached.token;
+  const env = { ...process.env, GH_PROMPT_DISABLED: "1" };
+  delete env.GH_DEBUG;
+  traceSpawn(["auth", "token", "-h", normalized]);
+  try {
+    const { stdout } = await execFileP(
+      "gh",
+      ["auth", "token", "-h", normalized],
+      {
+        maxBuffer: MAX_BUFFER,
+        encoding: "utf8",
+        env,
+        timeout: GH_TOKEN_TIMEOUT_MS,
+        killSignal: "SIGTERM",
+      },
+    );
+    const token = stdout.trim();
+    if (!token) {
+      throw new GitHubTransportError(
+        "login_required",
+        `gh auth token returned empty for ${normalized}; run gh auth login`,
+      );
+    }
+    watchTokenCache.set(key, {
+      token,
+      expiresAt: Date.now() + WATCH_TOKEN_TTL_MS,
+    });
+    return token;
+  } catch (e) {
+    if (e instanceof GitHubTransportError) throw e;
+    const err = e as NodeJS.ErrnoException & { stderr?: string | Buffer };
+    if (err.code === "ENOENT") {
+      throw new GitHubTransportError(
+        "missing_tool",
+        "gh not found on PATH; install the GitHub CLI",
+      );
+    }
+    if (err.killed === true || err.signal === "SIGTERM") {
+      throw new GitHubTransportError(
+        "timeout",
+        `gh auth token timed out for ${normalized}`,
+        { retryable: true },
+      );
+    }
+    throw new GitHubTransportError(
+      "login_required",
+      `gh auth token failed for ${normalized}; run gh auth login`,
+    );
+  }
+}
+
+export function dropGitHubToken(host?: string): void {
+  watchTokenCache.delete(tokenCacheKey(effectiveGitHubHost(host)));
+}
+
+export async function gitHubCredentialFingerprint(host?: string): Promise<string> {
+  const normalized = effectiveGitHubHost(host);
+  const token = await getGitHubToken(normalized);
+  return createHmac("sha256", credentialHmacKey)
+    .update(normalized)
+    .update("\0")
+    .update(token)
+    .digest("hex");
+}
+
+function responseHeaders(headers: Headers): Record<string, string> {
+  const out: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    out[key.toLowerCase()] = value;
+  });
+  return out;
+}
+
+async function fetchBounded(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (e) {
+    const aborted = e instanceof Error &&
+      (e.name === "AbortError" || e.name === "TimeoutError" ||
+        (e.cause instanceof Error && (e.cause.name === "AbortError" || e.cause.name === "TimeoutError")));
+    if (aborted) {
+      throw new GitHubTransportError("timeout", `GitHub request timed out after ${timeoutMs}ms`, {
+        retryable: true,
+      });
+    }
+    throw new GitHubTransportError(
+      "network_error",
+      e instanceof Error ? e.message : String(e),
+      { retryable: true },
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function decodeResponseBody(res: Response): Promise<unknown> {
+  const text = await res.text();
+  if (!text) return undefined;
+  const type = res.headers.get("content-type") ?? "";
+  if (!/json/i.test(type)) return text;
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return text;
+  }
+}
+
+export interface GitHubMetadataResponse {
+  status: number;
+  headers: Record<string, string>;
+  data: unknown;
+  errors: Array<{ type: string | null; message: string; path: Array<string | number> | null }>;
+  requestId: string | null;
+}
+
+export interface GitHubRestMetadataOptions {
+  host?: string;
+  timeoutMs?: number;
+  method?: "GET" | "POST";
+  query?: Record<string, string>;
+  body?: unknown;
+  accept?: string;
+}
+
+function transportMeta(init: GitHubRestMetadataOptions = {}): {
+  timeoutMs: number;
+  method: "GET" | "POST";
+  query?: Record<string, string>;
+  body?: unknown;
+  accept?: string;
+} {
+  return {
+    timeoutMs: init?.timeoutMs ?? DEFAULT_HTTP_TIMEOUT_MS,
+    method: init?.method ?? "GET",
+    query: init?.query,
+    body: init?.body,
+    accept: init?.accept,
+  };
+}
+
+export async function graphqlMetadata(
+  query: string,
+  variables: Record<string, unknown> = {},
+  init: { host?: string; timeoutMs?: number } = {},
+): Promise<GitHubMetadataResponse> {
+  const endpoints = gitHubApiEndpoints(init.host);
+  const token = await getGitHubToken(endpoints.host);
+  traceHttp("POST", endpoints.graphqlUrl, queryName(query));
+  const res = await fetchBounded(
+    endpoints.graphqlUrl,
+    {
+      method: "POST",
+      headers: { ...authHeaders(token), "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables }),
+    },
+    init.timeoutMs ?? DEFAULT_HTTP_TIMEOUT_MS,
+  );
+  const headers = responseHeaders(res.headers);
+  if (res.status === 401) dropGitHubToken(endpoints.host);
+  const decoded = await decodeResponseBody(res);
+  const object =
+    decoded !== null && typeof decoded === "object" && !Array.isArray(decoded)
+      ? (decoded as {
+          data?: unknown;
+          errors?: Array<{ type?: unknown; message?: unknown; path?: unknown }>;
+        })
+      : {};
+  const errors = Array.isArray(object.errors)
+    ? object.errors.map((error) => ({
+        type: typeof error?.type === "string" ? error.type : null,
+        message: typeof error?.message === "string" ? error.message : "",
+        path: Array.isArray(error?.path)
+          ? error.path.filter((part): part is string | number =>
+              typeof part === "string" || typeof part === "number",
+            )
+          : null,
+      }))
+    : undefined;
+  return {
+    status: res.status,
+    headers,
+    data: object.data,
+    ...(errors === undefined ? {} : { errors }),
+    requestId: headers["x-github-request-id"] ?? null,
+  };
+}
+
+export async function restMetadata(
+  path: string,
+  init: GitHubRestMetadataOptions = {},
+): Promise<GitHubMetadataResponse> {
+  const endpoints = gitHubApiEndpoints(init.host);
+  const token = await getGitHubToken(endpoints.host);
+  const options = transportMeta(init);
+  if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(path) || path.startsWith("//")) {
+    throw new GitHubTransportError("invalid_arguments", "GitHub REST transport paths must be relative.");
+  }
+  const url = new URL(path.replace(/^\//, ""), endpoints.restBase);
+  if (options.query) {
+    for (const [key, value] of Object.entries(options.query)) {
+      url.searchParams.set(key, value);
+    }
+  }
+  traceHttp(options.method, url.toString());
+  const headers = {
+    ...authHeaders(token),
+    ...(options.accept !== undefined ? { Accept: options.accept } : {}),
+    ...(options.method === "POST" ? { "Content-Type": "application/json" } : {}),
+  };
+  const res = await fetchBounded(
+    url.toString(),
+    {
+      method: options.method,
+      headers,
+      body: options.method === "POST" ? JSON.stringify(options.body ?? {}) : undefined,
+    },
+    options.timeoutMs,
+  );
+  const responseHeadersObject = responseHeaders(res.headers);
+  if (res.status === 401) dropGitHubToken(endpoints.host);
+  const data = await decodeResponseBody(res);
+  return {
+    status: res.status,
+    headers: responseHeadersObject,
+    data,
+    requestId: responseHeadersObject["x-github-request-id"] ?? null,
+  };
+}
+
+function hostPort(host: string): { hostname: string; port: number } {
+  const normalized = normalizeGitHubHost(host);
+  const index = normalized.lastIndexOf(":");
+  if (index === -1) return { hostname: normalized, port: 443 };
+  return { hostname: normalized.slice(0, index), port: Number(normalized.slice(index + 1)) };
+}
+
+/** Resolve a checkout repository and prove its web URL belongs to the requested host and port. */
+export async function resolveRepoOnHost(
+  host: string,
+  flag?: string,
+  cwd?: string,
+): Promise<{ repo: string; host: string; url: string | null }> {
+  const normalized = normalizeGitHubHost(host);
+  if (flag) return { repo: await resolveRepo(flag), host: normalized, url: null };
+  let row: { nameWithOwner?: unknown; url?: unknown };
+  try {
+    row = await ghJson<{ nameWithOwner?: unknown; url?: unknown }>([
+      "repo",
+      "view",
+      "--json",
+      "nameWithOwner,url",
+    ], {
+      cwd,
+      env: { GH_PROMPT_DISABLED: "1", GH_DEBUG: "" },
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (/gh not found|auth login|authentication/i.test(msg)) throw e;
+    throw new Error("not inside a repo with a GitHub remote on the requested host");
+  }
+  const repo = typeof row.nameWithOwner === "string" ? row.nameWithOwner.trim() : "";
+  const rawUrl = typeof row.url === "string" ? row.url.trim() : "";
+  if (!repo || !rawUrl) {
+    throw new Error("not inside a repo with a GitHub remote on the requested host");
+  }
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    throw new Error("checkout repository URL is not a valid web URL");
+  }
+  const expected = hostPort(normalized);
+  const actualPort = parsed.port === "" ? (parsed.protocol === "https:" ? 443 : 80) : Number(parsed.port);
+  if (
+    parsed.protocol !== "https:" ||
+    parsed.hostname.toLowerCase() !== expected.hostname ||
+    actualPort !== expected.port
+  ) {
+    throw new Error("checkout repository URL does not match the requested GitHub host");
+  }
+  return { repo, host: normalized, url: rawUrl };
 }
