@@ -295,7 +295,7 @@ export function registerCliCases({ test, assert, runCli }) {
       ]);
     }
 
-    result = await invoke(runCli, harness, ["help", "search", "sweep", "--json"]);
+    result = await invoke(runCli, harness, ["help", "search", "follow", "--json"]);
     assert.equal(result.code, 0);
     assert.deepEqual(result.json().commands[0].path, "watches run");
 
@@ -346,6 +346,18 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.match(result.stderr, /--fields requires --json/);
 
     result = await invoke(runCli, harness, ["watches", "list", "--json", "--fields", "watches,,pagination"]);
+    assert.equal(result.code, 2);
+    assert.equal(result.errorJson().reason, "invalid_arguments");
+  });
+
+  test("cli enforces the non-interactive follow timeout and timeout pairing", async (t) => {
+    const harness = makeHarness(t, { operations: {} });
+    let result = await invoke(runCli, harness, ["watches", "run", "--follow", "--json"]);
+    assert.equal(result.code, 2);
+    assert.equal(result.stdout, "");
+    assert.equal(result.errorJson().reason, "missing_timeout");
+
+    result = await invoke(runCli, harness, ["watches", "run", "--timeout", "1m", "--json"]);
     assert.equal(result.code, 2);
     assert.equal(result.errorJson().reason, "invalid_arguments");
   });
@@ -609,6 +621,42 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.equal(result.json().warnings[0].data.id, "github.com:owner/repo#124");
   });
 
+  test("cli follow emits snapshot and event JSONL then exits when no active watches remain", async (t) => {
+    const produced = event(5, "w_act01", "remarks", NOW, { count: 1 });
+    let sweepCalls = 0;
+    const harness = makeHarness(t, {
+      operations: {
+        async sweep() {
+          sweepCalls += 1;
+          const state = await this?.store?.readState?.() ?? null;
+          return {
+            outcome: "completed",
+            summary: sweepSummary(),
+            events: sweepCalls === 1 ? [produced] : [],
+            results: [{ id: "github.com:owner/repo#123", outcome: "read", detailRead: true, activityRead: true, eventCount: 1 }],
+          };
+        },
+      },
+    });
+    const originalSweep = harness.deps.operations.sweep;
+    harness.deps.operations.sweep = async (input) => {
+      const result = await originalSweep(input);
+      const state = await harness.store.readState();
+      state.watches.w_act01.state = "ended";
+      state.watches.w_act02.state = "ended";
+      await harness.store.writeState(state);
+      return result;
+    };
+    const result = await invoke(runCli, harness, ["watches", "run", "--follow", "--timeout", "1s", "--json"]);
+    assert.equal(result.code, 0);
+    assert.equal(result.stderr, "");
+    const lines = result.stdout.trim().split("\n").map((line) => JSON.parse(line));
+    assert.equal(lines[0].type, "snapshot");
+    assert.equal(lines[0].intervalSeconds, 120);
+    assert.equal(lines[1].type, "event");
+    assert.equal(lines[1].event.type, "remarks");
+  });
+
   test("cli human list output keeps rows on stdout and warnings on stderr", async (t) => {
     const harness = makeHarness(t);
     const result = await invoke(runCli, harness, ["watches", "list", "--limit", "999"]);
@@ -722,6 +770,16 @@ export function registerCliCases({ test, assert, runCli }) {
     assert.equal(calls, 0);
   });
 
+  test("cli explicit interactive mode relaxes only the follow timeout requirement", async (t) => {
+    const harness = makeHarness(t, { operations: {}, tty: true });
+    const result = await invoke(runCli, harness, [
+      "watches", "run", "--follow", "--non-interactive=false",
+    ]);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /operations are not wired/);
+  });
+
+
   test("cli orders watches by timestamp rather than ISO spelling", async (t) => {
     const harness = makeHarness(t);
     const state = harness.store.snapshot();
@@ -787,6 +845,121 @@ export function registerCliCases({ test, assert, runCli }) {
     const result = await invoke(runCli, harness, ["watches", "add", "123", "--repo", "owner/repo", "--json"]);
     assert.equal(result.code, 1);
     assert.equal(result.errorJson().reason, "internal_error");
+  });
+
+  test("cli interaction mode follows stdin and stderr rather than stdout", async (t) => {
+    const harness = makeHarness(t, { operations: {}, tty: false });
+    harness.deps.isTTY = { stdin: true, stdout: false, stderr: true };
+    const result = await invoke(runCli, harness, [
+      "watches", "run", "--follow", "--non-interactive=false",
+    ]);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /operations are not wired/);
+  });
+
+
+  test("cli follow with no active watches emits only the empty snapshot and exits 0", async (t) => {
+    const empty = fixtureState();
+    empty.watches = {};
+    empty.groups = {};
+    empty.endedWatches = {};
+    const harness = makeHarness(t, { state: empty, operations: undefined });
+    const result = await invoke(runCli, harness, ["watches", "run", "--follow", "--timeout", "1s", "--json"]);
+    assert.equal(result.code, 0);
+    assert.equal(result.stderr, "");
+    assert.deepEqual(result.lines().map((line) => JSON.parse(line).type), ["snapshot"]);
+    assert.deepEqual(JSON.parse(result.lines()[0]).watches, []);
+  });
+
+
+  test("cli follow timeout exits 0 without heartbeat lines", async (t) => {
+    let current = Date.parse(NOW);
+    let sweepCalls = 0;
+    const harness = makeHarness(t, {
+      operations: {
+        async sweep() {
+          sweepCalls += 1;
+          return {
+            outcome: "completed",
+            summary: sweepSummary(),
+            events: [],
+            results: [{ id: "github.com:owner/repo#123", outcome: "unchanged", detailRead: false, activityRead: false, eventCount: 0 }],
+          };
+        },
+      },
+    });
+    harness.deps.now = () => current;
+    harness.deps.sleep = async (ms) => {
+      current += ms;
+    };
+    const result = await invoke(runCli, harness, ["watches", "run", "--follow", "--timeout", "1s", "--json"]);
+    assert.equal(result.code, 0);
+    assert.equal(result.stderr, "");
+    assert.equal(sweepCalls, 1);
+    assert.deepEqual(result.lines().map((line) => JSON.parse(line).type), ["snapshot"]);
+  });
+
+  test("cli follow emits exact warning lines without ending the stream", async (t) => {
+    const harness = makeHarness(t, {
+      operations: {
+        async sweep() {
+          const state = await harness.store.readState();
+          state.watches.w_act01.state = "ended";
+          state.watches.w_act02.state = "ended";
+          await harness.store.writeState(state);
+          return {
+            outcome: "failed",
+            summary: sweepSummary({ succeeded: 0, failed: 1 }),
+            events: [],
+            results: [{
+              id: "github.com:owner/repo#123",
+              outcome: "failed",
+              detailRead: true,
+              activityRead: false,
+              eventCount: 0,
+              error: { reason: "network_error", message: "network failed", retryable: true },
+            }],
+          };
+        },
+      },
+    });
+    const result = await invoke(runCli, harness, ["watches", "run", "--follow", "--timeout", "1s", "--json"]);
+    assert.equal(result.code, 0);
+    const lines = result.lines().map((line) => JSON.parse(line));
+    assert.deepEqual(lines.map((line) => line.type), ["snapshot", "warning"]);
+    assert.deepEqual(Object.keys(lines[1]), ["type", "reason", "message", "data"]);
+    assert.equal(lines[1].reason, "sweep_group_failed");
+    assert.equal(lines[1].data.id, "github.com:owner/repo#123");
+    assert.equal(lines[1].data.error.reason, "network_error");
+  });
+
+  test("cli follow cancellation exits 130 without an error document", async (t) => {
+    const harness = makeHarness(t, {
+      operations: {
+        async sweep() {
+          return {
+            outcome: "completed",
+            summary: sweepSummary(),
+            events: [],
+            results: [{ id: "github.com:owner/repo#123", outcome: "unchanged", detailRead: false, activityRead: false, eventCount: 0 }],
+          };
+        },
+      },
+    });
+    harness.deps._signalState = { signal: null };
+    harness.deps.sleep = async () => {
+      harness.deps._signalState.signal = "SIGINT";
+    };
+    const result = await invoke(runCli, harness, ["watches", "run", "--follow", "--timeout", "1h", "--json"]);
+    assert.equal(result.code, 130);
+    assert.equal(result.stderr, "");
+    assert.deepEqual(result.lines().map((line) => JSON.parse(line).type), ["snapshot"]);
+
+    harness.deps._signalState = { signal: "SIGINT" };
+    const beforeStart = await invoke(runCli, harness, ["watches", "run", "--follow", "--timeout", "1h", "--json"]);
+    assert.equal(beforeStart.code, 130);
+    assert.equal(beforeStart.stdout, "");
+    assert.equal(beforeStart.stderr, "");
   });
 
   test("cli bounded cancellation before a state write exits 130 as canceled", async (t) => {
