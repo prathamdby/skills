@@ -261,15 +261,17 @@ const COMMAND_METADATA = {
   },
   "watches run": {
     path: "watches run",
-    summary: "Run one bounded watch sweep.",
+    summary: "Run one bounded watch sweep, or follow sweep ticks.",
     arguments: [],
     options: commandOptions([
       option("--watch", null, "string", "WATCH", null, null, "Sweep only one active watch."),
+      option("--follow", "-f", "boolean", null, false, BOOLEAN_VALUES, "Sweep every two minutes until stopped."),
+      option("--timeout", null, "string", "DURATION", null, null, "Stop follow mode after a duration."),
     ]),
     lifecycle: null,
     resultSchema: RESULT_SCHEMAS["watches run"],
-    nouns: ["watch", "run", "sweep"],
-    examples: ["watches run --watch w_7x2kq --json"],
+    nouns: ["watch", "run", "sweep", "follow", "poll"],
+    examples: ["watches run --follow --timeout 10m --json"],
   },
   "events list": {
     path: "events list",
@@ -349,6 +351,7 @@ const CANONICAL_FIELDS = {};
 for (const [command, meta] of Object.entries(COMMAND_METADATA)) {
   CANONICAL_FIELDS[command] = meta.resultSchema.map((item) => item.name);
 }
+const FOLLOW_FIELDS = ["type", "watches", "intervalSeconds", "event", "reason", "message", "data"];
 const HELP_DOCUMENT_FIELDS = ["path", "summary", "subcommands", "arguments", "options", "lifecycle", "resultSchema", "warnings"];
 
 const VALUE_OPTIONS = new Map([
@@ -358,18 +361,21 @@ const VALUE_OPTIONS = new Map([
   ["next", "next"],
   ["watch", "watch"],
   ["since", "since"],
+  ["timeout", "timeout"],
   ["fields", "fields"],
   ["cwd", "cwd"],
 ]);
 const BOOLEAN_OPTIONS = new Map([
   ["json", "json"],
   ["all", "all"],
+  ["follow", "follow"],
   ["debug", "debug"],
 ]);
 const SHORT_OPTIONS = new Map([
   ["-a", { name: "all", type: "boolean" }],
   ["-n", { name: "limit", type: "value" }],
   ["-s", { name: "since", type: "value" }],
+  ["-f", { name: "follow", type: "boolean" }],
   ["-h", { name: "help", type: "boolean" }],
   ["-d", { name: "debug", type: "boolean" }],
 ]);
@@ -379,7 +385,7 @@ const ALLOWED_OPTIONS = {
   "watches list": new Set(["state", "all", "limit", "next", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "watches inspect": new Set(["json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "watches remove": new Set(["json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
-  "watches run": new Set(["watch", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
+  "watches run": new Set(["watch", "follow", "timeout", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "events list": new Set(["watch", "since", "all", "limit", "next", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   help: new Set(["all", "json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
   "help search": new Set(["json", "fields", "debug", "no-color", "cwd", "non-interactive", "help"]),
@@ -499,6 +505,16 @@ function missingPrNext(ctx) {
       ctx.runnerPath,
       ["watches", "add", "<PR>", "--repo", "<OWNER/REPO>"],
       "Replace both placeholders with exact values",
+    ),
+  ];
+}
+
+function missingTimeoutNext(ctx) {
+  return [
+    nextCommand(
+      ctx.runnerPath,
+      ["watches", "run", "--follow", "--timeout", "<DURATION>", "--json"],
+      "Replace <DURATION> with a positive duration such as 30m",
     ),
   ];
 }
@@ -1683,6 +1699,7 @@ function boundedSweepDocument(result, extraWarnings) {
 }
 
 async function executeRun(ctx, parsed, fields) {
+  if (parsed.options.get("follow") === true) return executeFollow(ctx, parsed, fields);
   const selectorShape = parsed.options.get("watch") === undefined ? null : parseWatchSelector(parsed.options.get("watch"));
   const operations = await getOperations(ctx);
   if (!operations || typeof operations.sweep !== "function") throw operationsMissingError();
@@ -1729,6 +1746,124 @@ async function prepareSweepInput(ctx, parsed, selectorShape = null) {
     now: ctx.deps.now,
     isCanceled: () => Boolean(ctx.signalState.signal),
   };
+}
+
+function timeoutMsFrom(parsed) {
+  if (parsed.options.get("timeout") === undefined) return null;
+  return parseDuration(parsed.options.get("timeout"), "--timeout");
+}
+
+async function activeSelection(ctx, watchId) {
+  const state = await readState(ctx.deps);
+  const active = Object.values(state.watches ?? {}).filter((watch) => watch.state === "active");
+  const selected = watchId === null ? active : active.filter((watch) => watch.id === watchId);
+  return { state, active, selected };
+}
+
+async function executeFollow(ctx, parsed, fields) {
+  const invocationMs = nowMs(ctx.deps);
+  const timeoutMs = timeoutMsFrom(parsed);
+  const selectorShape = parsed.options.get("watch") === undefined ? null : parseWatchSelector(parsed.options.get("watch"));
+  let watchId = null;
+  const stateBefore = await readState(ctx.deps);
+  if (selectorShape !== null) {
+    watchId = resolveWatch(stateBefore, selectorShape, { activeOnly: true }).id;
+  }
+  const initial = await activeSelection(ctx, watchId);
+  const snapshotWatches = initial.selected.map(watchSummary);
+
+  if (ctx.json) {
+    const line = projectFollowLine({
+      type: "snapshot",
+      watches: snapshotWatches,
+      intervalSeconds: FOLLOW_INTERVAL_MS / 1000,
+    }, fields);
+    ctx.io.stdout(jsonText(line, false));
+  }
+  if (initial.selected.length === 0) return 0;
+
+  const operations = await getOperations(ctx);
+  if (!operations || typeof operations.sweep !== "function") throw operationsMissingError();
+
+  const deadlineMs = timeoutMs === null ? null : invocationMs + timeoutMs;
+  const input = {
+    watchId,
+    cwd: effectiveCwd(ctx),
+    env: environment(ctx.deps),
+    now: ctx.deps.now,
+    isCanceled: () => Boolean(ctx.signalState.signal),
+  };
+  const tailCache = new Map();
+  input.tailCache = tailCache;
+
+  for (;;) {
+    if (ctx.signalState.signal) return exitForSignal(ctx.signalState.signal);
+    if (deadlineMs !== null && nowMs(ctx.deps) >= deadlineMs) return 0;
+    const selection = await activeSelection(ctx, watchId);
+    if (selection.selected.length === 0) return 0;
+
+    const sweepStarted = nowMs(ctx.deps);
+    let result;
+    try {
+      result = validateSweepOutcome(await operations.sweep(input));
+    } catch (error) {
+      if (ctx.signalState.signal) return exitForSignal(ctx.signalState.signal);
+      throw error;
+    }
+
+    const warnings = [...validateOperationWarnings(result.warnings), ...groupWarnings(result.results)];
+    if (ctx.json) {
+      for (const item of warnings) {
+        const line = { type: "warning", reason: item.reason, message: item.message };
+        if (item.data !== undefined) line.data = item.data;
+        ctx.io.stdout(jsonText(projectFollowLine(line, fields), false));
+      }
+      for (const event of result.events) {
+        ctx.io.stdout(jsonText(projectFollowLine({ type: "event", event }, fields), false));
+      }
+    } else {
+      for (const event of result.events) ctx.io.stdout(`${sanitizeHumanText(compactEventLine(event))}\n`);
+      writeWarnings(ctx, warnings);
+    }
+
+    if (ctx.signalState.signal) return exitForSignal(ctx.signalState.signal);
+    const after = await activeSelection(ctx, watchId);
+    if (after.selected.length === 0) return 0;
+    if (deadlineMs !== null && nowMs(ctx.deps) >= deadlineMs) return 0;
+
+    const nextStart = sweepStarted + FOLLOW_INTERVAL_MS;
+    const waitMs = Math.max(0, nextStart - nowMs(ctx.deps));
+    const woke = await waitForNextTick(ctx, waitMs, deadlineMs);
+    if (woke === "timeout") return 0;
+    if (woke === "signal") return exitForSignal(ctx.signalState.signal);
+  }
+}
+
+async function waitForNextTick(ctx, waitMs, deadlineMs) {
+  const started = nowMs(ctx.deps);
+  const target = started + waitMs;
+  const sleeper = ctx.deps.sleep ?? defaultSleep;
+  for (;;) {
+    if (ctx.signalState.signal) return "signal";
+    const current = nowMs(ctx.deps);
+    if (deadlineMs !== null && current >= deadlineMs) return "timeout";
+    if (current >= target) return "tick";
+    let chunk = Math.min(1_000, target - current);
+    if (deadlineMs !== null) chunk = Math.min(chunk, Math.max(0, deadlineMs - current));
+    if (chunk <= 0) return deadlineMs !== null && current >= deadlineMs ? "timeout" : "tick";
+    await sleeper(chunk, ctx.signalState);
+  }
+}
+
+function defaultSleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function exitForSignal(signal) {
+  if (signal === "SIGTERM") return 143;
+  return 130;
 }
 
 function throwIfCanceled(ctx) {
@@ -1905,6 +2040,18 @@ function interactionMode(ctx) {
   return nonInteractive;
 }
 
+function validateRunInputs(ctx, parsed) {
+  const hasTimeout = parsed.options.get("timeout") !== undefined;
+  const follow = parsed.options.get("follow") === true;
+  if (hasTimeout && !follow) throw usageError("--timeout requires --follow.");
+  if (follow && interactionMode(ctx) && !hasTimeout) {
+    throw cliError("missing_timeout", "Non-interactive follow mode requires --timeout.", {
+      next: missingTimeoutNext(ctx),
+    });
+  }
+  if (hasTimeout) parseDuration(parsed.options.get("timeout"), "--timeout");
+}
+
 function createSignalState(enabled) {
   const state = { signal: null, listeners: [] };
   if (!enabled || typeof process?.once !== "function") return state;
@@ -1959,9 +2106,10 @@ function parseCommandLine(argv, deps) {
 }
 
 function validateBeforeExecute(ctx, command, parsed) {
-  const follow = false;
+  const follow = command.key === "watches run" && parsed.options.get("follow") === true;
   const helpMode = parsed.options.get("help") === true || (command.kind !== "command" && command.key !== "help");
   const fields = parseFields(parsed, command, follow, helpMode);
+  if (!helpMode && command.key === "watches run") validateRunInputs(ctx, parsed);
   return fields;
 }
 
@@ -2001,6 +2149,8 @@ export async function runCli(argv, deps = {}) {
     if (parsed.options.get("debug") === true) {
       ctx.io.stderr(`debug: command=${command.key}\n`);
     }
+    const follow = command.key === "watches run" && parsed.options.get("follow") === true;
+    if (follow && ctx.signalState.signal) return exitForSignal(ctx.signalState.signal);
     throwIfCanceled(ctx);
     return await dispatch(ctx, command, parsed);
   } catch (error) {
